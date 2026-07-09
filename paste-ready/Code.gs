@@ -5,6 +5,7 @@ const TIME_ZONE = 'America/Los_Angeles';
 const MIN_ACTIVITY_DATE = '2024-05-01';
 
 const SHEETS = Object.freeze({
+  START_HERE: 'START HERE',
   ACTIVITIES: 'Activity Log',
   RULES: 'Category Rules',
   SETTINGS: 'Settings',
@@ -280,6 +281,7 @@ function getOrCreateWorkbook_() {
 function setupWorkbook_(spreadsheet) {
   const activities = spreadsheet.getSheets()[0];
   activities.setName(SHEETS.ACTIVITIES);
+  const startHere = spreadsheet.insertSheet(SHEETS.START_HERE, 0);
   const rules = spreadsheet.insertSheet(SHEETS.RULES);
   const settings = spreadsheet.insertSheet(SHEETS.SETTINGS);
   const changeLog = spreadsheet.insertSheet(SHEETS.CHANGE_LOG);
@@ -303,13 +305,16 @@ function setupWorkbook_(spreadsheet) {
   changeLog.getRange(1, 1, 1, 5)
     .setValues([['Timestamp', 'Action', 'Activity ID', 'Details', 'User']]);
 
+  buildStartHereSheet_(spreadsheet);
   styleWorkbook_(spreadsheet);
   applyValidations_(spreadsheet);
+  applyWorkbookGuardrails_(spreadsheet);
   updateSettingsSheet_(spreadsheet);
 }
 
 function ensureWorkbookStructure_(spreadsheet) {
   const required = [
+    [SHEETS.START_HERE, ['PGS CU Assistant Workbook']],
     [SHEETS.ACTIVITIES, ACTIVITY_HEADERS],
     [SHEETS.RULES, RULE_HEADERS],
     [SHEETS.SETTINGS, ['Setting', 'Value', 'Purpose']],
@@ -321,7 +326,9 @@ function ensureWorkbookStructure_(spreadsheet) {
     if (!sheet) {
       sheet = spreadsheet.insertSheet(item[0]);
     }
-    sheet.getRange(1, 1, 1, item[1].length).setValues([item[1]]);
+    if (item[0] !== SHEETS.START_HERE) {
+      sheet.getRange(1, 1, 1, item[1].length).setValues([item[1]]);
+    }
   });
 
   const rulesSheet = spreadsheet.getSheetByName(SHEETS.RULES);
@@ -330,8 +337,10 @@ function ensureWorkbookStructure_(spreadsheet) {
   const rows = PGS_ACTIVITY_LIBRARY.map(activityRuleToRow_);
   rulesSheet.getRange(2, 1, rows.length, RULE_HEADERS.length).setValues(rows);
 
+  buildStartHereSheet_(spreadsheet);
   styleWorkbook_(spreadsheet);
   applyValidations_(spreadsheet);
+  applyWorkbookGuardrails_(spreadsheet);
 }
 
 function activityRuleToRow_(rule) {
@@ -358,9 +367,120 @@ function activityRuleToRow_(rule) {
   ];
 }
 
+function buildStartHereSheet_(spreadsheet) {
+  let sheet = spreadsheet.getSheetByName(SHEETS.START_HERE);
+  if (!sheet) sheet = spreadsheet.insertSheet(SHEETS.START_HERE, 0);
+
+  sheet.showSheet();
+  sheet.getDataRange().breakApart();
+  sheet.clear();
+  sheet.setHiddenGridlines(true);
+  sheet.setFrozenRows(0);
+  sheet.getRange('A1:F1').merge()
+    .setValue('PGS CU Assistant - START HERE')
+    .setBackground('#17365d')
+    .setFontColor('#ffffff')
+    .setFontSize(18)
+    .setFontWeight('bold')
+    .setHorizontalAlignment('center');
+
+  sheet.getRange('A3:F3').merge()
+    .setValue('Use the FamilyPD PGS website to add, edit, or delete activity records.')
+    .setBackground('#eaf4fb')
+    .setFontColor('#17365d')
+    .setFontWeight('bold')
+    .setWrap(true);
+
+  sheet.getRange('A5:B10').setValues([
+    ['Safe to do in this workbook', 'Avoid doing in this workbook'],
+    ['View and filter your Activity Log', 'Do not rename or delete sheets'],
+    ['Open evidence links and category folders', 'Do not change column headers'],
+    ['Review estimated and official CU totals', 'Do not sort only part of the Activity Log'],
+    ['Download or print a copy for your records', 'Do not edit Category Rules, Settings, or Change Log'],
+    ['Return to the web app for corrections', 'Do not paste a folder URL into the final evidence-link field']
+  ]);
+
+  sheet.getRange('A5:B5')
+    .setBackground('#dceaf7')
+    .setFontColor('#17365d')
+    .setFontWeight('bold');
+  sheet.getRange('A6:B10').setWrap(true).setVerticalAlignment('top');
+  sheet.getRange('A12:F12').merge()
+    .setValue('Important: the Sheet stores form entries. Evidence documents are uploaded by the teacher into Google Drive category folders; they are not copied automatically by the website.')
+    .setBackground('#fff4d6')
+    .setFontColor('#5b4500')
+    .setFontWeight('bold')
+    .setWrap(true);
+
+  sheet.setColumnWidth(1, 330);
+  sheet.setColumnWidth(2, 330);
+  sheet.setColumnWidths(3, 4, 100);
+  sheet.setRowHeight(1, 38);
+  sheet.setTabColor('#4d9b45');
+
+  if (sheet.getIndex() !== 1) {
+    spreadsheet.setActiveSheet(sheet);
+    spreadsheet.moveActiveSheet(1);
+  }
+}
+
+function applyWorkbookGuardrails_(spreadsheet) {
+  const activitySheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+  const internalSheets = [SHEETS.RULES, SHEETS.SETTINGS, SHEETS.CHANGE_LOG];
+
+  spreadsheet.getSheets().forEach(function(sheet) {
+    sheet.getProtections(SpreadsheetApp.ProtectionType.SHEET)
+      .filter(function(protection) {
+        return String(protection.getDescription() || '').indexOf('PGS Guardrail') === 0;
+      })
+      .forEach(function(protection) { protection.remove(); });
+
+    sheet.getProtections(SpreadsheetApp.ProtectionType.RANGE)
+      .filter(function(protection) {
+        return String(protection.getDescription() || '').indexOf('PGS Guardrail') === 0;
+      })
+      .forEach(function(protection) { protection.remove(); });
+  });
+
+  if (activitySheet) {
+    activitySheet.showSheet();
+    activitySheet.setTabColor('#2f75b5');
+    activitySheet.getRange(1, 1, 1, ACTIVITY_HEADERS.length)
+      .setNote('PGS Guardrail: Do not rename, delete, or reorder these headers. Use the web app to change records.');
+
+    activitySheet.protect()
+      .setDescription('PGS Guardrail - Use the web app to edit the Activity Log')
+      .setWarningOnly(true);
+
+    [1, 8, 9, 19, 20, 22, 23, 24, 25, 26].forEach(function(column) {
+      try { activitySheet.hideColumns(column); } catch (error) {}
+    });
+  }
+
+  internalSheets.forEach(function(name) {
+    const sheet = spreadsheet.getSheetByName(name);
+    if (!sheet) return;
+
+    sheet.setTabColor('#9aa7b4');
+    sheet.protect()
+      .setDescription('PGS Guardrail - Internal app data; do not edit')
+      .setWarningOnly(true);
+
+    try { sheet.hideSheet(); } catch (error) {}
+  });
+
+  const guide = spreadsheet.getSheetByName(SHEETS.START_HERE);
+  if (guide) {
+    guide.protect()
+      .setDescription('PGS Guardrail - Workbook instructions')
+      .setWarningOnly(true);
+  }
+}
+
 function styleWorkbook_(spreadsheet) {
   const navy = '#17365d';
   spreadsheet.getSheets().forEach(function(sheet) {
+    if (sheet.getName() === SHEETS.START_HERE) return;
     const lastColumn = Math.max(1, sheet.getLastColumn());
     sheet.setFrozenRows(1);
     sheet.getRange(1, 1, 1, lastColumn)

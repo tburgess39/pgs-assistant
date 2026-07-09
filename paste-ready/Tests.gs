@@ -151,6 +151,22 @@ function runAllPGSTests() {
     }
   });
 
+  test('Workbook guardrail sheet is configured', function() {
+    assertEqual_(SHEETS.START_HERE, 'START HERE');
+    if (typeof buildStartHereSheet_ !== 'function' ||
+        typeof applyWorkbookGuardrails_ !== 'function') {
+      throw new Error('Workbook guardrail functions are missing.');
+    }
+  });
+
+  test('Activity Log retains the protected technical columns', function() {
+    ['ID', 'Category Key', 'Sessions JSON', 'Record Type'].forEach(function(header) {
+      if (ACTIVITY_HEADERS.indexOf(header) === -1) {
+        throw new Error('Missing technical header: ' + header);
+      }
+    });
+  });
+
   test('May 1, 2024 cutoff is enforced', function() {
     let rejected = false;
     try {

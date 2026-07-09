@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     'switchRecordTypeButton','wizardProgress','activityStep1','activityStep2','activityStep3',
     'categoryKey','categoryGuidance','sessionSection','sessionInputBasis','sessionRows',
     'addSessionButton','sessionTotal','sessionWarning','quantityField','quantityLabel',
-    'quantity','quantityHelp','unitField','unit','paymentStatusField','paymentStatus',
+    'quantity','quantityHelp','quantityHelpButton','unitField','unit','unitHelpButton','paymentStatusField','paymentStatus',
     'titleIField','titleIException','clearActivityButton','nextToDetailsButton',
     'title','description','startDateField','startDateLabel','startDate',
     'endDateField','endDateLabel','endDate','organization','role','status',
@@ -637,11 +637,14 @@ function configureCategory(categoryKey) {
 
   if (['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0) {
     elements.quantityField.hidden = false;
-    elements.quantityLabel.textContent = rule.quantityLabel || 'Quantity';
+    elements.quantityLabel.childNodes[0].nodeValue =
+      (rule.quantityLabel || 'Quantity') + ' ';
     elements.quantityHelp.textContent = conciseQuantityHelp(rule);
+    elements.quantityHelpButton.dataset.help = quantityTooltip(rule);
     elements.quantity.step = String(rule.quantityStep || 1);
 
     elements.unitField.hidden = false;
+    elements.unitHelpButton.dataset.help = unitTooltip(rule);
     elements.unit.innerHTML = units.map(function(unit) {
       return '<option value="' + escapeHtml(unit) + '">' +
         escapeHtml(unitLabels[unit] || unit) + '</option>';
@@ -691,6 +694,37 @@ function entryInstruction(rule) {
 
   return rule.quantityHelp || rule.evidenceInputBasis ||
     ('Enter the ' + (rule.quantityLabel || 'quantity') + '.');
+}
+
+function quantityTooltip(rule) {
+  if (!rule) {
+    return 'Quantity is the number used to calculate this category.';
+  }
+
+  const examples = {
+    WRITE_IEP_MDT: 'Enter the number of qualifying IEPs or MDTs you wrote. Do not enter hours.',
+    IEP_MDT_TEAM: 'Enter the number of qualifying students or cases. Do not enter meeting hours.',
+    GRANT_RECIPIENT: 'Enter the number of grants actually awarded. Do not enter application or grant-writing hours.',
+    FOS_ASSIGNMENT: 'Enter the number of assigned field-observation students.',
+    PRACTICUM_ASSIGNMENT: 'Enter the number of qualifying weeks supporting the practicum student.',
+    STUDENT_TEACHER_ASSIGNMENT: 'Enter the number of qualifying weeks supporting the student teacher.',
+    MICRO_CREDENTIAL: 'Enter the number of approved Digital Promise micro-credentials earned.',
+    SECOND_ENDORSEMENT: 'Enter the number of qualifying endorsements maintained outside your primary assignment.'
+  };
+
+  return examples[rule.categoryKey] || rule.quantityHelp ||
+    'Enter the count, credits, CEUs, weeks, or documented duration required by this category.';
+}
+
+function unitTooltip(rule) {
+  const units = (rule && rule.units) || [];
+  const labels = units.map(function(unit) {
+    return unitLabels[unit] || unit;
+  });
+
+  return labels.length
+    ? 'Choose the unit shown on your official evidence: ' + labels.join(' or ') + '.'
+    : 'Only units allowed for the selected official category will appear here.';
 }
 
 function conciseQuantityHelp(rule) {

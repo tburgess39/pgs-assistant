@@ -204,7 +204,10 @@
 
         <div id="activityStep1" class="wizard-step active">
           <div class="field full">
-            <label for="categoryKey">Activity category</label>
+            <label for="categoryKey">Activity category
+  <button class="help-tip" type="button" aria-label="About activity category"
+    data-help="Choose the official PGS category that matches what you actually completed. Use Find My Category when you are unsure.">?</button>
+</label>
             <select id="categoryKey" required>
               <option value="">Loading categories...</option>
             </select>
@@ -240,18 +243,27 @@
 
           <div class="grid g2 calculation-fields">
             <div class="field" id="quantityField" hidden>
-              <label id="quantityLabel" for="quantity">Quantity</label>
+              <label id="quantityLabel" for="quantity">Quantity
+  <button class="help-tip" id="quantityHelpButton" type="button" aria-label="About quantity"
+    data-help="Quantity is the number used by the selected category. After you select a category, this becomes something specific such as number of IEPs, grants received, weeks, credits, or documented hours.">?</button>
+</label>
               <input id="quantity" type="number" min="0" step="1" value="0">
               <small id="quantityHelp"></small>
             </div>
 
             <div class="field" id="unitField" hidden>
-              <label for="unit">Unit</label>
+              <label for="unit">Unit
+  <button class="help-tip" id="unitHelpButton" type="button" aria-label="About unit"
+    data-help="The unit tells the calculator what the quantity represents, such as semester credits, quarter credits, IEPs, weeks, or CEUs. Only units allowed for the selected category will appear.">?</button>
+</label>
               <select id="unit"></select>
             </div>
 
             <div class="field" id="paymentStatusField" hidden>
-              <label for="paymentStatus">Payment status</label>
+              <label for="paymentStatus">Payment status
+  <button class="help-tip" type="button" aria-label="About payment status"
+    data-help="Unpaid means no compensation. Paid stipend or supplemental rate normally earns 1 CU per 6 qualifying hours. Time paid at the regular contractual rate is normally excluded unless the official guide specifically allows it.">?</button>
+</label>
               <select id="paymentStatus">
                 <option value="unpaid">Unpaid</option>
                 <option value="paid">Paid stipend / supplemental rate</option>
@@ -260,7 +272,10 @@
             </div>
 
             <div class="field" id="titleIField" hidden>
-              <label for="titleIException">Title I paid exception?</label>
+              <label for="titleIException">Title I paid exception?
+  <button class="help-tip" type="button" aria-label="About the Title I paid exception"
+    data-help="Choose Yes only when you serve at a Title I school and the official guide specifically allows paid work outside the contractual day to receive full CUs for this category. This applies only to certain activities, including qualifying PLC, tutoring, and mentor work. Choose No or Not sure when uncertain.">?</button>
+</label>
               <select id="titleIException">
                 <option value="no">No / Not sure</option>
                 <option value="yes">Yes</option>
@@ -308,12 +323,18 @@
             </div>
 
             <div class="field">
-              <label for="status">Tracking status</label>
+              <label for="status">Tracking status
+  <button class="help-tip" type="button" aria-label="About tracking status"
+    data-help="This is your private progress marker. Approved in ELMS or Confirmed in ELMS should be selected only after the activity and CU amount appear in your official ELMS record.">?</button>
+</label>
               <select id="status"></select>
             </div>
 
             <div class="field" id="officialApprovedField">
-              <label for="officialApprovedCUs">CUs shown or approved in ELMS</label>
+              <label for="officialApprovedCUs">CUs shown or approved in ELMS
+  <button class="help-tip" type="button" aria-label="About official ELMS CUs"
+    data-help="Enter this amount only after ELMS shows the official approved or automatically recorded CU total. Do not copy the assistant's estimate into this field.">?</button>
+</label>
               <input id="officialApprovedCUs" type="number" min="0" step=".01">
               <small>Only enter a value after it appears in ELMS.</small>
             </div>
@@ -335,7 +356,10 @@
           </label>
 
           <div class="field full">
-            <label for="evidenceLink">Final single-file evidence link</label>
+            <label for="evidenceLink">Final single-file evidence link
+  <button class="help-tip" type="button" aria-label="About the evidence link"
+    data-help="Paste the Google Drive link to the final combined evidence file that will be submitted in ELMS. Do not paste the category folder link.">?</button>
+</label>
             <input id="evidenceLink" type="url"
               placeholder="Paste the link to the final file, not the folder">
             <small>
@@ -445,6 +469,12 @@
           </p>
           <button id="createFoldersButton" class="btn green" type="button">Create or Verify My PGS Folders</button>
         </div>
+      </div>
+
+      <div class="notice info" style="margin-top:17px">
+        <strong>Sheet guardrails:</strong>
+        Use the website to add or edit records. The tracker Sheet is for viewing, filtering, and reference.
+        Internal tabs and technical columns are hidden, and protected areas display a warning before manual edits.
       </div>
 
       <div class="notice warn" style="margin-top:17px">

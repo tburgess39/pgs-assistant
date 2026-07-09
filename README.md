@@ -46,3 +46,21 @@ Category folder names now preserve readable spaces. For example:
 
 The previous sanitizer converted spaces into hyphens, which caused the folder-name
 test to fail even though the calculation and evidence tests passed.
+
+
+## Milestone 3.1 - Contextual Help and Workbook Guardrails
+
+- Added keyboard-accessible help icons for unfamiliar form terms.
+- Quantity and unit help changes with the selected category.
+- Explained the limited Title I paid exception in plain language.
+- Fixed the CSS issue that displayed fields before they were needed.
+- Added a START HERE worksheet.
+- Hid internal Category Rules, Settings, and Change Log tabs.
+- Hid technical Activity Log columns such as IDs, JSON, rule version, and record type.
+- Added warning-only protections to discourage manual edits without preventing
+  the Apps Script web app from maintaining the teacher-owned workbook.
+- Added header notes explaining that records should be changed through the web app.
+
+The workbook remains owned by the teacher. These controls prevent accidental
+changes; the owner can still override warnings or unhide sheets, so the web app
+continues to be the recommended editing interface.
