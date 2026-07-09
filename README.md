@@ -54,3 +54,23 @@ after May 1, 2024. Older activities require historical-rule review.
 
 This project does not replace official CCSD or CCEA guidance, ELMS, the PGS
 Reference Guide, Human Resources direction, or final PGS approval.
+
+
+## Milestone 2.5 - Automatic session hours
+
+Hour-based activities now use a session log instead of asking teachers to
+calculate decimal hours.
+
+Each session records:
+
+- Date
+- Start time
+- End time
+- Break minutes
+- Payment status
+- Automatically calculated net hours
+
+The app totals all sessions, derives the activity start/end dates, supports
+mixed paid and unpaid sessions, and recalculates the result again on the server
+before saving. Count-, credit-, fixed-value, and manual-review activities keep
+their category-specific inputs.
