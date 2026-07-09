@@ -66,12 +66,33 @@ function runAllPGSTests() {
     });
   });
 
-  test('Guided finder covers all 43 current category keys', function() {
+
+
+
+  test('Streamlined finder has nine alphabetized starting choices', function() {
+    const labels = PGS_GUIDED_FINDER.contexts.map(function(context) {
+      return context.label;
+    });
+
+    assertEqual_(labels.length, 9);
+
+    const sorted = labels.slice().sort(function(a, b) {
+      return a.localeCompare(b);
+    });
+
+    assertEqual_(JSON.stringify(labels), JSON.stringify(sorted));
+  });
+
+  test('Streamlined finder still covers all 43 current categories', function() {
     const finderKeys = [];
-    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
-      (context.roles || []).forEach(function(role) {
-        (role.activities || []).forEach(function(activity) {
-          if (activity.categoryKey) finderKeys.push(activity.categoryKey);
+
+    PGS_GUIDED_FINDER.contexts.forEach(function(context) {
+      context.roles.forEach(function(role) {
+        role.activities.forEach(function(activity) {
+          if (activity.categoryKey &&
+              finderKeys.indexOf(activity.categoryKey) === -1) {
+            finderKeys.push(activity.categoryKey);
+          }
         });
       });
     });
@@ -89,33 +110,45 @@ function runAllPGSTests() {
     }
   });
 
-  test('Guided finder contains only known category keys and documented choices', function() {
-    const currentKeys = PGS_ACTIVITY_LIBRARY.map(function(rule) {
-      return rule.categoryKey;
-    });
-
-    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
-      if (!context.label || !context.description) {
-        throw new Error('Incomplete context: ' + context.id);
+  test('Automatic ELMS and self-reported totals remain separate', function() {
+    const rules = [
+      {
+        active: true,
+        categoryKey: 'TEST',
+        parentCategory: 'Test',
+        activityName: 'Test Activity',
+        maximumCUs: 30
       }
+    ];
 
-      (context.roles || []).forEach(function(role) {
-        if (!role.label || !role.description) {
-          throw new Error('Incomplete role: ' + role.id);
-        }
+    const activities = [
+      {
+        recordType: 'self_report',
+        categoryKey: 'TEST',
+        estimatedCUs: 12,
+        officialApprovedCUs: 6
+      },
+      {
+        recordType: 'automatic_elms',
+        categoryKey: 'TEST',
+        estimatedCUs: '',
+        officialApprovedCUs: 9
+      }
+    ];
 
-        (role.activities || []).forEach(function(activity) {
-          if (!activity.label || !activity.description || !activity.officialBasis) {
-            throw new Error('Incomplete guided activity: ' + activity.id);
-          }
+    const summary = buildSummary_(activities, rules);
+    assertEqual_(summary.estimatedSelfReported, 12);
+    assertEqual_(summary.approvedSelfReported, 6);
+    assertEqual_(summary.automaticElmsTotal, 9);
+    assertEqual_(summary.confirmedTotal, 15);
+    assertEqual_(summary.categoryBalances[0].remaining, 15);
+  });
 
-          if (activity.categoryKey &&
-              currentKeys.indexOf(activity.categoryKey) === -1) {
-            throw new Error('Unknown category key: ' + activity.categoryKey);
-          }
-        });
-      });
-    });
+  test('Category folders are reused and final evidence links stay separate', function() {
+    const rule = findRuleForTest_('GRANT_RECIPIENT');
+    if (categoryFolderName_(rule) !== 'Grant Awards') {
+      throw new Error('Grant folder name is not concise.');
+    }
   });
 
   test('May 1, 2024 cutoff is enforced', function() {

@@ -3,12 +3,12 @@
 <head>
   <base target="_top">
   <meta charset="UTF-8">
-  <meta name="description" content="Private PGS CU Assistant with a complete category matcher and teacher-owned Google workspace.">
+  <meta name="description" content="Private FamilyPD PGS CU tracking and evidence workspace.">
   <style><?!= include('Styles'); ?></style>
 </head>
 <body>
 <div id="loading" class="loading">
-  <div><div class="spinner"></div><div id="loadingText">Opening your PGS workspace…</div></div>
+  <div><div class="spinner"></div><div id="loadingText">Opening your PGS workspace...</div></div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -16,21 +16,19 @@
   <aside>
     <div class="brand">
       <div class="logo">CU</div>
-      <div><h1>PGS CU Assistant</h1><small>Identify • Document • Prepare</small></div>
+      <div><h1>PGS CU Assistant</h1><small>Identify | Track | Document</small></div>
     </div>
     <nav>
-      <button class="active" data-view="dashboard">🏠 Dashboard</button>
-      <button data-view="matcher">🧭 Find My Category</button>
-      <button data-view="activity">➕ Add Activity</button>
-      <button data-view="directory">📚 Category Directory</button>
-      <button data-view="workspace">📁 Workspace Setup</button>
-      <button data-view="evidence">📎 Evidence Guide</button>
-      <button data-view="elms">✅ Prepare for ELMS</button>
-      <button data-view="records">📊 Activity Records</button>
+      <button class="active" data-view="dashboard">Dashboard</button>
+      <button data-view="matcher">Find My Category</button>
+      <button data-view="activity">Add or Track Activity</button>
+      <button data-view="records">My CU Records</button>
+      <button data-view="evidence">Evidence and ELMS</button>
+      <button data-view="workspace">My Google Workspace</button>
     </nav>
     <div class="note">
-      <strong>Private Workspace Build</strong><br>
-      The matcher recommends categories, but CCSD makes all final eligibility and approval decisions.
+      <strong>Your private workspace</strong><br>
+      Form entries are saved in your Google Sheet. You upload evidence files into your category folders.
     </div>
   </aside>
 
@@ -38,213 +36,221 @@
     <select class="mobile" id="mobileNav">
       <option value="dashboard">Dashboard</option>
       <option value="matcher">Find My Category</option>
-      <option value="activity">Add Activity</option>
-      <option value="directory">Category Directory</option>
-      <option value="workspace">Workspace Setup</option>
-      <option value="evidence">Evidence Guide</option>
-      <option value="elms">Prepare for ELMS</option>
-      <option value="records">Activity Records</option>
+      <option value="activity">Add or Track Activity</option>
+      <option value="records">My CU Records</option>
+      <option value="evidence">Evidence and ELMS</option>
+      <option value="workspace">My Google Workspace</option>
     </select>
 
     <div class="top">
-      <div><h2 id="heading">Dashboard</h2><p id="sub">One activity record powers the entire workflow.</p></div>
-      <a class="link" target="_blank" rel="noopener" href="https://ccsd.net/employees/current/employment/growth.php">Official CCSD PGS Resources ↗</a>
+      <div>
+        <h2 id="heading">Dashboard</h2>
+        <p id="sub">Track self-reported and automatically entered ELMS CUs in one place.</p>
+      </div>
+      <a class="link" target="_blank" rel="noopener"
+         href="https://ccsd.net/employees/current/employment/growth.php">
+        Official CCSD PGS Resources
+      </a>
     </div>
 
     <div class="workspace-banner">
       <div>
-        <strong id="workspaceStatus">Connecting to your teacher-owned workspace…</strong>
-        <div class="muted" id="workspaceDetails">The first opening creates the workbook automatically.</div>
+        <strong id="workspaceStatus">Connecting to your teacher-owned workspace...</strong>
+        <div class="muted" id="workspaceDetails"></div>
       </div>
       <div class="workspace-links">
-        <a id="workbookLink" href="#" target="_blank" rel="noopener" hidden>Open Sheet</a>
-        <a id="rootFolderLink" href="#" target="_blank" rel="noopener" hidden>Open PGS Folder</a>
+        <a id="workbookLink" href="#" target="_blank" rel="noopener" hidden>Open My Tracker Sheet</a>
+        <a id="rootFolderLink" href="#" target="_blank" rel="noopener" hidden>Open My PGS Folder</a>
       </div>
     </div>
 
     <div class="cutoff-banner" role="note">
-      <div class="cutoff-icon">📅</div>
+      <div class="cutoff-icon">Date</div>
       <div>
-        <strong>Applicability Notice</strong>
-        <p>This assistant, calculator, category matcher, evidence guidance, folder tools, and ELMS-preparation tools apply only to activities occurring on or after <strong>May 1, 2024</strong>.</p>
+        <strong>Current-guide activities only</strong>
+        <p>This assistant applies to activities occurring on or after <strong>May 1, 2024</strong>.</p>
       </div>
     </div>
 
     <section id="dashboard" class="view active">
       <div class="hero">
-        <h3>Describe the work. Let the assistant narrow the category.</h3>
-        <p>Teachers should not need to memorize all PGS activity names. For activities occurring on or after May 1, 2024, the matcher compares the activity against the complete current category library, explains the recommendation, and shows the documentation before the record is saved.</p>
+        <h3>Know where you stand before opening ELMS.</h3>
+        <p>
+          Find the correct category, enter only what that category requires,
+          organize the required evidence, and track CUs that ELMS enters automatically.
+        </p>
         <div class="actions">
-          <button class="btn gold" type="button" onclick="showView('matcher')">Find My Category</button>
-          <button class="btn white" type="button" onclick="showView('activity')">I Already Know It</button>
+          <button class="btn gold" type="button" id="dashboardFindButton">Find My Category</button>
+          <button class="btn white" type="button" id="dashboardSelfButton">I Know My Category</button>
+          <button class="btn white" type="button" id="dashboardAutoButton">Add CUs Already in ELMS</button>
         </div>
       </div>
 
-      <div class="grid g4 stats">
-        <div class="card stat"><div class="label">Current Activity Options</div><div class="value" id="libraryCount">0</div><small>Loaded from the full current guide</small></div>
-        <div class="card stat"><div class="label">Estimated CUs</div><div class="value" id="estimated">0.00</div><small>All activity estimates</small></div>
-        <div class="card stat"><div class="label">Approved CUs</div><div class="value" id="approved">0.00</div><small>Only official approvals entered</small></div>
-        <div class="card stat"><div class="label">Remaining</div><div class="value" id="remaining">225.00</div><small>Based on approved CUs</small></div>
+      <div class="grid dashboard-stats">
+        <div class="card stat">
+          <div class="label">Estimated Self-Reported</div>
+          <div class="value" id="estimatedSelf">0.00</div>
+          <small>Planned or entered activities, limited by category maximums</small>
+        </div>
+        <div class="card stat">
+          <div class="label">Approved Self-Reported</div>
+          <div class="value" id="approvedSelf">0.00</div>
+          <small>Only CUs approved in ELMS</small>
+        </div>
+        <div class="card stat">
+          <div class="label">Automatic ELMS CUs</div>
+          <div class="value" id="automaticElms">0.00</div>
+          <small>District/department activities confirmed in Advancement Status</small>
+        </div>
+        <div class="card stat">
+          <div class="label">Total Confirmed</div>
+          <div class="value" id="confirmedTotal">0.00</div>
+          <small>Approved self-reported plus automatic ELMS CUs</small>
+        </div>
+        <div class="card stat">
+          <div class="label">Remaining to 225</div>
+          <div class="value" id="remaining">225.00</div>
+          <small>Based only on confirmed CUs</small>
+        </div>
       </div>
+
+      <div class="notice info storage-note">
+        <strong>Where your information goes:</strong>
+        Everything typed into this assistant is saved in your teacher-owned Google Sheet.
+        Evidence files are not copied automatically; use the category folder button to upload them yourself.
+      </div>
+
       <div id="warningBox" class="notice warn"></div>
-      <div class="section"><h3>Annual Advancement Timeline</h3><p>Always verify dates on the official PGS page.</p></div>
-      <div class="grid g3">
-        <div class="card"><h3>June 1</h3><p>Request for Column Advancement deadline for the next contract year.</p></div>
-        <div class="card"><h3>August 31</h3><p>Complete all requirements and activities being used for the advancement cycle.</p></div>
-        <div class="card"><h3>October 1</h3><p>Submit all required documentation in ELMS for the current advancement cycle.</p></div>
-      </div>
     </section>
 
     <section id="matcher" class="view">
       <div class="card form">
         <div class="heading-actions">
           <div>
-            <h3>Guided Activity Category Finder</h3>
-            <p>Each step limits the next step to combinations supported by the current official PGS documentation.</p>
+            <h3>Find My Category</h3>
+            <p>Start broad. Each answer removes choices that do not apply.</p>
           </div>
-          <span class="verified-badge">43 current categories covered</span>
-        </div>
-
-        <div class="notice warn">
-          <strong>Date requirement:</strong> Use this finder only for activities occurring on or after May 1, 2024.
+          <span class="verified-badge">All 43 current categories mapped</span>
         </div>
 
         <div class="finder-steps">
           <div class="finder-step">
             <span class="step-number">1</span>
             <div class="field">
-              <label for="matcherContext">Where did the activity occur, or through whom was it provided or assigned?</label>
+              <label for="matcherContext">Where did it happen or who provided/assigned it?</label>
               <select id="matcherContext">
-                <option value="">Choose the setting or provider</option>
+                <option value="">Choose one</option>
               </select>
-              <small id="matcherContextHelp">Start here. The remaining choices will be limited automatically.</small>
+              <small id="matcherContextHelp">The list is alphabetized and grouped to reduce choices.</small>
             </div>
           </div>
 
           <div class="finder-step">
             <span class="step-number">2</span>
             <div class="field">
-              <label for="matcherRole">What was your role?</label>
+              <label for="matcherRole">What did you do?</label>
               <select id="matcherRole" disabled>
-                <option value="">Choose the setting/provider first</option>
+                <option value="">Choose the first answer</option>
               </select>
-              <small id="matcherRoleHelp">Only roles supported for the selected setting will appear.</small>
+              <small id="matcherRoleHelp">Only roles that fit the first answer will appear.</small>
             </div>
           </div>
 
-          <div class="finder-step activity-step">
+          <div class="finder-step">
             <span class="step-number">3</span>
             <div class="field full">
-              <label>Which official activity description most closely matches what happened?</label>
+              <label>Which description best matches?</label>
               <input id="matcherActivity" type="hidden">
               <div id="matcherActivityList" class="finder-activity-list">
-                <div class="empty-choice">Choose the setting/provider and your role to see the valid official activities.</div>
+                <div class="empty-choice">Choose the first two answers to see the available activities.</div>
               </div>
             </div>
           </div>
 
           <div class="finder-step">
             <span class="step-number">4</span>
-            <div class="fg compact-grid">
-              <div class="field">
-                <label for="matcherDate">Activity date</label>
-                <input id="matcherDate" type="date" min="2024-05-01" required>
-              </div>
-              <div class="field">
-                <label for="matcherDescription">Optional details that help confirm the match</label>
-                <textarea id="matcherDescription" placeholder="Example: The PLC met after school to analyze WRS data and plan instructional interventions."></textarea>
-              </div>
+            <div class="field">
+              <label for="matcherDate">Activity date</label>
+              <input id="matcherDate" type="date" min="2024-05-01">
             </div>
           </div>
         </div>
 
-        <div id="matcherSelectionHelp" class="selection-summary" hidden></div>
-
-        <div class="actions" style="justify-content:flex-end;margin-top:18px">
-          <button id="matchButton" class="btn blue" type="button" disabled>Review the Official Match</button>
-        </div>
+        <div id="specialAlertArea"></div>
+        <div id="matchResults" class="match-results"></div>
       </div>
-
-      <div id="specialAlertArea"></div>
-      <div id="matchResults" class="match-results"></div>
     </section>
 
     <section id="activity" class="view">
-      <div class="card form">
+      <form id="activityForm" class="card form">
+        <input id="activityId" type="hidden">
+        <input id="recordType" type="hidden" value="self_report">
+
         <div class="heading-actions">
           <div>
-            <h3 id="formHeading">Add a Professional Activity</h3>
-            <p>Choose directly or return to the matcher for help.</p><div class="notice warn"><strong>Only current-cycle rules:</strong> This form accepts activities occurring on or after May 1, 2024.</div>
+            <h3 id="formHeading">Add a Self-Reported Activity</h3>
+            <p id="formSubheading">First enter only the information used to calculate this category.</p>
           </div>
-          <button class="btn ghost" type="button" onclick="showView('matcher')">Help Me Choose</button>
+          <button type="button" class="btn small ghost" id="switchRecordTypeButton">
+            Track CUs already in ELMS
+          </button>
         </div>
-        <form id="activityForm">
-          <input id="activityId" type="hidden">
-          <div class="fg">
-            <div class="field full">
-              <label for="title">Activity title</label>
-              <input id="title" required placeholder="Example: BSU Student Success PLC Meeting">
-            </div>
-            <div class="field full">
-              <label for="description">What did you do?</label>
-              <textarea id="description" required></textarea>
-            </div>
-            <div class="field" id="startDateField">
-              <label id="startDateLabel" for="startDate">Start date</label>
-              <input id="startDate" type="date" min="2024-05-01" required>
-            </div>
-            <div class="field" id="endDateField">
-              <label id="endDateLabel" for="endDate">End date</label>
-              <input id="endDate" type="date" min="2024-05-01">
-            </div>
-            <div class="field">
-              <label for="organization">Organization / site</label>
-              <input id="organization">
-            </div>
-            <div class="field">
-              <label for="role">Your role</label>
-              <input id="role" placeholder="Participant, advisor, presenter…">
-            </div>
-            <div class="field full">
-              <label for="categoryKey">Confirmed activity category</label>
-              <select id="categoryKey" required><option value="">Loading full category library…</option></select>
-            </div>
-            <div id="categoryGuidance" class="category-guidance full" hidden></div>
 
-            <div class="session-panel full" id="sessionSection" hidden>
-              <div class="session-heading">
-                <div>
-                  <h4>Activity Session Log</h4>
-                  <p>Enter each meeting or work session. Hours are calculated automatically after breaks.</p>
-                </div>
-                <button class="btn small ghost" id="addSessionButton" type="button">+ Add Session</button>
+        <div class="wizard-progress" id="wizardProgress">
+          <span class="active" data-step-indicator="1">1. Calculate</span>
+          <span data-step-indicator="2">2. Activity Details</span>
+          <span data-step-indicator="3">3. Evidence</span>
+        </div>
+
+        <div id="activityStep1" class="wizard-step active">
+          <div class="field full">
+            <label for="categoryKey">Activity category</label>
+            <select id="categoryKey" required>
+              <option value="">Loading categories...</option>
+            </select>
+          </div>
+
+          <div id="categoryGuidance" class="category-guidance full" hidden></div>
+
+          <div class="session-panel full" id="sessionSection" hidden>
+            <div class="session-heading">
+              <div>
+                <h4>Qualifying Sessions</h4>
+                <p id="sessionInputBasis">Enter each qualifying date and exact start/end time.</p>
               </div>
-              <div class="session-note" id="sessionInputBasis">
-                Use separate activity records when the work belongs to different PGS categories. Payment status may vary by session.
-              </div>
-              <div class="session-table-wrap">
-                <table class="session-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Start</th>
-                      <th>End</th>
-                      <th>Break</th>
-                      <th>Payment</th>
-                      <th>Hours</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="sessionRows"></tbody>
-                </table>
-              </div>
-              <div class="session-total">
-                <span>Total qualifying time</span>
-                <strong id="sessionTotal">0.00 hours</strong>
-              </div>
-              <div class="notice warn" id="sessionWarning" hidden></div>
+              <button class="btn small ghost" id="addSessionButton" type="button">Add Session</button>
             </div>
-            <div class="field" id="paymentStatusField">
+            <div class="session-table-wrap">
+              <table class="session-table">
+                <thead>
+                  <tr>
+                    <th>Date</th><th>Start</th><th>End</th><th>Break</th>
+                    <th>Payment</th><th>Hours</th><th></th>
+                  </tr>
+                </thead>
+                <tbody id="sessionRows"></tbody>
+              </table>
+            </div>
+            <div class="session-total">
+              <span>Total qualifying time</span>
+              <strong id="sessionTotal">0.00 hours</strong>
+            </div>
+            <div class="notice warn" id="sessionWarning" hidden></div>
+          </div>
+
+          <div class="grid g2 calculation-fields">
+            <div class="field" id="quantityField" hidden>
+              <label id="quantityLabel" for="quantity">Quantity</label>
+              <input id="quantity" type="number" min="0" step="1" value="0">
+              <small id="quantityHelp"></small>
+            </div>
+
+            <div class="field" id="unitField" hidden>
+              <label for="unit">Unit</label>
+              <select id="unit"></select>
+            </div>
+
+            <div class="field" id="paymentStatusField" hidden>
               <label for="paymentStatus">Payment status</label>
               <select id="paymentStatus">
                 <option value="unpaid">Unpaid</option>
@@ -252,129 +258,205 @@
                 <option value="contract">Regular contractual rate</option>
               </select>
             </div>
-            <div class="field" id="quantityField">
-              <label id="quantityLabel" for="quantity">Quantity</label>
-              <input id="quantity" type="number" min="0" step="1" value="0">
-              <small id="quantityHelp"></small>
-            </div>
-            <div class="field" id="unitField">
-              <label for="unit">Calculation unit</label>
-              <select id="unit"><option value="hours">Hours</option></select>
-            </div>
-            <div class="field" id="titleIField">
-              <label for="titleIException">Title I paid exception applicable?</label>
+
+            <div class="field" id="titleIField" hidden>
+              <label for="titleIException">Title I paid exception?</label>
               <select id="titleIException">
                 <option value="no">No / Not sure</option>
                 <option value="yes">Yes</option>
               </select>
             </div>
-            <div class="field">
-              <label for="status">Status</label>
-              <select id="status">
-                <option>Needs evidence</option>
-                <option>In progress</option>
-                <option>Ready for ELMS</option>
-                <option>Submitted</option>
-                <option>Returned for corrections</option>
-                <option>Approved — enter only after official CCSD approval</option>
-                <option>Denied</option>
-              </select>
+          </div>
+
+          <div class="actions wizard-actions">
+            <button type="button" class="btn ghost" id="clearActivityButton">Clear</button>
+            <button type="button" class="btn blue" id="nextToDetailsButton">Next: Activity Details</button>
+          </div>
+        </div>
+
+        <div id="activityStep2" class="wizard-step">
+          <div class="grid g2">
+            <div class="field full">
+              <label for="title">Activity name</label>
+              <input id="title" required placeholder="Example: Quarter 1 CTE PLC">
             </div>
+
+            <div class="field full">
+              <label for="description">Short description</label>
+              <textarea id="description" required
+                placeholder="Briefly describe what occurred."></textarea>
+            </div>
+
+            <div class="field" id="startDateField">
+              <label id="startDateLabel" for="startDate">Start date</label>
+              <input id="startDate" type="date" min="2024-05-01">
+            </div>
+
+            <div class="field" id="endDateField">
+              <label id="endDateLabel" for="endDate">End date</label>
+              <input id="endDate" type="date" min="2024-05-01">
+            </div>
+
             <div class="field">
-              <label for="officialApprovedCUs">Official approved CUs</label>
+              <label for="organization">Organization or school/site</label>
+              <input id="organization">
+            </div>
+
+            <div class="field">
+              <label for="role">Your role</label>
+              <input id="role" placeholder="Participant, mentor, presenter...">
+            </div>
+
+            <div class="field">
+              <label for="status">Tracking status</label>
+              <select id="status"></select>
+            </div>
+
+            <div class="field" id="officialApprovedField">
+              <label for="officialApprovedCUs">CUs shown or approved in ELMS</label>
               <input id="officialApprovedCUs" type="number" min="0" step=".01">
+              <small>Only enter a value after it appears in ELMS.</small>
             </div>
-            <div class="field full">
-              <label for="evidenceLink">Google Drive evidence link</label>
-              <input id="evidenceLink" type="url" placeholder="https://drive.google.com/...">
-            </div>
-            <div class="field full">
-              <label for="notes">Private notes</label>
-              <textarea id="notes"></textarea>
-            </div>
-            <label class="checkline full">
-              <input id="createFolder" type="checkbox">
-              Create a Google Drive evidence folder when saving.
-            </label>
           </div>
-          <div class="actions" style="justify-content:flex-end;margin-top:18px">
-            <button type="reset" class="btn ghost">Clear</button>
-            <button id="saveButton" class="btn blue">Calculate & Save Once</button>
+
+          <div class="actions wizard-actions">
+            <button type="button" class="btn ghost" id="backToCalculationButton">Back</button>
+            <button type="button" class="btn blue" id="nextToEvidenceButton">Next: Evidence</button>
+            <button type="button" class="btn blue" id="saveAutomaticButton" hidden>Save ELMS Tracking Record</button>
           </div>
-        </form>
-        <div class="result" id="result">
-          <h3>Saved Result</h3>
-          <div class="rg">
-            <div class="rb"><small>Category</small><strong id="resultCategory">—</strong></div>
-            <div class="rb"><small>Estimated CUs</small><strong id="resultCUs">—</strong></div>
-            <div class="rb"><small>Rule version</small><strong id="resultRule">—</strong></div>
-            <div class="rb"><small>Status</small><strong id="resultStatus">—</strong></div>
+        </div>
+
+        <div id="activityStep3" class="wizard-step">
+          <div id="evidenceRequirementBox" class="evidence-simple"></div>
+
+          <label class="checkline full" id="createFolderLine">
+            <input id="createFolder" type="checkbox" checked>
+            Create or reuse this category's Google Drive folder when I save.
+          </label>
+
+          <div class="field full">
+            <label for="evidenceLink">Final single-file evidence link</label>
+            <input id="evidenceLink" type="url"
+              placeholder="Paste the link to the final file, not the folder">
+            <small>
+              Leave blank until the final combined file is ready. The folder link is not the ELMS evidence link.
+            </small>
           </div>
+
+          <div class="field full">
+            <label for="notes">Private notes</label>
+            <textarea id="notes" placeholder="Optional reminder for yourself"></textarea>
+          </div>
+
+          <div class="actions wizard-actions">
+            <button type="button" class="btn ghost" id="backToDetailsButton">Back</button>
+            <button id="saveButton" class="btn blue">Save Activity</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="result" id="result">
+        <h3>Saved</h3>
+        <div class="rg">
+          <div class="rb"><small>Category</small><strong id="resultCategory">-</strong></div>
+          <div class="rb"><small>Estimated CUs</small><strong id="resultCUs">-</strong></div>
+          <div class="rb"><small>Status</small><strong id="resultStatus">-</strong></div>
+        </div>
+        <div class="actions">
+          <a id="resultFolderLink" class="btn green" target="_blank" rel="noopener" hidden>
+            Open Category Folder
+          </a>
+          <a id="resultWorkbookLink" class="btn ghost" target="_blank" rel="noopener">
+            Open Tracker Sheet
+          </a>
         </div>
       </div>
     </section>
 
-    <section id="directory" class="view">
+    <section id="records" class="view">
       <div class="card">
         <div class="heading-actions">
-          <div><h3>Complete Current Category Directory</h3><p id="directoryCount">Loading…</p><p class="verified-label" id="ruleAuditLabel"></p></div>
-          <input id="directorySearch" class="search-box" placeholder="Search categories, examples, or keywords">
+          <div>
+            <h3>My CU Records</h3>
+            <p>Self-reported and automatic ELMS records remain separate so totals are not duplicated.</p>
+          </div>
+          <button class="btn small blue" type="button" id="recordsAddButton">Add Record</button>
         </div>
-        <div id="directoryGroups"></div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Activity</th><th>Type</th><th>Category</th><th>Estimated</th>
+                <th>Confirmed</th><th>Status</th><th>Evidence</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"><tr><td colspan="8">Loading...</td></tr></tbody>
+          </table>
+        </div>
       </div>
-      <details class="card" style="margin-top:17px">
-        <summary><strong>Historical categories no longer shown as current choices</strong></summary>
-        <p>These remain in the project archive so the system does not lose the history, but they are not presented as current categories.</p>
-        <div id="expiredList" class="columns-list"></div>
-      </details>
-    </section>
 
-    <section id="workspace" class="view">
-      <div class="grid g2">
-        <div class="card"><h3>Teacher-Owned Workbook</h3><p>One Activity Log, complete Category Rules, Settings, and Change Log.</p><button id="openWorkbookButton" class="btn blue" type="button">Open My Workbook</button></div>
-        <div class="card"><h3>Drive Folder Structure</h3><p>Create the PGS folders once; each activity can receive its own evidence folder.</p><button id="createFoldersButton" class="btn green" type="button">Create / Verify Folders</button></div>
+      <div class="card" style="margin-top:17px">
+        <h3>CU Progress by Category</h3>
+        <p>Category maximums apply to each column movement.</p>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th><th>Estimated</th><th>Approved Self-Reported</th>
+                <th>Automatic ELMS</th><th>Total Confirmed</th><th>Maximum</th><th>Remaining</th>
+              </tr>
+            </thead>
+            <tbody id="categoryBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <section id="evidence" class="view">
       <div class="card form">
-        <h3>Category-Specific Evidence Guide</h3>
-        <p>Select a saved activity. The guide is generated from the exact category already stored in the Activity Log.</p>
+        <h3>Evidence and ELMS Preparation</h3>
+        <p>Select a saved activity to see only the evidence required for that category.</p>
         <div class="field">
           <label for="evidenceActivitySelect">Saved activity</label>
-          <select id="evidenceActivitySelect"><option value="">Choose an activity</option></select>
+          <select id="evidenceActivitySelect">
+            <option value="">Choose an activity</option>
+          </select>
         </div>
       </div>
       <div id="evidenceGuideOutput" style="margin-top:17px"></div>
     </section>
 
-    <section id="elms" class="view">
-      <div class="notice warn"><strong>Single-file requirement:</strong> A folder is not the final ELMS submission. For self-reported activities, combine the required original, unaltered documentation into one file and submit the share link to that file.</div>
+    <section id="workspace" class="view">
       <div class="grid g2">
-        <div class="card"><h3>Before Opening ELMS</h3><p>Confirm the category, calculation inputs, forms, signatures, final single-file packet, CCSD sharing permissions, and deadlines.</p></div>
-        <div class="card"><h3>Current Boundary</h3><p>The assistant organizes and prepares the record. It does not directly submit into ELMS.</p></div>
-      </div>
-      <div class="section"><h3>Activity Readiness Review</h3><p>Generated from the same Activity Log records.</p></div>
-      <div id="elmsReadinessOutput"></div>
-    </section>
+        <div class="card">
+          <h3>Your Tracker Sheet</h3>
+          <p>
+            Every form entry is stored in a Google Sheet owned by your signed-in account.
+            The app does not use a separate FamilyPD database.
+          </p>
+          <button id="openWorkbookButton" class="btn blue" type="button">Open My Tracker Sheet</button>
+        </div>
 
-    <section id="records" class="view">
-      <div class="card">
-        <h3>Activity Records</h3>
-        <div style="overflow:auto">
-          <table>
-            <thead><tr><th>Activity</th><th>Category</th><th>Quantity</th><th>Estimated</th><th>Official</th><th>Status</th><th>Evidence</th><th>Actions</th></tr></thead>
-            <tbody id="recordsBody"><tr><td colspan="8">Loading records…</td></tr></tbody>
-          </table>
+        <div class="card">
+          <h3>Your Category Evidence Folders</h3>
+          <p>
+            The app creates reusable category folders. You still upload the actual certificates,
+            redacted IEP pages, agendas, award notices, and other evidence.
+          </p>
+          <button id="createFoldersButton" class="btn green" type="button">Create or Verify My PGS Folders</button>
         </div>
       </div>
-      <div class="card" style="margin-top:17px">
-        <h3>Category Balances</h3>
-        <div style="overflow:auto"><table><thead><tr><th>Category</th><th>Recorded</th><th>Countable</th><th>Maximum</th><th>Over Maximum</th><th>Remaining</th></tr></thead><tbody id="categoryBody"></tbody></table></div>
+
+      <div class="notice warn" style="margin-top:17px">
+        <strong>ELMS file-link reminder:</strong>
+        Submit the link to the final combined evidence file. Do not submit the category folder link.
       </div>
     </section>
 
-    <footer><strong>Disclaimer:</strong> Unofficial educator-created guidance. The matcher does not guarantee eligibility or approval. Verify current CCSD PGS guidance and announcements.</footer>
+    <footer>
+      <strong>Disclaimer:</strong> Unofficial educator-created guidance.
+      CCSD makes all final eligibility and CU approval decisions.
+    </footer>
   </main>
 </div>
 <?!= include('Client'); ?>

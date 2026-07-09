@@ -360,3 +360,90 @@ details summary{cursor:pointer;color:var(--navy)}
 }
 
 #quantityHelp{display:block;margin-top:6px;color:var(--muted);line-height:1.4}
+
+/* Milestone 3.0 streamlined workflow */
+.dashboard-stats{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:13px;
+}
+.storage-note{margin-top:16px}
+.wizard-progress{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:18px 0;
+}
+.wizard-progress span{
+  padding:8px 12px;
+  border-radius:999px;
+  background:#e9eef5;
+  color:#5e6d7d;
+  font-size:12px;
+  font-weight:900;
+}
+.wizard-progress span.active{
+  background:var(--navy);
+  color:#fff;
+}
+.wizard-step{display:none}
+.wizard-step.active{display:block}
+.wizard-actions{
+  justify-content:space-between;
+  margin-top:20px;
+  border-top:1px solid #e3e9f0;
+  padding-top:16px;
+}
+.simple-guidance{
+  display:grid;
+  gap:9px;
+}
+.simple-guidance > div{
+  display:grid;
+  grid-template-columns:125px minmax(0,1fr);
+  gap:12px;
+  padding:12px 14px;
+  border:1px solid #dbe5ef;
+  border-radius:10px;
+  background:#fff;
+}
+.simple-guidance strong{color:var(--navy)}
+.simple-guidance span{color:#3d4d60;line-height:1.5}
+.category-guidance{
+  padding:15px;
+  border:1px solid #c8dced;
+  border-radius:13px;
+  background:#f4f9fd;
+}
+.evidence-simple{
+  padding:18px;
+  border:1px solid #c8dced;
+  border-radius:13px;
+  background:#f8fbfe;
+}
+.evidence-simple h3{margin-top:0;color:var(--navy)}
+.simplified-match .simple-guidance{margin:14px 0}
+.finder-activity-card small{display:none}
+.calculation-fields{margin-top:14px}
+.result .actions{margin-top:15px}
+.result.show{display:block}
+details{
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid #dce4ed;
+  border-radius:9px;
+  background:#fafcfe;
+}
+details summary{
+  cursor:pointer;
+  color:var(--navy);
+  font-weight:800;
+}
+@media(max-width:1200px){
+  .dashboard-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .dashboard-stats{grid-template-columns:1fr}
+  .simple-guidance > div{grid-template-columns:1fr;gap:4px}
+  .wizard-actions{flex-direction:column-reverse}
+  .wizard-actions .btn{width:100%}
+}

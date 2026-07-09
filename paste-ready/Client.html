@@ -4,52 +4,85 @@
 const MIN_ACTIVITY_DATE = '2024-05-01';
 
 const pageMeta = {
-  dashboard: ['Dashboard', 'One activity record powers the entire workflow.'],
-  matcher: ['Find My Category', 'Describe the work and compare the strongest current category matches.'],
-  activity: ['Add Activity', 'Confirm the category, calculation details, and evidence record.'],
-  directory: ['Category Directory', 'Browse every current activity option in the library.'],
-  workspace: ['Workspace Setup', 'Create the teacher-owned Sheet and Drive structure.'],
-  evidence: ['Evidence Guide', 'Use category-specific documentation guidance.'],
-  elms: ['Prepare for ELMS', 'Gather everything before entering the official district system.'],
-  records: ['Activity Records', 'Review progress, evidence, and category balances.']
+  dashboard: ['Dashboard', 'Track self-reported and automatically entered ELMS CUs in one place.'],
+  matcher: ['Find My Category', 'Start broad and see only the activities that apply.'],
+  activity: ['Add or Track Activity', 'Enter only the information required for the selected category.'],
+  records: ['My CU Records', 'Review estimated, approved, and automatic ELMS CUs.'],
+  evidence: ['Evidence and ELMS', 'See exactly what belongs in the category folder.'],
+  workspace: ['My Google Workspace', 'Your Sheet stores entries; your folders store evidence files.']
 };
 
 const unitLabels = {
-  hours: 'Hours', semester_credit: 'Semester credits',
-  quarter_credit: 'Quarter credits', iep_mdt: 'IEPs / MDTs written',
-  student_case: 'Students / cases', fos_student: 'FOS students',
-  week: 'Weeks', award: 'Awards', grant: 'Grants',
-  microcredential: 'Micro-credentials', submission: 'Submission',
-  certification: 'Certification', endorsement: 'Endorsements',
-  documented_hours: 'Documented clock hours', ceu: 'CEUs listed on certificate'
+  hours: 'Hours',
+  semester_credit: 'Semester credits',
+  quarter_credit: 'Quarter credits',
+  iep_mdt: 'IEPs / MDTs written',
+  student_case: 'Students / cases',
+  fos_student: 'FOS students',
+  week: 'Weeks',
+  award: 'Awards',
+  grant: 'Grants',
+  microcredential: 'Micro-credentials',
+  submission: 'Submission',
+  certification: 'Certification',
+  endorsement: 'Endorsements',
+  documented_hours: 'Documented clock hours',
+  ceu: 'CEUs listed on certificate'
 };
 
+const selfStatuses = [
+  'Planning',
+  'Needs evidence',
+  'Ready for ELMS',
+  'Submitted to ELMS',
+  'Returned for corrections',
+  'Approved in ELMS',
+  'Denied'
+];
+
+const automaticStatuses = [
+  'Waiting to appear in ELMS',
+  'Confirmed in ELMS'
+];
+
 const state = {
-  activities: [], rules: [], workspace: {}, summary: {},
-  warnings: [], specialRules: [], expiredActivityNames: [], ruleAudit: {}, finder: {contexts: []}
+  activities: [],
+  rules: [],
+  workspace: {},
+  summary: {},
+  warnings: [],
+  specialRules: [],
+  finder: {contexts: []},
+  currentStep: 1
 };
 
 const elements = {};
 
 document.addEventListener('DOMContentLoaded', function() {
   [
-    'loading','loadingText','toast','mobileNav','heading','sub','workspaceStatus',
-    'workspaceDetails','workbookLink','rootFolderLink','libraryCount','estimated',
-    'approved','remaining','warningBox','matcherDescription','matcherRole',
-    'matcherContext','matcherActivity','matcherActivityList','matcherDate','matchButton',
-    'matcherContextHelp','matcherRoleHelp','matcherSelectionHelp','specialAlertArea',
-    'matchResults','activityForm','activityId','title','description','startDate',
-    'endDate','organization','role','categoryKey','categoryGuidance','paymentStatus',
-    'quantity','quantityLabel','unit','titleIException','status','officialApprovedCUs',
-    'evidenceLink','notes','createFolder','saveButton','formHeading','result',
-    'resultCategory','resultCUs','resultRule','resultStatus','directoryCount',
-    'directorySearch','directoryGroups','expiredList','openWorkbookButton',
-    'createFoldersButton','recordsBody','categoryBody','evidenceActivitySelect',
-    'evidenceGuideOutput','elmsReadinessOutput','ruleAuditLabel',
-    'startDateField','endDateField','startDateLabel','endDateLabel','paymentStatusField',
-    'quantityField','quantityHelp','unitField','titleIField','sessionInputBasis',
-    'sessionSection','sessionRows','addSessionButton','sessionTotal','sessionWarning'
-  ].forEach(function(id) { elements[id] = document.getElementById(id); });
+    'loading','loadingText','toast','mobileNav','heading','sub',
+    'workspaceStatus','workspaceDetails','workbookLink','rootFolderLink',
+    'estimatedSelf','approvedSelf','automaticElms','confirmedTotal','remaining',
+    'warningBox','dashboardFindButton','dashboardSelfButton','dashboardAutoButton',
+    'matcherContext','matcherContextHelp','matcherRole','matcherRoleHelp',
+    'matcherActivity','matcherActivityList','matcherDate','specialAlertArea','matchResults',
+    'activityForm','activityId','recordType','formHeading','formSubheading',
+    'switchRecordTypeButton','wizardProgress','activityStep1','activityStep2','activityStep3',
+    'categoryKey','categoryGuidance','sessionSection','sessionInputBasis','sessionRows',
+    'addSessionButton','sessionTotal','sessionWarning','quantityField','quantityLabel',
+    'quantity','quantityHelp','unitField','unit','paymentStatusField','paymentStatus',
+    'titleIField','titleIException','clearActivityButton','nextToDetailsButton',
+    'title','description','startDateField','startDateLabel','startDate',
+    'endDateField','endDateLabel','endDate','organization','role','status',
+    'officialApprovedField','officialApprovedCUs','backToCalculationButton',
+    'nextToEvidenceButton','saveAutomaticButton','evidenceRequirementBox',
+    'createFolderLine','createFolder','evidenceLink','notes','backToDetailsButton',
+    'saveButton','result','resultCategory','resultCUs','resultStatus',
+    'resultFolderLink','resultWorkbookLink','recordsAddButton','recordsBody','categoryBody',
+    'evidenceActivitySelect','evidenceGuideOutput','openWorkbookButton','createFoldersButton'
+  ].forEach(function(id) {
+    elements[id] = document.getElementById(id);
+  });
 
   bindEvents();
   addSessionRow();
@@ -58,22 +91,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function bindEvents() {
   document.querySelectorAll('nav button').forEach(function(button) {
-    button.addEventListener('click', function() { showView(button.dataset.view); });
+    button.addEventListener('click', function() {
+      showView(button.dataset.view);
+    });
   });
-  elements.mobileNav.addEventListener('change', function(event) { showView(event.target.value); });
+
+  elements.mobileNav.addEventListener('change', function(event) {
+    showView(event.target.value);
+  });
+
+  elements.dashboardFindButton.addEventListener('click', function() {
+    showView('matcher');
+  });
+
+  elements.dashboardSelfButton.addEventListener('click', function() {
+    startNewActivity('self_report');
+  });
+
+  elements.dashboardAutoButton.addEventListener('click', function() {
+    startNewActivity('automatic_elms');
+  });
+
+  elements.recordsAddButton.addEventListener('click', function() {
+    startNewActivity('self_report');
+  });
+
   elements.matcherContext.addEventListener('change', populateFinderRoles);
   elements.matcherRole.addEventListener('change', renderFinderActivities);
   elements.matcherActivityList.addEventListener('change', selectFinderActivity);
-  elements.matcherDate.addEventListener('change', updateFinderButton);
-  elements.matchButton.addEventListener('click', runMatcher);
+
   elements.categoryKey.addEventListener('change', function() {
     configureCategory(elements.categoryKey.value);
   });
-  elements.directorySearch.addEventListener('input', renderDirectory);
-  elements.evidenceActivitySelect.addEventListener('change', renderEvidenceGuide);
-  elements.addSessionButton.addEventListener('click', function() { addSessionRow(); });
+
+  elements.switchRecordTypeButton.addEventListener('click', function() {
+    const nextType = elements.recordType.value === 'automatic_elms'
+      ? 'self_report'
+      : 'automatic_elms';
+    startNewActivity(nextType);
+  });
+
+  elements.addSessionButton.addEventListener('click', function() {
+    addSessionRow();
+  });
+
   elements.sessionRows.addEventListener('input', updateSessionTotals);
   elements.sessionRows.addEventListener('change', updateSessionTotals);
+
   elements.sessionRows.addEventListener('click', function(event) {
     const button = event.target.closest('button[data-remove-session]');
     if (!button) return;
@@ -81,42 +145,66 @@ function bindEvents() {
     if (!elements.sessionRows.children.length) addSessionRow();
     updateSessionTotals();
   });
-  elements.activityForm.addEventListener('submit', saveActivity);
-  elements.activityForm.addEventListener('reset', function() { setTimeout(resetFormState, 0); });
-  elements.openWorkbookButton.addEventListener('click', function() {
-    if (state.workspace.spreadsheetUrl) window.open(state.workspace.spreadsheetUrl, '_blank', 'noopener');
+
+  elements.clearActivityButton.addEventListener('click', function() {
+    startNewActivity(elements.recordType.value);
   });
-  elements.createFoldersButton.addEventListener('click', createWorkspaceFolders);
+
+  elements.nextToDetailsButton.addEventListener('click', goToDetails);
+  elements.backToCalculationButton.addEventListener('click', function() {
+    showActivityStep(1);
+  });
+  elements.nextToEvidenceButton.addEventListener('click', goToEvidence);
+  elements.backToDetailsButton.addEventListener('click', function() {
+    showActivityStep(2);
+  });
+  elements.saveAutomaticButton.addEventListener('click', saveActivity);
+  elements.activityForm.addEventListener('submit', saveActivity);
+
+  elements.status.addEventListener('change', updateOfficialField);
+
   elements.recordsBody.addEventListener('click', function(event) {
     const button = event.target.closest('button[data-action]');
     if (!button) return;
+
     if (button.dataset.action === 'edit') editActivity(button.dataset.id);
     if (button.dataset.action === 'delete') removeActivity(button.dataset.id);
-    if (button.dataset.action === 'folder') createActivityFolder(button.dataset.id);
+    if (button.dataset.action === 'folder') createCategoryFolder(button.dataset.id);
   });
-  document.body.addEventListener('click', function(event) {
-    const useButton = event.target.closest('button[data-use-category]');
-    if (useButton) useCategory(useButton.dataset.useCategory);
+
+  elements.evidenceActivitySelect.addEventListener('change', renderEvidenceGuide);
+
+  elements.openWorkbookButton.addEventListener('click', function() {
+    if (state.workspace.spreadsheetUrl) {
+      window.open(state.workspace.spreadsheetUrl, '_blank', 'noopener');
+    }
   });
+
+  elements.createFoldersButton.addEventListener('click', createWorkspaceFolders);
 }
 
 function runServer(method, payload) {
   return new Promise(function(resolve, reject) {
-    const runner = google.script.run.withSuccessHandler(resolve)
+    const runner = google.script.run
+      .withSuccessHandler(resolve)
       .withFailureHandler(function(error) {
         reject(new Error(error && error.message ? error.message : String(error)));
       });
+
     if (method === 'getBootstrapData') runner.getBootstrapData();
     else if (method === 'saveActivity') runner.saveActivity(payload);
     else if (method === 'deleteActivity') runner.deleteActivity(payload);
     else if (method === 'createWorkspaceFolders') runner.createWorkspaceFolders();
-    else if (method === 'createEvidenceFolderForActivity') runner.createEvidenceFolderForActivity(payload);
-    else reject(new Error('Unknown server method.'));
+    else if (method === 'createEvidenceFolderForActivity') {
+      runner.createEvidenceFolderForActivity(payload);
+    } else {
+      reject(new Error('Unknown server method.'));
+    }
   });
 }
 
 async function loadBootstrap() {
-  setLoading(true, 'Loading the complete PGS category library...');
+  setLoading(true, 'Loading your PGS tracker...');
   try {
     applyBootstrap(await runServer('getBootstrapData'));
   } catch (error) {
@@ -128,67 +216,106 @@ async function loadBootstrap() {
 
 function applyBootstrap(data) {
   state.activities = data.activities || [];
-  state.rules = (data.rules || []).filter(function(rule) { return rule.active; });
+  state.rules = (data.rules || []).filter(function(rule) {
+    return rule.active;
+  });
   state.workspace = data.workspace || {};
   state.summary = data.summary || {};
   state.warnings = data.warnings || [];
   state.specialRules = data.specialRules || [];
   state.finder = data.finderData || {contexts: []};
-  state.expiredActivityNames = data.expiredActivityNames || [];
-  state.ruleAudit = data.ruleAudit || {};
 
   populateCategories();
   initializeGuidedFinder();
   renderWorkspace();
-  renderDashboard(data.libraryCount || state.rules.length);
-  renderDirectory();
-  renderExpired();
+  renderDashboard();
   renderRecords();
   populateEvidenceActivities();
   renderEvidenceGuide();
-  renderElmsReadiness();
-  renderRuleAudit();
+
+  elements.resultWorkbookLink.href = state.workspace.spreadsheetUrl || '#';
+}
+
+function renderWorkspace() {
+  const hasWorkbook = Boolean(state.workspace.spreadsheetUrl);
+  const hasFolder = Boolean(state.workspace.rootFolderUrl);
+
+  elements.workspaceStatus.textContent = hasWorkbook
+    ? 'Connected to your teacher-owned Google Sheet.'
+    : 'Your tracker Sheet has not been created yet.';
+
+  elements.workspaceDetails.textContent =
+    'Entries are saved in the Sheet. Evidence files remain under your control in Google Drive.';
+
+  setLink(elements.workbookLink, state.workspace.spreadsheetUrl, 'Open My Tracker Sheet');
+  setLink(elements.rootFolderLink, state.workspace.rootFolderUrl, 'Open My PGS Folder');
+
+  elements.openWorkbookButton.disabled = !hasWorkbook;
+}
+
+function renderDashboard() {
+  elements.estimatedSelf.textContent = numberText(state.summary.estimatedSelfReported);
+  elements.approvedSelf.textContent = numberText(state.summary.approvedSelfReported);
+  elements.automaticElms.textContent = numberText(state.summary.automaticElmsTotal);
+  elements.confirmedTotal.textContent = numberText(state.summary.confirmedTotal);
+  elements.remaining.textContent = numberText(state.summary.remaining);
+
+  elements.warningBox.innerHTML = state.warnings.slice(0, 3).map(function(message) {
+    return '<div>- ' + escapeHtml(message) + '</div>';
+  }).join('');
 }
 
 function populateCategories() {
   const selected = elements.categoryKey.value;
   const groups = groupBy(state.rules, 'parentCategory');
-  let html = '<option value="">Choose a category or use the matcher</option>';
+  let html = '<option value="">Choose the official category</option>';
 
-  Object.keys(groups).sort().forEach(function(parent) {
+  Object.keys(groups).sort(function(a, b) {
+    return a.localeCompare(b);
+  }).forEach(function(parent) {
+    const sortedRules = groups[parent].slice().sort(function(a, b) {
+      return a.activityName.localeCompare(b.activityName);
+    });
+
     html += '<optgroup label="' + escapeHtml(parent) + '">';
-    groups[parent].forEach(function(rule) {
+
+    sortedRules.forEach(function(rule) {
       html += '<option value="' + escapeHtml(rule.categoryKey) + '">' +
         escapeHtml(rule.activityName) + '</option>';
     });
+
     html += '</optgroup>';
   });
 
   elements.categoryKey.innerHTML = html;
-  if (state.rules.some(function(rule) { return rule.categoryKey === selected; })) {
+
+  if (state.rules.some(function(rule) {
+    return rule.categoryKey === selected;
+  })) {
     elements.categoryKey.value = selected;
   }
 }
 
 function initializeGuidedFinder() {
-  const contexts = state.finder.contexts || [];
+  const contexts = (state.finder.contexts || []).slice().sort(function(a, b) {
+    return a.label.localeCompare(b.label);
+  });
+
   elements.matcherContext.innerHTML =
-    '<option value="">Choose the setting or provider</option>' +
+    '<option value="">Choose one</option>' +
     contexts.map(function(context) {
       return '<option value="' + escapeHtml(context.id) + '">' +
         escapeHtml(context.label) + '</option>';
     }).join('');
 
   elements.matcherRole.innerHTML =
-    '<option value="">Choose the setting/provider first</option>';
+    '<option value="">Choose the first answer</option>';
   elements.matcherRole.disabled = true;
   elements.matcherActivity.value = '';
   elements.matcherActivityList.innerHTML =
-    '<div class="empty-choice">Choose the setting/provider and your role to see the valid official activities.</div>';
-  elements.matcherSelectionHelp.hidden = true;
+    '<div class="empty-choice">Choose the first two answers to see the available activities.</div>';
   elements.matchResults.innerHTML = '';
   elements.specialAlertArea.innerHTML = '';
-  updateFinderButton();
 }
 
 function getFinderContext() {
@@ -200,6 +327,7 @@ function getFinderContext() {
 function getFinderRole() {
   const context = getFinderContext();
   if (!context) return null;
+
   return (context.roles || []).find(function(role) {
     return role.id === elements.matcherRole.value;
   });
@@ -208,6 +336,7 @@ function getFinderRole() {
 function getFinderActivity() {
   const role = getFinderRole();
   if (!role) return null;
+
   return (role.activities || []).find(function(activity) {
     return activity.id === elements.matcherActivity.value;
   });
@@ -217,67 +346,74 @@ function populateFinderRoles() {
   const context = getFinderContext();
 
   elements.matcherActivity.value = '';
-  elements.matcherActivityList.innerHTML =
-    '<div class="empty-choice">Choose your role to see the valid official activities.</div>';
-  elements.matcherSelectionHelp.hidden = true;
   elements.matchResults.innerHTML = '';
   elements.specialAlertArea.innerHTML = '';
 
   if (!context) {
-    elements.matcherRole.innerHTML =
-      '<option value="">Choose the setting/provider first</option>';
     elements.matcherRole.disabled = true;
+    elements.matcherRole.innerHTML =
+      '<option value="">Choose the first answer</option>';
+    elements.matcherActivityList.innerHTML =
+      '<div class="empty-choice">Choose the first two answers to see the available activities.</div>';
     elements.matcherContextHelp.textContent =
-      'Start here. The remaining choices will be limited automatically.';
-    elements.matcherRoleHelp.textContent =
-      'Only roles supported for the selected setting will appear.';
-    updateFinderButton();
+      'The list is alphabetized and grouped to reduce choices.';
     return;
   }
 
   elements.matcherContextHelp.textContent = context.description;
   elements.matcherRole.disabled = false;
   elements.matcherRole.innerHTML =
-    '<option value="">Choose your role</option>' +
+    '<option value="">Choose what you did</option>' +
     (context.roles || []).map(function(role) {
       return '<option value="' + escapeHtml(role.id) + '">' +
         escapeHtml(role.label) + '</option>';
     }).join('');
 
-  elements.matcherRoleHelp.textContent =
-    'Choose what you actually did. Unrelated roles have been removed.';
-  updateFinderButton();
+  if ((context.roles || []).length === 1) {
+    elements.matcherRole.value = context.roles[0].id;
+    renderFinderActivities();
+  } else {
+    elements.matcherActivityList.innerHTML =
+      '<div class="empty-choice">Choose what you did to see the matching activities.</div>';
+  }
 }
 
 function renderFinderActivities() {
   const role = getFinderRole();
   elements.matcherActivity.value = '';
-  elements.matcherSelectionHelp.hidden = true;
   elements.matchResults.innerHTML = '';
   elements.specialAlertArea.innerHTML = '';
 
   if (!role) {
     elements.matcherActivityList.innerHTML =
-      '<div class="empty-choice">Choose your role to see the valid official activities.</div>';
-    elements.matcherRoleHelp.textContent =
-      'Only roles supported for the selected setting will appear.';
-    updateFinderButton();
+      '<div class="empty-choice">Choose what you did to see the matching activities.</div>';
     return;
   }
 
   elements.matcherRoleHelp.textContent = role.description;
 
-  elements.matcherActivityList.innerHTML = (role.activities || []).map(function(activity) {
+  const activities = (role.activities || []).slice().sort(function(a, b) {
+    return a.label.localeCompare(b.label);
+  });
+
+  elements.matcherActivityList.innerHTML = activities.map(function(activity) {
     return '<label class="finder-activity-card">' +
       '<input type="radio" name="finderActivityChoice" value="' +
       escapeHtml(activity.id) + '">' +
       '<span><strong>' + escapeHtml(activity.label) + '</strong>' +
-      '<p>' + escapeHtml(activity.description) + '</p>' +
-      '<small>' + escapeHtml(activity.officialBasis) + '</small></span>' +
+      '<p>' + escapeHtml(activity.description) + '</p></span>' +
       '</label>';
   }).join('');
 
-  updateFinderButton();
+  if (activities.length === 1) {
+    const radio = elements.matcherActivityList.querySelector(
+      'input[name="finderActivityChoice"]'
+    );
+    if (radio) {
+      radio.checked = true;
+      selectFinderActivity({target: radio});
+    }
+  }
 }
 
 function selectFinderActivity(event) {
@@ -293,248 +429,516 @@ function selectFinderActivity(event) {
       card.classList.toggle('selected', Boolean(input && input.checked));
     });
 
-  const context = getFinderContext();
-  const role = getFinderRole();
-  const activity = getFinderActivity();
-
-  if (context && role && activity) {
-    elements.matcherSelectionHelp.hidden = false;
-    elements.matcherSelectionHelp.innerHTML =
-      '<strong>Selected path:</strong> ' +
-      escapeHtml(context.label) + ' -> ' +
-      escapeHtml(role.label) + ' -> ' +
-      escapeHtml(activity.label) +
-      '<br><small>' + escapeHtml(activity.description) + '</small>';
-  }
-
-  updateFinderButton();
+  renderFinderResult();
 }
 
-function updateFinderButton() {
-  elements.matchButton.disabled =
-    !getFinderContext() ||
-    !getFinderRole() ||
-    !getFinderActivity() ||
-    !elements.matcherDate.value;
-}
-
-function runMatcher() {
-  const activityDate = elements.matcherDate.value;
-  const context = getFinderContext();
-  const role = getFinderRole();
+function renderFinderResult() {
   const selected = getFinderActivity();
+  const context = getFinderContext();
+  const role = getFinderRole();
 
-  if (!context || !role || !selected) {
-    showToast('Complete the setting, role, and official activity-description steps.', true);
-    return;
-  }
+  if (!selected || !context || !role) return;
 
-  if (!activityDate) {
-    showToast('Enter the activity date.', true);
-    elements.matcherDate.focus();
-    return;
-  }
-
-  if (activityDate < MIN_ACTIVITY_DATE) {
-    showToast('This assistant applies only to activities occurring on or after May 1, 2024.', true);
+  const date = elements.matcherDate.value;
+  if (date && date < MIN_ACTIVITY_DATE) {
     elements.matchResults.innerHTML =
-      '<div class="notice danger"><strong>Outside the scope of this assistant:</strong> ' +
-      'Activities before May 1, 2024 must be reviewed using the rules and documentation ' +
-      'that applied at that time.</div>';
+      '<div class="notice danger">This assistant applies only to activities on or after May 1, 2024.</div>';
     return;
   }
 
-  const description = elements.matcherDescription.value.trim().toLowerCase();
-  renderSpecialAlerts(description, selected.specialRuleId || '');
+  renderSpecialAlerts(selected.specialRuleId || '');
 
   if (selected.workflowOnly) {
     elements.matchResults.innerHTML =
       '<div class="match-card best">' +
-      '<div class="match-head"><div><div class="parent-label">Special workflow</div>' +
-      '<h3>' + escapeHtml(selected.label) + '</h3></div>' +
-      '<div class="score-pill">Official announcement</div></div>' +
-      '<div class="match-path"><span>' + escapeHtml(context.label) + '</span>' +
-      '<span>' + escapeHtml(role.label) + '</span></div>' +
-      '<p>' + escapeHtml(selected.description) + '</p>' +
-      '<div class="notice info"><strong>What to do:</strong> ' +
-      escapeHtml(selected.officialBasis) + '</div>' +
-      '<div class="source-proof"><strong>Official basis</strong>' +
+      '<div class="parent-label">Special department workflow</div>' +
+      '<h3>' + escapeHtml(selected.label) + '</h3>' +
+      '<p>' + escapeHtml(selected.officialBasis) + '</p>' +
+      '<details><summary>Official source</summary><p>' +
       escapeHtml((selected.sourceDocument || 'CCSD and CCEA PGS Announcements') +
-      (selected.sourcePage ? ', page ' + selected.sourcePage : '') +
-      (selected.sourceDate ? ' (' + selected.sourceDate + ')' : '')) +
-      '</div></div>';
+        (selected.sourcePage ? ', page ' + selected.sourcePage : '')) +
+      '</p></details></div>';
     return;
   }
 
   const rule = getRule(selected.categoryKey);
-  if (!rule) {
-    showToast('The selected official category is not available in the current library.', true);
-    return;
-  }
-
-  const maxText = rule.maximumCUs === null
-    ? 'No stated category maximum'
-    : rule.maximumCUs + ' CU maximum';
-
-  const sourceDocument = selected.sourceDocument || rule.sourceDocument;
-  const sourcePage = selected.sourcePage || rule.sourcePage;
+  if (!rule) return;
 
   elements.matchResults.innerHTML =
-    '<div class="match-card best">' +
-    '<div class="match-head"><div><div class="parent-label">' +
-    escapeHtml(rule.parentCategory) + '</div><h3>' +
-    escapeHtml(rule.activityName) + '</h3></div>' +
-    '<div class="score-pill">Official-path match</div></div>' +
-    '<div class="match-path"><span>' + escapeHtml(context.label) + '</span>' +
-    '<span>' + escapeHtml(role.label) + '</span>' +
-    '<span>' + escapeHtml(selected.label) + '</span></div>' +
-    '<p><strong>Why this matches:</strong> ' +
-    escapeHtml(selected.description) + '</p>' +
-    '<div class="notice info"><strong>How to record it:</strong> ' +
-    escapeHtml(rule.evidenceInputBasis || measurementSummary(rule)) + '</div>' +
-    '<div class="match-details">' +
-      '<div class="detail-box"><strong>Official description / limitation</strong>' +
-      escapeHtml(rule.limitations) + '</div>' +
-      '<div class="detail-box"><strong>Calculation / maximum</strong>' +
-      escapeHtml(calculationSummary(rule) + ' | ' + maxText) + '</div>' +
-      '<div class="detail-box"><strong>Submission path</strong>' +
-      escapeHtml(submissionLabel(rule.submissionMode)) + '</div>' +
-      '<div class="detail-box"><strong>Required documentation</strong>' +
-      escapeHtml(rule.documentation) + '</div>' +
+    '<div class="match-card best simplified-match">' +
+    '<div class="parent-label">Recommended official category</div>' +
+    '<h3>' + escapeHtml(rule.activityName) + '</h3>' +
+    '<div class="simple-guidance">' +
+      '<div><strong>Enter</strong><span>' +
+        escapeHtml(entryInstruction(rule)) + '</span></div>' +
+      '<div><strong>Upload</strong><span>' +
+        escapeHtml(rule.documentation) + '</span></div>' +
+      importantGuidanceHtml(rule) +
     '</div>' +
-    '<div class="source-proof"><strong>Recommendation source</strong>' +
-    escapeHtml(sourceDocument + ', page ' + sourcePage) +
-    '<br><small>Rule library verified ' + escapeHtml(rule.lastVerified || '') +
-    '. Final eligibility and approval remain with CCSD.</small></div>' +
+    '<details><summary>Why this recommendation is supported</summary>' +
+      '<p>' + escapeHtml(selected.description) + '</p>' +
+      '<p><strong>Source:</strong> ' +
+      escapeHtml(rule.sourceDocument + ', page ' + rule.sourcePage) + '</p>' +
+    '</details>' +
     '<button class="btn blue" type="button" data-use-category="' +
-    escapeHtml(rule.categoryKey) + '">Use This Official Category</button></div>';
+      escapeHtml(rule.categoryKey) + '">Continue with This Category</button>' +
+    '</div>';
+
+  const button = elements.matchResults.querySelector('button[data-use-category]');
+  if (button) {
+    button.addEventListener('click', function() {
+      useCategory(button.dataset.useCategory);
+    });
+  }
 }
 
-function renderSpecialAlerts(description, selectedRuleId) {
+function renderSpecialAlerts(selectedRuleId) {
   const date = elements.matcherDate.value;
+
   const matches = state.specialRules.filter(function(rule) {
-    const explicitlySelected = selectedRuleId && rule.id === selectedRuleId;
-    const keywordMatch = (rule.keywords || []).some(function(keyword) {
-      return description.indexOf(String(keyword).toLowerCase()) >= 0;
-    });
+    const selected = selectedRuleId && rule.id === selectedRuleId;
     const dateMatch = !date || !rule.effectiveDate || date >= rule.effectiveDate;
-    return (explicitlySelected || keywordMatch) && dateMatch;
+    return selected && dateMatch;
   });
 
   elements.specialAlertArea.innerHTML = matches.map(function(rule) {
-    return '<div class="notice danger"><strong>' + escapeHtml(rule.title) +
-      '</strong><br>' + escapeHtml(rule.message) +
-      '<br><small>Source: ' + escapeHtml(rule.source) + '</small></div>';
+    return '<div class="notice danger"><strong>' +
+      escapeHtml(rule.title) + '</strong><br>' +
+      escapeHtml(rule.message) + '</div>';
   }).join('');
 }
 
 function useCategory(categoryKey) {
-  const rule = getRule(categoryKey);
-  if (!rule) return;
+  startNewActivity('self_report');
   elements.categoryKey.value = categoryKey;
-  const selectedFinderActivity = getFinderActivity();
-  elements.description.value = elements.description.value ||
-    elements.matcherDescription.value.trim() ||
-    (selectedFinderActivity ? selectedFinderActivity.description : '');
-  if (elements.matcherDate.value) {
-    elements.startDate.value = elements.startDate.value || elements.matcherDate.value;
-    elements.endDate.value = elements.endDate.value || elements.matcherDate.value;
+
+  const selected = getFinderActivity();
+  const context = getFinderContext();
+  const role = getFinderRole();
+
+  if (selected) {
+    elements.description.placeholder =
+      'Briefly explain what you did. Example: ' + (selected.description || '');
   }
+
+  if (context) elements.organization.value = context.label || '';
+  if (role) elements.role.value = role.label || '';
+  if (elements.matcherDate.value) {
+    elements.startDate.value = elements.matcherDate.value;
+    elements.endDate.value = elements.matcherDate.value;
+  }
+
   configureCategory(categoryKey);
 
-  if (rule.entryMode === 'session_time' && elements.matcherDate.value) {
-    const firstDate = elements.sessionRows.querySelector('.session-date');
-    if (firstDate && !firstDate.value) firstDate.value = elements.matcherDate.value;
+  const rule = getRule(categoryKey);
+  if (rule && rule.entryMode === 'session_time' && elements.matcherDate.value) {
+    const dateInput = elements.sessionRows.querySelector('.session-date');
+    if (dateInput) dateInput.value = elements.matcherDate.value;
     updateSessionTotals();
   }
+}
 
+function startNewActivity(recordType) {
+  resetActivityForm();
+  elements.recordType.value = recordType || 'self_report';
+  configureRecordType();
+  showActivityStep(1);
   showView('activity');
-  elements.title.focus();
+}
+
+function configureRecordType() {
+  const automatic = elements.recordType.value === 'automatic_elms';
+
+  elements.formHeading.textContent = automatic
+    ? 'Track CUs Already Entered in ELMS'
+    : 'Add a Self-Reported Activity';
+
+  elements.formSubheading.textContent = automatic
+    ? 'Choose the category shown in Advancement Status, then enter the CU amount from ELMS.'
+    : 'First enter only the information used to calculate this category.';
+
+  elements.switchRecordTypeButton.textContent = automatic
+    ? 'Add a Self-Reported Activity'
+    : 'Track CUs already in ELMS';
+
+  elements.nextToEvidenceButton.hidden = automatic;
+  elements.saveAutomaticButton.hidden = !automatic;
+  elements.createFolderLine.hidden = automatic;
+
+  populateStatusOptions();
+  configureCategory(elements.categoryKey.value);
+  updateWizardIndicators();
+}
+
+function populateStatusOptions() {
+  const options = elements.recordType.value === 'automatic_elms'
+    ? automaticStatuses
+    : selfStatuses;
+
+  const current = elements.status.value;
+
+  elements.status.innerHTML = options.map(function(status) {
+    return '<option value="' + escapeHtml(status) + '">' +
+      escapeHtml(status) + '</option>';
+  }).join('');
+
+  if (options.indexOf(current) >= 0) {
+    elements.status.value = current;
+  } else {
+    elements.status.value = options[0];
+  }
+
+  updateOfficialField();
 }
 
 function configureCategory(categoryKey) {
   const rule = getRule(categoryKey);
+  const automaticRecord = elements.recordType.value === 'automatic_elms';
+
+  hideCalculationFields();
+
   if (!rule) {
     elements.categoryGuidance.hidden = true;
     return;
   }
 
+  if (rule.entryMode === 'automatic' && !automaticRecord) {
+    elements.recordType.value = 'automatic_elms';
+    configureRecordType();
+    return;
+  }
+
+  elements.categoryGuidance.hidden = false;
+  elements.categoryGuidance.innerHTML =
+    '<div class="simple-guidance">' +
+      '<div><strong>Enter</strong><span>' +
+        escapeHtml(automaticRecord
+          ? 'Enter the CUs exactly as they appear in ELMS on the next screen.'
+          : entryInstruction(rule)) +
+      '</span></div>' +
+      (automaticRecord ? '' :
+        '<div><strong>Upload</strong><span>' +
+          escapeHtml(rule.documentation) + '</span></div>') +
+      (automaticRecord ? '' : importantGuidanceHtml(rule)) +
+    '</div>';
+
+  if (automaticRecord) return;
+
   const mode = rule.entryMode || '';
-  const units = rule.units && rule.units.length ? rule.units : ['hours'];
+  const units = rule.units && rule.units.length ? rule.units : [];
 
-  elements.unit.innerHTML = units.map(function(unit) {
-    return '<option value="' + escapeHtml(unit) + '">' +
-      escapeHtml(unitLabels[unit] || unit) + '</option>';
-  }).join('');
-
-  elements.startDateLabel.textContent = rule.dateLabel || 'Activity date';
-  elements.endDateLabel.textContent = rule.endDateLabel || 'End date';
-  elements.quantityLabel.textContent = rule.quantityLabel || quantityLabelFor(units[0]);
-  elements.quantityHelp.textContent = rule.quantityHelp || '';
-  elements.quantity.step = String(rule.quantityStep || 1);
-
-  const isSession = mode === 'session_time';
-  const isDuration = mode === 'duration_hours';
-  const isAutomatic = mode === 'automatic';
-  const isFixed = mode === 'fixed';
-  const showsQuantity = ['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0;
-  const showsPayment = isSession || isDuration;
-
-  elements.sessionSection.hidden = !isSession;
-  elements.startDateField.hidden = isSession;
-  elements.endDateField.hidden = isSession || !rule.showEndDate;
-  elements.paymentStatusField.hidden = !showsPayment;
-  elements.quantityField.hidden = !showsQuantity;
-  elements.unitField.hidden = !showsQuantity;
-  elements.titleIField.hidden = !rule.titleIExceptionAllowed;
-
-  elements.startDate.required = !isSession;
-  elements.paymentStatus.disabled = !showsPayment;
-  elements.titleIException.disabled = !rule.titleIExceptionAllowed;
-
-  if (!rule.titleIExceptionAllowed) elements.titleIException.value = 'no';
-
-  if (isSession) {
-    elements.unit.innerHTML = '<option value="hours">Hours</option>';
-    elements.unit.value = 'hours';
-    elements.sessionInputBasis.textContent = rule.evidenceInputBasis ||
-      'Enter each qualifying session with exact start and end times.';
+  if (mode === 'session_time') {
+    elements.sessionSection.hidden = false;
+    elements.sessionInputBasis.textContent =
+      'Enter each qualifying session. The assistant calculates net hours after breaks.';
     if (!elements.sessionRows.children.length) addSessionRow();
     updateSessionTotals();
   }
 
-  if (isDuration) {
-    elements.unit.innerHTML = '<option value="hours">Documented clock hours</option>';
-    elements.unit.value = 'hours';
+  if (['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0) {
+    elements.quantityField.hidden = false;
+    elements.quantityLabel.textContent = rule.quantityLabel || 'Quantity';
+    elements.quantityHelp.textContent = conciseQuantityHelp(rule);
+    elements.quantity.step = String(rule.quantityStep || 1);
+
+    elements.unitField.hidden = false;
+    elements.unit.innerHTML = units.map(function(unit) {
+      return '<option value="' + escapeHtml(unit) + '">' +
+        escapeHtml(unitLabels[unit] || unit) + '</option>';
+    }).join('');
   }
 
-  elements.unit.onchange = function() {
-    elements.quantityLabel.textContent = rule.quantityLabel || quantityLabelFor(elements.unit.value);
-  };
+  if (mode === 'duration_hours') {
+    elements.paymentStatusField.hidden = false;
+    elements.unit.innerHTML = '<option value="hours">Documented clock hours</option>';
+  }
 
-  const maxText = rule.maximumCUs === null ? 'No stated maximum' : rule.maximumCUs + ' CU maximum';
-  elements.categoryGuidance.hidden = false;
-  elements.categoryGuidance.innerHTML =
-    '<h4>' + escapeHtml(rule.parentCategory + ': ' + rule.activityName) + '</h4>' +
-    '<p><strong>How this activity is measured:</strong> ' +
-      escapeHtml(measurementSummary(rule)) + '</p>' +
-    '<div class="notice info"><strong>What to enter:</strong> ' +
-      escapeHtml(rule.evidenceInputBasis || '') + '</div>' +
-    '<p><strong>Calculation:</strong> ' + escapeHtml(calculationSummary(rule)) +
-    ' <strong> | ' + escapeHtml(maxText) + '</strong></p>' +
-    '<p><strong>Documentation:</strong> ' + escapeHtml(rule.documentation) + '</p>' +
-    '<p><strong>Watch for:</strong> ' + escapeHtml(rule.limitations) + '</p>' +
-    (isAutomatic
-      ? '<div class="notice warn"><strong>Automatic ELMS activity:</strong> Save only as a personal tracking record. Do not create a duplicate self-reported submission.</div>'
-      : '') +
-    (mode === 'credit_review' || mode === 'ceu_or_hours'
-      ? '<div class="notice warn">The final CU value may require category-specific review of the transcript, approval status, hours, or CEUs.</div>'
-      : '');
+  if (rule.titleIExceptionAllowed) {
+    elements.titleIField.hidden = false;
+  }
 
-  elements.saveButton.textContent = isAutomatic ? 'Save Tracking Record' :
-    (elements.activityId.value ? 'Recalculate & Update' : 'Calculate & Save Once');
+  if (mode === 'fixed') {
+    elements.categoryGuidance.innerHTML +=
+      '<div class="notice info"><strong>Official fixed value:</strong> ' +
+      escapeHtml(calculationSummary(rule)) + '</div>';
+  }
+
+  updateDetailDateLabels(rule);
 }
 
+function hideCalculationFields() {
+  elements.sessionSection.hidden = true;
+  elements.quantityField.hidden = true;
+  elements.unitField.hidden = true;
+  elements.paymentStatusField.hidden = true;
+  elements.titleIField.hidden = true;
+}
+
+function entryInstruction(rule) {
+  const mode = rule.entryMode || '';
+
+  if (mode === 'session_time') {
+    return 'Each qualifying date, start time, end time, break, and payment status.';
+  }
+
+  if (mode === 'automatic') {
+    return 'No self-reported quantity. Track the CUs after they appear in ELMS.';
+  }
+
+  if (mode === 'fixed') {
+    return 'Confirm that the official milestone was completed. The CU value is fixed.';
+  }
+
+  return rule.quantityHelp || rule.evidenceInputBasis ||
+    ('Enter the ' + (rule.quantityLabel || 'quantity') + '.');
+}
+
+function conciseQuantityHelp(rule) {
+  if (rule.categoryKey === 'WRITE_IEP_MDT') {
+    return 'Enter only the number of qualifying IEPs/MDTs written.';
+  }
+
+  if (rule.categoryKey === 'IEP_MDT_TEAM') {
+    return 'Enter only the number of qualifying students/cases.';
+  }
+
+  if (rule.categoryKey === 'GRANT_RECIPIENT') {
+    return 'Enter only grants actually awarded. Do not enter grant-writing hours.';
+  }
+
+  return rule.quantityHelp || '';
+}
+
+function importantGuidanceHtml(rule) {
+  let message = '';
+
+  if (rule.categoryKey === 'WRITE_IEP_MDT' ||
+      rule.categoryKey === 'IEP_MDT_TEAM') {
+    message =
+      'Redact all parent/student information, including signatures, before uploading the signature pages.';
+  } else if (rule.categoryKey === 'GRANT_RECIPIENT') {
+    message =
+      'The current category is based on grants received, not hours spent writing or applying.';
+  } else if (rule.categoryKey === 'DISTRICT_PD') {
+    message =
+      'Do not create a duplicate self-reported ELMS submission.';
+  } else if (rule.limitations) {
+    message = rule.limitations;
+  }
+
+  return message
+    ? '<div><strong>Important</strong><span>' + escapeHtml(message) + '</span></div>'
+    : '';
+}
+
+function updateDetailDateLabels(rule) {
+  if (!rule) return;
+
+  elements.startDateLabel.textContent = rule.dateLabel || 'Start date';
+  elements.endDateLabel.textContent = rule.endDateLabel || 'End date';
+
+  const sessionMode = rule.entryMode === 'session_time';
+  elements.startDateField.hidden = sessionMode;
+  elements.endDateField.hidden = sessionMode || !rule.showEndDate;
+
+  if (sessionMode) {
+    const sessions = collectSessions().filter(function(session) {
+      return session.date;
+    });
+
+    const dates = sessions.map(function(session) {
+      return session.date;
+    }).sort();
+
+    if (dates.length) {
+      elements.startDate.value = dates[0];
+      elements.endDate.value = dates[dates.length - 1];
+    }
+  }
+}
+
+function showActivityStep(step) {
+  state.currentStep = step;
+
+  [1,2,3].forEach(function(number) {
+    const panel = elements['activityStep' + number];
+    if (panel) panel.classList.toggle('active', number === step);
+  });
+
+  updateWizardIndicators();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function updateWizardIndicators() {
+  const automatic = elements.recordType.value === 'automatic_elms';
+
+  elements.wizardProgress
+    .querySelectorAll('[data-step-indicator]')
+    .forEach(function(indicator) {
+      const step = Number(indicator.dataset.stepIndicator);
+      indicator.classList.toggle('active', step === state.currentStep);
+      indicator.hidden = automatic && step === 3;
+    });
+}
+
+function validateCalculationStep() {
+  const rule = getRule(elements.categoryKey.value);
+
+  if (!rule) {
+    showToast('Choose an activity category.', true);
+    return false;
+  }
+
+  if (elements.recordType.value === 'automatic_elms') return true;
+
+  const mode = rule.entryMode || '';
+
+  if (mode === 'session_time') {
+    const sessions = collectSessions().filter(function(session) {
+      return session.date || session.startTime || session.endTime;
+    });
+
+    if (!sessions.length) {
+      showToast('Add at least one qualifying session.', true);
+      return false;
+    }
+
+    const invalid = sessions.find(function(session) {
+      return !session.date || !session.startTime || !session.endTime ||
+        calculateSessionMinutes(session).error;
+    });
+
+    if (invalid) {
+      showToast(
+        calculateSessionMinutes(invalid).error ||
+        'Every session needs a date, start time, and end time.',
+        true
+      );
+      return false;
+    }
+
+    updateSessionTotals();
+  }
+
+  if (['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0 &&
+      !(Number(elements.quantity.value) > 0)) {
+    showToast((rule.quantityLabel || 'Quantity') + ' must be greater than zero.', true);
+    elements.quantity.focus();
+    return false;
+  }
+
+  return true;
+}
+
+function goToDetails() {
+  if (!validateCalculationStep()) return;
+
+  const rule = getRule(elements.categoryKey.value);
+  updateDetailDateLabels(rule);
+
+  if (!elements.title.value) {
+    elements.title.value = shortActivityTitle(rule);
+  }
+
+  elements.description.placeholder = elements.description.placeholder ||
+    'Briefly explain what you did for this activity.';
+
+  showActivityStep(2);
+}
+
+function shortActivityTitle(rule) {
+  if (!rule) return '';
+
+  const shortNames = {
+    WRITE_IEP_MDT: 'IEPs/MDTs Written',
+    IEP_MDT_TEAM: 'IEP/MDT Team Participation',
+    GRANT_RECIPIENT: 'Grant Awards',
+    PLC: 'PLC Participation',
+    MICRO_CREDENTIAL: 'Digital Promise Micro-Credentials'
+  };
+
+  return shortNames[rule.categoryKey] || rule.activityName;
+}
+
+function validateDetailsStep() {
+  if (!elements.title.value.trim()) {
+    showToast('Enter an activity name.', true);
+    elements.title.focus();
+    return false;
+  }
+
+  if (!elements.description.value.trim()) {
+    showToast('Enter a short activity description.', true);
+    elements.description.focus();
+    return false;
+  }
+
+  const rule = getRule(elements.categoryKey.value);
+  const sessionMode = rule && rule.entryMode === 'session_time';
+
+  if (!sessionMode && !elements.startDate.value) {
+    showToast('Enter the activity date or beginning of the activity period.', true);
+    elements.startDate.focus();
+    return false;
+  }
+
+  if (elements.startDate.value &&
+      elements.startDate.value < MIN_ACTIVITY_DATE) {
+    showToast('This assistant applies only to activities on or after May 1, 2024.', true);
+    return false;
+  }
+
+  if (elements.endDate.value &&
+      elements.endDate.value < elements.startDate.value) {
+    showToast('The end date cannot be earlier than the start date.', true);
+    return false;
+  }
+
+  if (elements.recordType.value === 'automatic_elms' &&
+      elements.status.value === 'Confirmed in ELMS' &&
+      !(Number(elements.officialApprovedCUs.value) > 0)) {
+    showToast('Enter the CUs shown in ELMS.', true);
+    elements.officialApprovedCUs.focus();
+    return false;
+  }
+
+  return true;
+}
+
+function goToEvidence() {
+  if (!validateDetailsStep()) return;
+
+  const rule = getRule(elements.categoryKey.value);
+  renderEvidenceRequirement(rule);
+  showActivityStep(3);
+}
+
+function renderEvidenceRequirement(rule) {
+  if (!rule) {
+    elements.evidenceRequirementBox.innerHTML = '';
+    return;
+  }
+
+  elements.evidenceRequirementBox.innerHTML =
+    '<h3>Evidence for ' + escapeHtml(rule.activityName) + '</h3>' +
+    '<div class="simple-guidance">' +
+      '<div><strong>Upload these items</strong><span>' +
+        escapeHtml(rule.documentation) + '</span></div>' +
+      importantGuidanceHtml(rule) +
+      '<div><strong>Final ELMS file</strong><span>' +
+        'Combine the required evidence into one final file. Paste that file link below; do not paste the folder link.' +
+      '</span></div>' +
+    '</div>';
+}
+
+function updateOfficialField() {
+  const automatic = elements.recordType.value === 'automatic_elms';
+  const officialStatus =
+    elements.status.value === 'Approved in ELMS' ||
+    elements.status.value === 'Confirmed in ELMS';
+
+  elements.officialApprovedField.hidden = !(automatic || officialStatus);
+}
 
 function addSessionRow(session) {
   const data = session || {};
@@ -544,13 +948,13 @@ function addSessionRow(session) {
     '<td><input class="session-date" type="date" min="' + MIN_ACTIVITY_DATE +
       '" value="' + escapeHtml(data.date || '') + '" aria-label="Session date"></td>' +
     '<td><input class="session-start" type="time" value="' +
-      escapeHtml(data.startTime || '') + '" aria-label="Session start time"></td>' +
+      escapeHtml(data.startTime || '') + '" aria-label="Start time"></td>' +
     '<td><input class="session-end" type="time" value="' +
-      escapeHtml(data.endTime || '') + '" aria-label="Session end time"></td>' +
+      escapeHtml(data.endTime || '') + '" aria-label="End time"></td>' +
     '<td><input class="session-break" type="number" min="0" step="1" value="' +
       escapeHtml(data.breakMinutes === undefined ? '0' : data.breakMinutes) +
       '" aria-label="Break minutes"></td>' +
-    '<td><select class="session-payment" aria-label="Session payment status">' +
+    '<td><select class="session-payment" aria-label="Payment status">' +
       paymentOptionsHtml(data.paymentStatus || 'unpaid') + '</select></td>' +
     '<td><span class="session-hours">0.00</span></td>' +
     '<td><button class="icon-button" type="button" data-remove-session ' +
@@ -570,7 +974,7 @@ function paymentOptionsHtml(selected) {
   return options.map(function(option) {
     return '<option value="' + option[0] + '"' +
       (option[0] === selected ? ' selected' : '') + '>' +
-      option[1] + '</option>';
+      escapeHtml(option[1]) + '</option>';
   }).join('');
 }
 
@@ -589,10 +993,6 @@ function collectSessions() {
 function calculateSessionMinutes(session) {
   if (!session.date || !session.startTime || !session.endTime) {
     return {minutes: 0, error: ''};
-  }
-
-  if (session.date < MIN_ACTIVITY_DATE) {
-    return {minutes: 0, error: 'A session is before May 1, 2024.'};
   }
 
   const start = timeStringToMinutes(session.startTime);
@@ -614,7 +1014,9 @@ function calculateSessionMinutes(session) {
 
 function timeStringToMinutes(value) {
   const parts = String(value || '').split(':');
-  return parts.length === 2 ? Number(parts[0]) * 60 + Number(parts[1]) : 0;
+  return parts.length === 2
+    ? Number(parts[0]) * 60 + Number(parts[1])
+    : 0;
 }
 
 function updateSessionTotals() {
@@ -638,319 +1040,87 @@ function updateSessionTotals() {
       (result.minutes / 60).toFixed(2);
   });
 
-  const totalHours = totalMinutes / 60;
-  elements.sessionTotal.textContent = totalHours.toFixed(2) + ' hours';
-  elements.quantity.value = totalHours;
+  elements.sessionTotal.textContent =
+    (totalMinutes / 60).toFixed(2) + ' hours';
+
+  elements.quantity.value = totalMinutes / 60;
   elements.unit.value = 'hours';
 
   const sessions = collectSessions().filter(function(session) {
-    return session.date || session.startTime || session.endTime;
+    return session.date;
   });
 
-  const dates = sessions.map(function(session) { return session.date; })
-    .filter(Boolean).sort();
+  const dates = sessions.map(function(session) {
+    return session.date;
+  }).sort();
 
   if (dates.length) {
     elements.startDate.value = dates[0];
     elements.endDate.value = dates[dates.length - 1];
   }
 
-  const statuses = sessions.map(function(session) { return session.paymentStatus; })
-    .filter(function(value, index, array) { return array.indexOf(value) === index; });
+  const statuses = sessions.map(function(session) {
+    return session.paymentStatus;
+  }).filter(function(value, index, array) {
+    return array.indexOf(value) === index;
+  });
 
   elements.paymentStatus.value =
-    statuses.length === 1 ? statuses[0] : (statuses.length > 1 ? 'mixed' : 'unpaid');
+    statuses.length === 1
+      ? statuses[0]
+      : (statuses.length > 1 ? 'mixed' : 'unpaid');
 
   elements.sessionWarning.hidden = !firstError;
   elements.sessionWarning.textContent = firstError;
 }
 
-function renderDirectory() {
-  const query = elements.directorySearch.value.trim().toLowerCase();
-  const filtered = state.rules.filter(function(rule) {
-    const haystack = [
-      rule.parentCategory, rule.activityName, rule.documentation,
-      rule.limitations, (rule.keywords || []).join(' ')
-    ].join(' ').toLowerCase();
-    return !query || haystack.indexOf(query) >= 0;
-  });
-  const groups = groupBy(filtered, 'parentCategory');
-  elements.directoryCount.textContent =
-    filtered.length + ' of ' + state.rules.length + ' current activity options shown';
-
-  elements.directoryGroups.innerHTML = Object.keys(groups).sort().map(function(parent) {
-    return '<div class="directory-group"><h4>' + escapeHtml(parent) + '</h4>' +
-      groups[parent].map(function(rule) {
-        return '<div class="directory-item"><div><strong>' +
-          escapeHtml(rule.activityName) + '</strong><br><small>' +
-          escapeHtml(calculationSummary(rule)) + '</small></div><div>' +
-          escapeHtml(rule.limitations) + '</div><button class="btn small ghost" type="button" data-use-category="' +
-          escapeHtml(rule.categoryKey) + '">Select</button></div>';
-      }).join('') + '</div>';
-  }).join('');
-}
-
-function renderExpired() {
-  elements.expiredList.innerHTML = state.expiredActivityNames.map(function(name) {
-    return '<div> |  ' + escapeHtml(name) + '</div>';
-  }).join('');
-}
-
-function renderDashboard(count) {
-  elements.libraryCount.textContent = String(count);
-  elements.estimated.textContent = numberText(state.summary.estimatedTotal);
-  elements.approved.textContent = numberText(state.summary.approvedTotal);
-  elements.remaining.textContent = numberText(state.summary.remaining);
-  elements.warningBox.innerHTML = state.warnings.map(function(w) {
-    return '<div> |  ' + escapeHtml(w) + '</div>';
-  }).join('');
-}
-
-function renderWorkspace() {
-  const hasWorkbook = Boolean(state.workspace.spreadsheetUrl);
-  const hasFolder = Boolean(state.workspace.rootFolderUrl);
-  elements.workspaceStatus.textContent = hasWorkbook
-    ? 'Connected to your teacher-owned Google Sheet.'
-    : 'Your workbook has not been created yet.';
-  elements.workspaceDetails.textContent = hasFolder
-    ? 'The PGS Drive folder structure is connected.'
-    : 'Use Workspace Setup to create the Drive folders.';
-  setLink(elements.workbookLink, state.workspace.spreadsheetUrl, 'Open Sheet');
-  setLink(elements.rootFolderLink, state.workspace.rootFolderUrl, 'Open PGS Folder');
-  elements.openWorkbookButton.disabled = !hasWorkbook;
-}
-
-function renderRecords() {
-  if (!state.activities.length) {
-    elements.recordsBody.innerHTML = '<tr><td colspan="8">No activities saved yet.</td></tr>';
-  } else {
-    elements.recordsBody.innerHTML = state.activities.map(function(a) {
-      const evidenceUrl = safeHttpUrl(a.evidenceLink || a.activityFolderUrl);
-      const evidence = evidenceUrl
-        ? '<a href="' + escapeHtml(evidenceUrl) + '" target="_blank" rel="noopener">Open</a>'
-        : 'Missing';
-      const folderButton = a.activityFolderUrl ? '' :
-        '<button class="btn small green" type="button" data-action="folder" data-id="' +
-        escapeHtml(a.id) + '">Create Folder</button>';
-      return '<tr><td><strong>' + escapeHtml(a.title) + '</strong><br><small>' +
-        escapeHtml(truncate(a.description, 70)) + '</small></td><td>' +
-        escapeHtml(a.categoryName) + '</td><td>' +
-        (a.unit === 'hours' && a.sessions && a.sessions.length
-          ? numberText(a.quantity) + ' hours across ' + a.sessions.length +
-            (a.sessions.length === 1 ? ' session' : ' sessions')
-          : numberText(a.quantity) + ' ' + escapeHtml(unitLabels[a.unit] || a.unit)) +
-        '</td><td>' + estimateText(a.estimatedCUs) + '</td><td>' +
-        (a.officialApprovedCUs === '' ? '-' : numberText(a.officialApprovedCUs)) +
-        '</td><td><span class="tag">' + escapeHtml(a.status) + '</span></td><td>' +
-        evidence + '</td><td><div class="table-actions"><button class="btn small ghost" type="button" data-action="edit" data-id="' +
-        escapeHtml(a.id) + '">Edit</button>' + folderButton +
-        '<button class="btn small danger-button" type="button" data-action="delete" data-id="' +
-        escapeHtml(a.id) + '">Delete</button></div></td></tr>';
-    }).join('');
-  }
-
-  elements.categoryBody.innerHTML = (state.summary.categoryBalances || []).map(function(item) {
-    return '<tr><td><strong>' + escapeHtml(item.category) + '</strong><br><small>' +
-      escapeHtml(item.parentCategory) + '</small></td><td>' + numberText(item.recorded) +
-      '</td><td>' + numberText(item.countable) +
-      '</td><td>' + (item.maximum === null ? 'No stated max' : numberText(item.maximum)) +
-      '</td><td>' + numberText(item.overMaximum) +
-      '</td><td>' + (item.remaining === null ? '-' : numberText(item.remaining)) + '</td></tr>';
-  }).join('');
-}
-
-
-function renderRuleAudit() {
-  const audit = state.ruleAudit || {};
-  elements.ruleAuditLabel.textContent = audit.lastVerified
-    ? 'Source library last verified ' + audit.lastVerified + '  |  ' + (audit.currentOptions || state.rules.length) + ' current options'
-    : '';
-}
-
-function populateEvidenceActivities() {
-  const selected = elements.evidenceActivitySelect.value;
-  elements.evidenceActivitySelect.innerHTML = '<option value="">Choose an activity</option>' +
-    state.activities.map(function(activity) {
-      return '<option value="' + escapeHtml(activity.id) + '">' +
-        escapeHtml(activity.title + ' - ' + activity.categoryName) + '</option>';
-    }).join('');
-  if (state.activities.some(function(activity) { return activity.id === selected; })) {
-    elements.evidenceActivitySelect.value = selected;
-  }
-}
-
-function renderEvidenceGuide() {
-  const id = elements.evidenceActivitySelect.value;
-  if (!id) {
-    elements.evidenceGuideOutput.innerHTML = state.activities.length
-      ? '<div class="notice info">Choose a saved activity to generate its evidence guide.</div>'
-      : '<div class="notice warn">Add an activity first. The evidence guide will use that same Activity Log record.</div>';
-    return;
-  }
-
-  const activity = state.activities.find(function(item) { return item.id === id; });
-  const rule = activity ? getRule(activity.categoryKey) : null;
-  if (!activity || !rule) {
-    elements.evidenceGuideOutput.innerHTML = '<div class="notice danger">The saved category rule could not be found.</div>';
-    return;
-  }
-
-  const checklist = (rule.evidenceChecklist || []).map(function(item) {
-    return '<div class="check-item"><span>[ ]</span><span>' + escapeHtml(item) + '</span></div>';
-  }).join('');
-
-  const sessionSummary = activity.sessions && activity.sessions.length
-    ? '<h4>Recorded time log</h4><div style="overflow:auto"><table><thead><tr>' +
-      '<th>Date</th><th>Start</th><th>End</th><th>Break</th><th>Payment</th><th>Hours</th>' +
-      '</tr></thead><tbody>' + activity.sessions.map(function(session) {
-        return '<tr><td>' + escapeHtml(session.date) + '</td><td>' +
-          escapeHtml(session.startTime) + '</td><td>' + escapeHtml(session.endTime) +
-          '</td><td>' + numberText(session.breakMinutes) + ' min</td><td>' +
-          escapeHtml(session.paymentStatus) + '</td><td>' +
-          numberText(session.hours) + '</td></tr>';
-      }).join('') + '</tbody></table></div>'
-    : '';
-
-  elements.evidenceGuideOutput.innerHTML = '<div class="evidence-card">' +
-    '<div class="parent-label">' + escapeHtml(rule.parentCategory) + '</div>' +
-    '<h3>' + escapeHtml(activity.title) + '</h3>' +
-    '<p><strong>Confirmed category:</strong> ' + escapeHtml(rule.activityName) + '</p>' +
-    '<div class="grid g2">' +
-      '<div class="detail-box"><strong>How this category is measured</strong>' + escapeHtml(measurementSummary(rule)) + '</div>' +
-      '<div class="detail-box"><strong>What the teacher should enter</strong>' + escapeHtml(rule.evidenceInputBasis || '') + '</div>' +
-      '<div class="detail-box"><strong>Approval form</strong>' + escapeHtml(rule.approvalForm) + '</div>' +
-      '<div class="detail-box"><strong>Approval timing</strong>' + escapeHtml(rule.approvalTiming) + '</div>' +
-      '<div class="detail-box"><strong>Required documentation</strong>' + escapeHtml(rule.documentation) + '</div>' +
-      '<div class="detail-box"><strong>Final submission packet</strong>' + escapeHtml(rule.packetInstructions) + '</div>' +
-    '</div>' + sessionSummary +
-    '<h4>Preparation checklist</h4><div class="checklist">' + checklist + '</div>' +
-    '<div class="notice warn"><strong>Original-document safeguard:</strong> Do not change information provided by an issuing organization. Combining required documents into one file must not alter their content.</div>' +
-    '</div>';
-}
-
-function renderElmsReadiness() {
-  if (!state.activities.length) {
-    elements.elmsReadinessOutput.innerHTML = '<div class="notice info">No saved activities to review yet.</div>';
-    return;
-  }
-
-  elements.elmsReadinessOutput.innerHTML = '<div class="readiness-grid">' +
-    state.activities.map(function(activity) {
-      const rule = getRule(activity.categoryKey);
-      const issues = [];
-      let cardClass = '';
-      let label = 'Needs preparation';
-
-      if (!rule) {
-        issues.push('Category rule is missing.');
-      } else if (rule.submissionMode === 'automatic') {
-        cardClass = 'auto';
-        label = 'Automatic ELMS activity';
-        issues.push('Do not create a duplicate self-reported activity. Verify the completed course appears in Advancement Status.');
-      } else {
-        if (!activity.evidenceLink) issues.push('Add the final single-file Google Drive link.');
-        if (activity.estimatedCUs === '') issues.push('CU estimate requires category-specific review.');
-        if (!activity.startDate) issues.push('Add the activity date.');
-        if (activity.status === 'Ready for ELMS' && !issues.length) {
-          cardClass = 'ready';
-          label = 'Marked ready for ELMS';
-        }
-        if (!issues.length) issues.push('Review the category-specific evidence guide, link sharing, and current deadlines before submission.');
-      }
-
-      return '<div class="readiness-card ' + cardClass + '"><div class="parent-label">' +
-        escapeHtml(label) + '</div><h4>' + escapeHtml(activity.title) + '</h4><p>' +
-        escapeHtml(activity.categoryName) + '</p><ul>' + issues.map(function(issue) {
-          return '<li>' + escapeHtml(issue) + '</li>';
-        }).join('') + '</ul></div>';
-    }).join('') + '</div>';
-}
-
 async function saveActivity(event) {
-  event.preventDefault();
+  if (event) event.preventDefault();
 
-  const selectedRule = getRule(elements.categoryKey.value);
-  if (!selectedRule) {
-    showToast('Choose or confirm an activity category.', true);
-    return;
-  }
+  if (!validateCalculationStep() || !validateDetailsStep()) return;
 
-  const mode = selectedRule.entryMode || '';
-
-  if (mode === 'session_time') {
-    const sessions = collectSessions().filter(function(session) {
-      return session.date || session.startTime || session.endTime;
-    });
-
-    if (!sessions.length) {
-      showToast('Add at least one activity session.', true);
-      return;
-    }
-
-    const invalidSession = sessions.find(function(session) {
-      return calculateSessionMinutes(session).error ||
-        !session.date || !session.startTime || !session.endTime;
-    });
-
-    if (invalidSession) {
-      showToast(calculateSessionMinutes(invalidSession).error ||
-        'Every session requires a date, start time, and end time.', true);
-      return;
-    }
-
-    updateSessionTotals();
-  } else {
-    if (!elements.startDate.value) {
-      showToast('Enter the activity date. This assistant applies only to activities occurring on or after May 1, 2024.', true);
-      elements.startDate.focus();
-      return;
-    }
-
-    if (elements.startDate.value < MIN_ACTIVITY_DATE ||
-        (elements.endDate.value && elements.endDate.value < MIN_ACTIVITY_DATE)) {
-      showToast('This assistant applies only to activities occurring on or after May 1, 2024.', true);
-      return;
-    }
-
-    if (elements.endDate.value && elements.endDate.value < elements.startDate.value) {
-      showToast('The activity end date cannot be earlier than the start date.', true);
-      return;
-    }
-
-    if (['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0 &&
-        !(Number(elements.quantity.value) > 0)) {
-      showToast((selectedRule.quantityLabel || 'Quantity') + ' must be greater than zero.', true);
-      elements.quantity.focus();
-      return;
-    }
-  }
+  const rule = getRule(elements.categoryKey.value);
 
   const payload = {
-    id: elements.activityId.value, title: elements.title.value.trim(),
-    description: elements.description.value.trim(), startDate: elements.startDate.value,
-    endDate: elements.endDate.value, organization: elements.organization.value.trim(),
-    role: elements.role.value.trim(), categoryKey: elements.categoryKey.value,
-    paymentStatus: elements.paymentStatus.value, quantity: Number(elements.quantity.value || 0),
-    unit: elements.unit.value, titleIException: elements.titleIException.value,
-    sessions: getRule(elements.categoryKey.value) &&
-      getRule(elements.categoryKey.value).entryMode === 'session_time'
+    id: elements.activityId.value,
+    recordType: elements.recordType.value,
+    title: elements.title.value.trim(),
+    description: elements.description.value.trim(),
+    startDate: elements.startDate.value,
+    endDate: elements.endDate.value,
+    organization: elements.organization.value.trim(),
+    role: elements.role.value.trim(),
+    categoryKey: elements.categoryKey.value,
+    paymentStatus: elements.paymentStatus.value,
+    quantity: Number(elements.quantity.value || 0),
+    unit: elements.unit.value,
+    titleIException: elements.titleIException.value,
+    sessions: rule && rule.entryMode === 'session_time' &&
+      elements.recordType.value === 'self_report'
         ? collectSessions()
         : [],
-    status: elements.status.value, officialApprovedCUs: elements.officialApprovedCUs.value,
-    evidenceLink: elements.evidenceLink.value.trim(), notes: elements.notes.value.trim(),
-    createFolder: elements.createFolder.checked
+    status: elements.status.value,
+    officialApprovedCUs: elements.officialApprovedCUs.value,
+    evidenceLink: elements.evidenceLink.value.trim(),
+    notes: elements.notes.value.trim(),
+    createFolder: elements.recordType.value === 'self_report' &&
+      elements.createFolder.checked
   };
 
-  setLoading(true, payload.id ? 'Updating the activity record...' : 'Saving the activity record...');
+  setLoading(true, 'Saving to your Google Sheet...');
+
   try {
     const data = await runServer('saveActivity', payload);
     applyBootstrap(data);
-    const saved = state.activities.find(function(a) {
-      return a.title === payload.title && a.categoryKey === payload.categoryKey;
+
+    const saved = state.activities.find(function(item) {
+      return item.id === data.savedId;
     });
+
     if (saved) showSavedResult(saved);
-    showToast('Activity saved to the single Activity Log.');
-    resetFormState();
+
+    showToast('Saved in your teacher-owned Google Sheet.');
+    showView('activity');
   } catch (error) {
     showToast(error.message, true);
   } finally {
@@ -958,118 +1128,337 @@ async function saveActivity(event) {
   }
 }
 
-function editActivity(id) {
-  const a = state.activities.find(function(item) { return item.id === id; });
-  if (!a) return;
-  elements.activityId.value = a.id;
-  elements.title.value = a.title;
-  elements.description.value = a.description;
-  elements.startDate.value = a.startDate || '';
-  elements.endDate.value = a.endDate || '';
-  elements.organization.value = a.organization || '';
-  elements.role.value = a.role || '';
-  elements.categoryKey.value = a.categoryKey;
-  configureCategory(a.categoryKey);
+function showSavedResult(activity) {
+  elements.resultCategory.textContent = activity.categoryName;
+  elements.resultCUs.textContent =
+    activity.recordType === 'automatic_elms'
+      ? numberText(activity.officialApprovedCUs)
+      : estimateText(activity.estimatedCUs);
+  elements.resultStatus.textContent = activity.status;
 
-  const editingRule = getRule(a.categoryKey);
-  elements.sessionRows.innerHTML = '';
-  if (editingRule && editingRule.entryMode === 'session_time') {
-    if (a.sessions && a.sessions.length) {
-      a.sessions.forEach(function(session) { addSessionRow(session); });
-    } else {
-      addSessionRow();
-    }
+  setLink(
+    elements.resultFolderLink,
+    activity.activityFolderUrl,
+    'Open Category Folder'
+  );
+
+  elements.result.classList.add('show');
+  elements.result.scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+function editActivity(id) {
+  const activity = state.activities.find(function(item) {
+    return item.id === id;
+  });
+
+  if (!activity) return;
+
+  resetActivityForm();
+
+  elements.activityId.value = activity.id;
+  elements.recordType.value = activity.recordType || 'self_report';
+  configureRecordType();
+
+  elements.categoryKey.value = activity.categoryKey;
+  configureCategory(activity.categoryKey);
+
+  elements.title.value = activity.title || '';
+  elements.description.value = activity.description || '';
+  elements.startDate.value = activity.startDate || '';
+  elements.endDate.value = activity.endDate || '';
+  elements.organization.value = activity.organization || '';
+  elements.role.value = activity.role || '';
+  elements.status.value = activity.status || '';
+  elements.officialApprovedCUs.value =
+    activity.officialApprovedCUs === '' ? '' : activity.officialApprovedCUs;
+  elements.evidenceLink.value = activity.evidenceLink || '';
+  elements.notes.value = activity.notes || '';
+
+  const rule = getRule(activity.categoryKey);
+
+  if (rule && rule.entryMode === 'session_time') {
+    elements.sessionRows.innerHTML = '';
+    (activity.sessions || []).forEach(function(session) {
+      addSessionRow(session);
+    });
+    if (!elements.sessionRows.children.length) addSessionRow();
+    updateSessionTotals();
+  } else {
+    elements.quantity.value = activity.quantity || 0;
+    elements.unit.value = activity.unit || elements.unit.value;
+    elements.paymentStatus.value = activity.paymentStatus || 'unpaid';
+    elements.titleIException.value = activity.titleIException || 'no';
   }
 
-  elements.paymentStatus.value = a.paymentStatus;
-  elements.quantity.value = a.quantity;
-  elements.unit.value = a.unit;
-  if (editingRule && editingRule.entryMode === 'session_time') updateSessionTotals();
-  elements.titleIException.value = a.titleIException || 'no';
-  elements.status.value = a.status;
-  elements.officialApprovedCUs.value = a.officialApprovedCUs;
-  elements.evidenceLink.value = a.evidenceLink || '';
-  elements.notes.value = a.notes || '';
-  elements.formHeading.textContent = 'Edit Professional Activity';
-  elements.saveButton.textContent = 'Recalculate & Update';
+  populateStatusOptions();
+  if ((elements.status.querySelector(
+      'option[value="' + cssEscape(activity.status || '') + '"]'
+    ))) {
+    elements.status.value = activity.status;
+  }
+  updateOfficialField();
+
+  elements.formHeading.textContent =
+    activity.recordType === 'automatic_elms'
+      ? 'Edit ELMS Tracking Record'
+      : 'Edit Self-Reported Activity';
+
+  showActivityStep(1);
   showView('activity');
 }
 
 async function removeActivity(id) {
-  const a = state.activities.find(function(item) { return item.id === id; });
-  if (!a || !confirm('Delete "' + a.title + '"? Drive folders will remain.')) return;
-  setLoading(true, 'Deleting the activity record...');
+  const activity = state.activities.find(function(item) {
+    return item.id === id;
+  });
+
+  if (!activity || !confirm('Delete "' + activity.title + '"? Drive folders will remain.')) {
+    return;
+  }
+
+  setLoading(true, 'Deleting the tracker record...');
+
   try {
     applyBootstrap(await runServer('deleteActivity', id));
-    showToast('Activity record deleted.');
-  } catch (error) { showToast(error.message, true); }
-  finally { setLoading(false); }
+    showToast('Tracker record deleted.');
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function createCategoryFolder(id) {
+  setLoading(true, 'Creating or opening the category folder...');
+
+  try {
+    applyBootstrap(await runServer('createEvidenceFolderForActivity', id));
+    const activity = state.activities.find(function(item) {
+      return item.id === id;
+    });
+
+    if (activity && activity.activityFolderUrl) {
+      window.open(activity.activityFolderUrl, '_blank', 'noopener');
+    }
+
+    showToast('Category folder is ready.');
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
 }
 
 async function createWorkspaceFolders() {
-  setLoading(true, 'Creating or verifying Drive folders...');
+  setLoading(true, 'Creating or verifying your PGS folders...');
+
   try {
     applyBootstrap(await runServer('createWorkspaceFolders'));
-    showToast('PGS folder structure is ready.');
-  } catch (error) { showToast(error.message, true); }
-  finally { setLoading(false); }
+    showToast('Your PGS folder structure is ready.');
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
 }
 
-async function createActivityFolder(id) {
-  setLoading(true, 'Creating the activity evidence folder...');
-  try {
-    applyBootstrap(await runServer('createEvidenceFolderForActivity', id));
-    showToast('Activity evidence folder created.');
-  } catch (error) { showToast(error.message, true); }
-  finally { setLoading(false); }
+function renderRecords() {
+  if (!state.activities.length) {
+    elements.recordsBody.innerHTML =
+      '<tr><td colspan="8">No records yet.</td></tr>';
+  } else {
+    elements.recordsBody.innerHTML = state.activities.map(function(activity) {
+      const automatic = activity.recordType === 'automatic_elms';
+      const evidenceUrl = safeHttpUrl(activity.evidenceLink);
+      const folderUrl = safeHttpUrl(activity.activityFolderUrl);
+
+      let evidence = automatic
+        ? 'Not required for tracker'
+        : (evidenceUrl
+          ? '<a href="' + escapeHtml(evidenceUrl) +
+            '" target="_blank" rel="noopener">Final file</a>'
+          : 'Final file not linked');
+
+      if (folderUrl && !automatic) {
+        evidence += '<br><a href="' + escapeHtml(folderUrl) +
+          '" target="_blank" rel="noopener">Category folder</a>';
+      }
+
+      const folderButton = !automatic && !folderUrl
+        ? '<button class="btn small green" type="button" data-action="folder" data-id="' +
+          escapeHtml(activity.id) + '">Create Folder</button>'
+        : '';
+
+      return '<tr>' +
+        '<td><strong>' + escapeHtml(activity.title) + '</strong><br><small>' +
+          escapeHtml(truncate(activity.description, 75)) + '</small></td>' +
+        '<td>' + (automatic ? 'Automatic ELMS' : 'Self-reported') + '</td>' +
+        '<td>' + escapeHtml(activity.categoryName) + '</td>' +
+        '<td>' + estimateText(activity.estimatedCUs) + '</td>' +
+        '<td>' + (activity.officialApprovedCUs === ''
+          ? '-'
+          : numberText(activity.officialApprovedCUs)) + '</td>' +
+        '<td><span class="tag">' + escapeHtml(activity.status) + '</span></td>' +
+        '<td>' + evidence + '</td>' +
+        '<td><div class="table-actions">' +
+          '<button class="btn small ghost" type="button" data-action="edit" data-id="' +
+            escapeHtml(activity.id) + '">Edit</button>' +
+          folderButton +
+          '<button class="btn small danger-button" type="button" data-action="delete" data-id="' +
+            escapeHtml(activity.id) + '">Delete</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  const balances = (state.summary.categoryBalances || []).filter(function(item) {
+    return item.estimated > 0 ||
+      item.approvedSelfReported > 0 ||
+      item.automaticElms > 0;
+  });
+
+  elements.categoryBody.innerHTML = balances.length
+    ? balances.map(function(item) {
+      return '<tr>' +
+        '<td><strong>' + escapeHtml(item.category) + '</strong><br><small>' +
+          escapeHtml(item.parentCategory) + '</small></td>' +
+        '<td>' + numberText(item.estimated) + '</td>' +
+        '<td>' + numberText(item.approvedSelfReported) + '</td>' +
+        '<td>' + numberText(item.automaticElms) + '</td>' +
+        '<td>' + numberText(item.confirmedTotal) + '</td>' +
+        '<td>' + (item.maximum === null ? 'No stated max' : numberText(item.maximum)) + '</td>' +
+        '<td>' + (item.remaining === null ? '-' : numberText(item.remaining)) + '</td>' +
+      '</tr>';
+    }).join('')
+    : '<tr><td colspan="7">Category totals will appear after records are saved.</td></tr>';
 }
 
-function showSavedResult(a) {
-  elements.resultCategory.textContent = a.categoryName;
-  elements.resultCUs.textContent = estimateText(a.estimatedCUs);
-  elements.resultRule.textContent = a.ruleVersion || 'Not recorded';
-  elements.resultStatus.textContent = a.status;
-  elements.result.classList.add('show');
+function populateEvidenceActivities() {
+  const selected = elements.evidenceActivitySelect.value;
+
+  const selfReported = state.activities.filter(function(activity) {
+    return activity.recordType !== 'automatic_elms';
+  });
+
+  elements.evidenceActivitySelect.innerHTML =
+    '<option value="">Choose an activity</option>' +
+    selfReported.map(function(activity) {
+      return '<option value="' + escapeHtml(activity.id) + '">' +
+        escapeHtml(activity.title + ' - ' + activity.categoryName) +
+      '</option>';
+    }).join('');
+
+  if (selfReported.some(function(activity) {
+    return activity.id === selected;
+  })) {
+    elements.evidenceActivitySelect.value = selected;
+  }
 }
 
-function resetFormState() {
+function renderEvidenceGuide() {
+  const id = elements.evidenceActivitySelect.value;
+
+  if (!id) {
+    elements.evidenceGuideOutput.innerHTML =
+      '<div class="notice info">Choose a self-reported activity to see its evidence requirements.</div>';
+    return;
+  }
+
+  const activity = state.activities.find(function(item) {
+    return item.id === id;
+  });
+
+  const rule = activity ? getRule(activity.categoryKey) : null;
+
+  if (!activity || !rule) {
+    elements.evidenceGuideOutput.innerHTML =
+      '<div class="notice danger">The saved category rule could not be found.</div>';
+    return;
+  }
+
+  const folderButton = activity.activityFolderUrl
+    ? '<a class="btn green" href="' + escapeHtml(activity.activityFolderUrl) +
+      '" target="_blank" rel="noopener">Open Category Folder</a>'
+    : '<button class="btn green" type="button" data-create-guide-folder="' +
+      escapeHtml(activity.id) + '">Create Category Folder</button>';
+
+  elements.evidenceGuideOutput.innerHTML =
+    '<div class="card evidence-card">' +
+      '<div class="parent-label">' + escapeHtml(rule.parentCategory) + '</div>' +
+      '<h3>' + escapeHtml(activity.title) + '</h3>' +
+      '<div class="simple-guidance">' +
+        '<div><strong>Upload these items</strong><span>' +
+          escapeHtml(rule.documentation) + '</span></div>' +
+        importantGuidanceHtml(rule) +
+        '<div><strong>Final file</strong><span>' +
+          'Combine the required evidence into one final file. Share the final file so CCSD users with the link can view it.' +
+        '</span></div>' +
+      '</div>' +
+      '<div class="actions">' + folderButton +
+        (activity.evidenceLink
+          ? '<a class="btn ghost" href="' + escapeHtml(activity.evidenceLink) +
+            '" target="_blank" rel="noopener">Open Final Evidence File</a>'
+          : '') +
+      '</div>' +
+      '<details><summary>Official source</summary><p>' +
+        escapeHtml(rule.sourceDocument + ', page ' + rule.sourcePage) +
+      '</p></details>' +
+    '</div>';
+
+  const createButton = elements.evidenceGuideOutput.querySelector(
+    '[data-create-guide-folder]'
+  );
+
+  if (createButton) {
+    createButton.addEventListener('click', function() {
+      createCategoryFolder(createButton.dataset.createGuideFolder);
+    });
+  }
+}
+
+function resetActivityForm() {
   elements.activityForm.reset();
   elements.activityId.value = '';
-  elements.quantity.value = '0';
+  elements.recordType.value = 'self_report';
+  elements.categoryKey.value = '';
+  elements.categoryGuidance.hidden = true;
   elements.sessionRows.innerHTML = '';
   addSessionRow();
-  elements.sessionSection.hidden = true;
-  elements.startDateField.hidden = false;
-  elements.endDateField.hidden = false;
-  elements.paymentStatusField.hidden = false;
-  elements.quantityField.hidden = false;
-  elements.unitField.hidden = false;
-  elements.titleIField.hidden = true;
-  elements.startDateLabel.textContent = 'Start date';
-  elements.endDateLabel.textContent = 'End date';
-  elements.quantityHelp.textContent = '';
-  elements.formHeading.textContent = 'Add a Professional Activity';
-  elements.saveButton.textContent = 'Calculate & Save Once';
-  elements.categoryGuidance.hidden = true;
-  elements.paymentStatus.disabled = false;
-  elements.titleIException.disabled = false;
+  elements.quantity.value = '0';
+  elements.evidenceLink.value = '';
+  elements.notes.value = '';
+  elements.result.classList.remove('show');
+  hideCalculationFields();
+  populateStatusOptions();
+  showActivityStep(1);
 }
 
 function showView(viewId) {
   if (!pageMeta[viewId]) return;
-  document.querySelectorAll('.view').forEach(function(view) { view.classList.remove('active'); });
+
+  document.querySelectorAll('.view').forEach(function(view) {
+    view.classList.remove('active');
+  });
+
   document.getElementById(viewId).classList.add('active');
+
   document.querySelectorAll('nav button').forEach(function(button) {
     button.classList.toggle('active', button.dataset.view === viewId);
   });
+
   elements.mobileNav.value = viewId;
   elements.heading.textContent = pageMeta[viewId][0];
   elements.sub.textContent = pageMeta[viewId][1];
+
   window.scrollTo({top: 0, behavior: 'smooth'});
 }
-window.showView = showView;
 
-function getRule(key) { return state.rules.find(function(rule) { return rule.categoryKey === key; }); }
+function getRule(key) {
+  return state.rules.find(function(rule) {
+    return rule.categoryKey === key;
+  });
+}
+
 function groupBy(items, key) {
   return items.reduce(function(groups, item) {
     const value = item[key] || 'Other';
@@ -1077,71 +1466,99 @@ function groupBy(items, key) {
     return groups;
   }, {});
 }
-function unique(items) { return Array.from(new Set(items)); }
-function quantityLabelFor(unit) { return unitLabels[unit] || 'Quantity'; }
-function measurementSummary(rule) {
-  const mode = rule.entryMode || '';
-  if (mode === 'session_time') return 'Exact dated sessions with start time, end time, breaks, and payment status.';
-  if (mode === 'duration_hours') return 'Documented total hours/duration from the certificate, transcript, time report, or provider record.';
-  if (mode === 'count') return rule.quantityLabel || 'Number of qualifying items completed or received.';
-  if (mode === 'credit' || mode === 'credit_review') return 'Semester or quarter credits shown on the official transcript.';
-  if (mode === 'fixed') return 'Fixed CU value established by the official guide.';
-  if (mode === 'ceu_or_hours') return 'Hours or CEUs exactly as shown on the responsible organization certificate/transcript.';
-  if (mode === 'automatic') return 'Automatically calculated and recorded through the District PD report in ELMS.';
-  return 'Category-specific documentation review.';
-}
+
 function calculationSummary(rule) {
   if (rule.calculationType === 'hours') {
-    return 'Normally 1 CU per ' + rule.unpaidHoursPerCU + ' unpaid hours or ' +
-      rule.paidHoursPerCU + ' paid hours';
+    return 'Normally 1 CU per ' + rule.unpaidHoursPerCU +
+      ' unpaid hours or ' + rule.paidHoursPerCU + ' paid hours';
   }
-  if (rule.calculationType === 'count') return rule.perUnitCUs + ' CUs per ' + quantityLabelFor((rule.units || [])[0]).toLowerCase().replace(/s$/, '');
-  if (rule.calculationType === 'fixed') return rule.fixedCUs + ' fixed CUs';
+
+  if (rule.calculationType === 'count') {
+    return rule.perUnitCUs + ' CUs per qualifying item';
+  }
+
+  if (rule.calculationType === 'fixed') {
+    return rule.fixedCUs + ' fixed CUs';
+  }
+
   if (rule.calculationType === 'unit_rate') {
     return Object.keys(rule.unitRates || {}).map(function(unit) {
-      return rule.unitRates[unit] + ' CUs per ' + quantityLabelFor(unit).toLowerCase().replace(/s$/, '');
+      return rule.unitRates[unit] + ' CUs per ' +
+        (unitLabels[unit] || unit).toLowerCase();
     }).join(' or ');
   }
-  return 'Requires activity-specific verification';
+
+  return 'Requires category-specific review';
 }
-function submissionLabel(mode) {
-  if (mode === 'automatic') return 'Automatically recorded in ELMS; normally do not self-report';
-  if (mode === 'department') return 'Submitted or entered through the responsible department';
-  return 'Self-reported in ELMS with the required Drive documentation';
+
+function estimateText(value) {
+  return value === '' || value === null || value === undefined
+    ? '-'
+    : numberText(value);
 }
-function estimateText(value) { return value === '' || value === null ? 'Review required' : numberText(value); }
+
 function setLoading(show, message) {
   elements.loading.classList.toggle('hidden', !show);
   if (message) elements.loadingText.textContent = message;
 }
+
 function showToast(message, isError) {
   elements.toast.textContent = message;
-  elements.toast.style.borderLeft = '5px solid ' + (isError ? '#c94747' : '#4d9b45');
+  elements.toast.style.borderLeft =
+    '5px solid ' + (isError ? '#c94747' : '#4d9b45');
   elements.toast.classList.add('show');
+
   clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(function() { elements.toast.classList.remove('show'); }, 4500);
+  showToast.timer = setTimeout(function() {
+    elements.toast.classList.remove('show');
+  }, 5000);
 }
+
 function setLink(element, url, label) {
-  const safe = safeHttpUrl(url); element.hidden = !safe;
-  if (safe) { element.href = safe; element.textContent = label; }
+  const safe = safeHttpUrl(url);
+  element.hidden = !safe;
+
+  if (safe) {
+    element.href = safe;
+    element.textContent = label;
+  }
 }
+
 function safeHttpUrl(value) {
   if (!value) return '';
+
   try {
     const parsed = new URL(value);
-    return ['http:', 'https:'].indexOf(parsed.protocol) >= 0 ? parsed.href : '';
-  } catch (error) { return ''; }
+    return ['http:', 'https:'].indexOf(parsed.protocol) >= 0
+      ? parsed.href
+      : '';
+  } catch (error) {
+    return '';
+  }
 }
+
 function escapeHtml(value) {
   return String(value === null || value === undefined ? '' : value)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
+
 function truncate(value, length) {
   const text = String(value || '');
-  return text.length > length ? text.slice(0, length - 1) + '...' : text;
+  return text.length > length
+    ? text.slice(0, length - 1) + '...'
+    : text;
 }
+
 function numberText(value) {
-  const number = Number(value); return Number.isFinite(number) ? number.toFixed(2) : '0.00';
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(2) : '0.00';
+}
+
+function cssEscape(value) {
+  return String(value || '').replace(/["\\]/g, '\\$&');
 }
 </script>

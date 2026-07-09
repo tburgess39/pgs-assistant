@@ -2459,18 +2459,148 @@ const PGS_ACTIVITY_LIBRARY = [
 ];
 
 const PGS_GUIDED_FINDER = {
-  "version": "2026-07-10",
-  "sourceNote": "Decision paths are based on the 9/1/23 PGS Reference Guide, Documentation Required for CU Submission in ELMS, and current CCSD/CCEA PGS announcements.",
+  "version": "2026-07-10-m3",
+  "sourceNote": "Guided choices are mapped to the 9/1/23 PGS Reference Guide, Documentation Required for CU Submission in ELMS, and current CCSD/CCEA announcements.",
   "contexts": [
     {
+      "id": "awards_grants",
+      "label": "Awards or Grants",
+      "description": "Choose this when you actually received an award or grant. Applications that were not awarded are not current CU categories.",
+      "roles": [
+        {
+          "id": "received_award",
+          "label": "I received an award",
+          "description": "Choose the level of the organization that issued the award.",
+          "activities": [
+            {
+              "id": "community_award",
+              "categoryKey": "COMMUNITY_AWARD",
+              "label": "Recipient of a Community-Based Award",
+              "description": "I won a qualifying award from a local agency, company, organization, or District opportunity.",
+              "officialBasis": "Five CUs for one community award; maximum 5 CUs."
+            },
+            {
+              "id": "state_award",
+              "categoryKey": "STATE_AWARD",
+              "label": "Recipient of a State Professional Award",
+              "description": "I received a state-level professional award recognizing excellence in professional practice.",
+              "officialBasis": "Fifteen CUs for one state award; maximum 15 CUs."
+            },
+            {
+              "id": "national_award",
+              "categoryKey": "NATIONAL_AWARD",
+              "label": "Recipient of a National Professional Award",
+              "description": "I received a national professional award recognizing excellence in professional practice.",
+              "officialBasis": "Twenty-five CUs for each national award."
+            }
+          ]
+        },
+        {
+          "id": "received_grant",
+          "label": "I received a grant",
+          "description": "Use this only for grants that were actually awarded and directly benefit students, the school, classroom climate, or school community.",
+          "activities": [
+            {
+              "id": "grant_recipient",
+              "categoryKey": "GRANT_RECIPIENT",
+              "label": "Recipient of a Grant that Directly Impacts Students, School, or Community",
+              "description": "I received a qualifying grant that directly benefits students, classroom/school climate, the school, or school community.",
+              "officialBasis": "Three CUs per received grant; maximum 30 CUs."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ccsd_providers",
+      "label": "CCSD District, ELMS, RPDP, CCEA, or Vegas PBS",
+      "description": "Choose this for professional learning delivered or recorded by District-related providers.",
+      "roles": [
+        {
+          "id": "completed_district_learning",
+          "label": "I attended or completed the professional learning",
+          "description": "Choose the provider that issued or recorded the activity.",
+          "activities": [
+            {
+              "id": "district_pd",
+              "categoryKey": "DISTRICT_PD",
+              "label": "CCSD District Professional Development registered in ELMS",
+              "description": "I completed a District professional development course that is recorded in the District PD report in ELMS.",
+              "officialBasis": "District PD is automatically recorded in ELMS; a duplicate self-report is normally not required."
+            },
+            {
+              "id": "rpdp_pd",
+              "categoryKey": "RPDP_PD",
+              "label": "RPDP professional development workshop or course",
+              "description": "I completed an RPDP workshop or course and received a completion record showing hours.",
+              "officialBasis": "RPDP professional development; no stated category maximum."
+            },
+            {
+              "id": "ccea_pd",
+              "categoryKey": "CCEA_COLLAB_PD",
+              "label": "CCEA or Nevada Collaboratory professional development",
+              "description": "I completed professional development, coursework, modules, or micro-credentials offered through CCEA or The Nevada Collaboratory.",
+              "officialBasis": "CCEA/Nevada Collaboratory professional development; no stated category maximum."
+            },
+            {
+              "id": "vegas_pbs_pd",
+              "categoryKey": "VEGAS_PBS_PD",
+              "label": "Vegas PBS Professional Development Credit Course",
+              "description": "I completed an NVDOE-approved Vegas PBS professional development credit course in the Vegas PBS portal.",
+              "officialBasis": "Vegas PBS PD credit course; no stated category maximum."
+            },
+            {
+              "id": "linkedin_cte",
+              "workflowOnly": true,
+              "specialRuleId": "LINKEDIN_CTE_2024",
+              "label": "LinkedIn Learning completed by a CTE teacher",
+              "description": "I am a CTE teacher and completed LinkedIn Learning on or after February 15, 2024.",
+              "officialBasis": "Current announcement: the CTE Department collects and enters qualifying LinkedIn Learning activities; do not submit a duplicate self-report.",
+              "sourceDocument": "CCSD and CCEA PGS Announcements",
+              "sourcePage": "2",
+              "sourceDate": "February 15, 2024"
+            }
+          ]
+        },
+        {
+          "id": "taught_district_learning",
+          "label": "I taught, presented, or facilitated the professional learning",
+          "description": "District-level teaching includes qualifying PDE, RPDP, or CCEA professional development.",
+          "activities": [
+            {
+              "id": "teach_district_pd",
+              "categoryKey": "TEACH_DISTRICT_PD",
+              "label": "Taught a District-level PD course for at least five attendees",
+              "description": "I taught District-level professional development, including PDE credit, RPDP, or CCEA, for a minimum of five attendees.",
+              "officialBasis": "District-level PD instruction; maximum 70 CUs."
+            }
+          ]
+        },
+        {
+          "id": "developed_district_learning",
+          "label": "I wrote, developed, or substantially revised the course",
+          "description": "Use this for qualifying first-time development or significant revision of a District, RPDP, or CCEA course.",
+          "activities": [
+            {
+              "id": "write_district_pd",
+              "categoryKey": "WRITE_DISTRICT_PD",
+              "label": "Developed a new District, RPDP, or CCEA PD course",
+              "description": "I wrote a new District-level professional development course designed for at least 20 enrollees, or made significant revisions to an existing course.",
+              "officialBasis": "Up to three documented creation hours per presentation hour; maximum 50 CUs."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "college_university",
-      "label": "A college or university",
-      "description": "Use this path for semester or quarter credit that will appear on an official university transcript.",
+      "label": "College or University",
+      "description": "Choose this for coursework that will appear on an official university transcript.",
       "roles": [
         {
           "id": "completed_coursework",
           "label": "I completed college coursework",
-          "description": "Choose the description that matches the institution, department/content, and course level.",
+          "description": "Choose the description that matches the university approval status, department/content, and course level.",
           "activities": [
             {
               "id": "college_approved_ed",
@@ -2519,193 +2649,242 @@ const PGS_GUIDED_FINDER = {
       ]
     },
     {
-      "id": "ccsd_district",
-      "label": "CCSD District professional development or ELMS",
-      "description": "Use this path for District-provided professional learning, District-level instruction, or District-level course development.",
+      "id": "external_professional",
+      "label": "External Conference, Webinar, or Professional Organization",
+      "description": "Choose this for recognized professional organizations outside the District provider categories.",
       "roles": [
         {
-          "id": "district_participant",
-          "label": "I attended or completed the professional learning",
-          "description": "Choose the provider or workflow that actually delivered the activity.",
+          "id": "attended_live",
+          "label": "I attended live, in person, or synchronously",
+          "description": "The activity occurred in real time at a coordinated date and time.",
           "activities": [
             {
-              "id": "district_pd",
-              "categoryKey": "DISTRICT_PD",
-              "label": "CCSD District Professional Development registered in ELMS",
-              "description": "I completed a District professional development course that is recorded in the District PD report in ELMS.",
-              "officialBasis": "District PD is automatically recorded in ELMS; a duplicate self-report is normally not required."
+              "id": "sync_conference",
+              "categoryKey": "SYNC_CONFERENCE",
+              "label": "In-person, live virtual, or synchronous conference attendance",
+              "description": "I attended a real-time conference provided by an organization recognized by my profession or content area.",
+              "officialBasis": "Synchronous conference attendance; maximum 80 CUs."
+            }
+          ]
+        },
+        {
+          "id": "completed_on_demand",
+          "label": "I completed an asynchronous conference or webinar",
+          "description": "The content was viewed on demand rather than at a coordinated real-time session.",
+          "activities": [
+            {
+              "id": "async_conference",
+              "categoryKey": "ASYNC_CONFERENCE_WEBINAR",
+              "label": "Asynchronous Conference or Webinar",
+              "description": "I completed an on-demand conference or webinar that did not occur in real time.",
+              "officialBasis": "Asynchronous conference/webinar; maximum 10 CUs."
+            }
+          ]
+        },
+        {
+          "id": "presented_conference",
+          "label": "I presented at the conference",
+          "description": "The provider must be recognized by the profession or content area.",
+          "activities": [
+            {
+              "id": "conference_presentation",
+              "categoryKey": "CONFERENCE_PRESENTATION",
+              "label": "Presentation at a Recognized Professional Conference",
+              "description": "I delivered a presentation at a conference recognized by my profession or content area.",
+              "officialBasis": "Up to three documented creation hours per unique presentation hour; maximum 50 CUs."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iep_mdt",
+      "label": "IEP or MDT",
+      "description": "Choose the role you performed in the IEP/MDT process.",
+      "roles": [
+        {
+          "id": "iep_writer",
+          "label": "I was responsible for writing the IEP or MDT",
+          "description": "For special education teachers and related-services providers writing documents on their caseload.",
+          "activities": [
+            {
+              "id": "write_iep",
+              "categoryKey": "WRITE_IEP_MDT",
+              "label": "Writing IEPs and MDTs as the responsible special education teacher/provider",
+              "description": "I wrote an IEP/MDT for a student on my caseload as the special education teacher or related-services special education provider.",
+              "officialBasis": "One CU per qualifying IEP/MDT; maximum 30 CUs."
+            }
+          ]
+        },
+        {
+          "id": "iep_team_member",
+          "label": "I participated as another member of the IEP/MDT team",
+          "description": "You must participate in the writing process and attend the meeting.",
+          "activities": [
+            {
+              "id": "iep_team",
+              "categoryKey": "IEP_MDT_TEAM",
+              "label": "Participating as a Member of the IEP/MDT Team",
+              "description": "I participated in the IEP/MDT writing process and attended the meeting to support the student's goals.",
+              "officialBasis": "One-half CU per qualifying student; maximum 30 CUs."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "credentials_licenses",
+      "label": "License, Endorsement, Credential, or National Board",
+      "description": "Choose this for approved micro-credentials, National Board, endorsements, or specialty-license continuing education.",
+      "roles": [
+        {
+          "id": "earned_microcredential",
+          "label": "I earned an approved micro-credential",
+          "description": "Only Digital Promise-approved micro-credentials qualify in this category.",
+          "activities": [
+            {
+              "id": "microcredential",
+              "categoryKey": "MICRO_CREDENTIAL",
+              "label": "Digital Promise-Approved Micro-Credential",
+              "description": "I earned a Digital Promise-approved micro-credential related to my assignment, license, or professional growth goals.",
+              "officialBasis": "Approved micro-credentials; maximum 50 CUs."
+            }
+          ]
+        },
+        {
+          "id": "national_board",
+          "label": "I completed a National Board milestone",
+          "description": "Choose the milestone that was successfully completed.",
+          "activities": [
+            {
+              "id": "nbpts_process",
+              "categoryKey": "NBPTS_PROCESS",
+              "label": "National Board Process - Initial Submission of All Components",
+              "description": "I completed the initial submission of all required National Board components.",
+              "officialBasis": "Initial submission may earn 133 CUs."
             },
             {
-              "id": "linkedin_cte",
-              "workflowOnly": true,
-              "specialRuleId": "LINKEDIN_CTE_2024",
-              "label": "LinkedIn Learning completed by a CTE teacher",
-              "description": "I am a CTE teacher and completed LinkedIn Learning on or after February 15, 2024.",
-              "officialBasis": "Current announcement: the CTE Department collects and enters qualifying LinkedIn Learning activities; do not submit a duplicate self-report.",
-              "sourceDocument": "CCSD and CCEA PGS Announcements",
-              "sourcePage": "2",
-              "sourceDate": "February 15, 2024"
+              "id": "nbpts_certification",
+              "categoryKey": "NBPTS_CERTIFICATION",
+              "label": "National Board Certification",
+              "description": "I successfully achieved National Board for Professional Teaching Standards certification.",
+              "officialBasis": "Successful certification may earn an additional 92 CUs."
+            },
+            {
+              "id": "nbpts_moc",
+              "categoryKey": "NBPTS_MOC",
+              "label": "National Board Maintenance of Certification (MOC)",
+              "description": "I successfully completed the National Board Maintenance of Certification process.",
+              "officialBasis": "Maintenance of Certification earns 30 CUs."
             }
           ]
         },
         {
-          "id": "district_instructor",
-          "label": "I taught, presented, or facilitated the professional development",
-          "description": "District-level teaching must meet the official audience and documentation requirements.",
+          "id": "license_or_ceu",
+          "label": "I maintained an endorsement or completed specialty-license CEUs",
+          "description": "Choose the evidence that appears on your license, certificate, or transcript.",
           "activities": [
             {
-              "id": "teach_district_pd",
-              "categoryKey": "TEACH_DISTRICT_PD",
-              "label": "Taught a District-level PD course for at least five attendees",
-              "description": "I taught District-level professional development, including PDE credit, RPDP, or CCEA, for a minimum of five attendees.",
-              "officialBasis": "District-level PD instruction; maximum 70 CUs."
-            }
-          ]
-        },
-        {
-          "id": "district_developer",
-          "label": "I wrote, developed, or substantially revised the course",
-          "description": "Use this only for a new District-level course or significant revisions meeting the official enrollment requirement.",
-          "activities": [
+              "id": "second_endorsement",
+              "categoryKey": "SECOND_ENDORSEMENT",
+              "label": "Maintaining a Second Endorsement Outside the Primary Assignment",
+              "description": "I maintained an eligible endorsement that is not required for my primary teaching/licensed assignment.",
+              "officialBasis": "Ten CUs per qualifying endorsement; maximum 20 CUs."
+            },
             {
-              "id": "write_district_pd",
-              "categoryKey": "WRITE_DISTRICT_PD",
-              "label": "Developed a new District, RPDP, or CCEA PD course",
-              "description": "I wrote a new District-level professional development course designed for at least 20 enrollees, or made significant revisions to an existing course.",
-              "officialBasis": "Up to three documented creation hours per presentation hour; maximum 50 CUs."
+              "id": "specialty_ceu",
+              "categoryKey": "SPECIALTY_CEU",
+              "label": "Professional/Specialty License Continuing Education Units (CEUs)",
+              "description": "I completed CEUs related to my licensed assignment, specialty professional license, or professional growth goals.",
+              "officialBasis": "Qualifying specialty-license CEUs; no stated category maximum."
+            },
+            {
+              "id": "mha_counselor",
+              "categoryKey": "SPECIALTY_CEU",
+              "specialRuleId": "MHA_COUNSELOR_2026",
+              "label": "Approved Mental Health Academy coursework as a CCSD counselor",
+              "description": "I am a CCSD counselor and completed an MHA course on the current approved list that aligns to my assignment or licensure.",
+              "officialBasis": "Current announcement requires Guidance and Counseling review and may require the Time-Based Activities form.",
+              "sourceDocument": "9/1/23 PGS Reference Guide plus CCSD and CCEA PGS Announcements",
+              "sourcePage": "10 and announcement pages 2-3",
+              "sourceDate": "March 12 and March 30, 2026"
             }
           ]
         }
       ]
     },
     {
-      "id": "rpdp",
-      "label": "RPDP",
-      "description": "Use this path for Regional Professional Development Program workshops, courses, teaching, or course development.",
+      "id": "mentoring_candidate",
+      "label": "Mentoring or Teacher-Candidate Placement",
+      "description": "Choose this for a qualifying educator mentoring relationship or an assigned teacher-candidate placement.",
       "roles": [
         {
-          "id": "rpdp_participant",
-          "label": "I attended or completed an RPDP workshop or course",
-          "description": "University credit attached to an RPDP course follows the college-coursework rules instead.",
+          "id": "mentor",
+          "label": "I served as the mentor",
+          "description": "The relationship must meet one of the official mentor eligibility situations.",
           "activities": [
             {
-              "id": "rpdp_pd",
-              "categoryKey": "RPDP_PD",
-              "label": "RPDP professional development workshop or course",
-              "description": "I completed an RPDP workshop or course and received a completion record showing hours.",
-              "officialBasis": "RPDP professional development; no stated category maximum."
+              "id": "mentor_activity",
+              "categoryKey": "MENTOR",
+              "label": "Participating in a Mentoring Relationship as the Mentor",
+              "description": "I mentored an eligible experienced educator needing support, a new educator, an educator new to CCSD, or an eligible long-term vacancy substitute.",
+              "officialBasis": "Mentor category; maximum 80 CUs."
             }
           ]
         },
         {
-          "id": "rpdp_instructor",
-          "label": "I taught or facilitated the RPDP course",
-          "description": "Choose this for District-level instruction delivered through RPDP.",
+          "id": "mentee",
+          "label": "I was the mentee",
+          "description": "The professional learning must occur within a qualifying mentoring relationship.",
           "activities": [
             {
-              "id": "teach_rpdp",
-              "categoryKey": "TEACH_DISTRICT_PD",
-              "label": "Taught an RPDP professional development course",
-              "description": "I taught an RPDP professional development course for the required audience.",
-              "officialBasis": "Combined District-level teaching category; maximum 70 CUs."
+              "id": "mentee_activity",
+              "categoryKey": "MENTEE",
+              "label": "Participating in a Mentoring Relationship as the Mentee",
+              "description": "I was mentored as an eligible experienced educator needing support, a new educator, or an educator new to CCSD.",
+              "officialBasis": "Mentee category; maximum 30 CUs."
             }
           ]
         },
         {
-          "id": "rpdp_developer",
-          "label": "I wrote or developed the RPDP course",
-          "description": "Choose this for first-time development or significant revisions.",
+          "id": "candidate_host",
+          "label": "I hosted an assigned teacher candidate",
+          "description": "Choose the candidate's official placement type.",
           "activities": [
             {
-              "id": "write_rpdp",
-              "categoryKey": "WRITE_DISTRICT_PD",
-              "label": "Developed a new RPDP professional development course",
-              "description": "I wrote or significantly revised an RPDP course designed for at least 20 enrollees.",
-              "officialBasis": "Combined District-level course-development category; maximum 50 CUs."
+              "id": "fos",
+              "categoryKey": "FOS_ASSIGNMENT",
+              "label": "Assignment of a Field Observation Student (FOS)",
+              "description": "A supervisor assigned a field-observation student who completed the required observation time with me.",
+              "officialBasis": "Two CUs per FOS; maximum 8 CUs."
+            },
+            {
+              "id": "practicum",
+              "categoryKey": "PRACTICUM_ASSIGNMENT",
+              "label": "Assignment of a Practicum Student",
+              "description": "A supervisor assigned a practicum student to me for a documented placement.",
+              "officialBasis": "Two CUs per week; maximum 20 CUs."
+            },
+            {
+              "id": "student_teacher",
+              "categoryKey": "STUDENT_TEACHER_ASSIGNMENT",
+              "label": "Assignment of a Student Teacher",
+              "description": "A supervisor assigned a student teacher to me for a documented placement.",
+              "officialBasis": "Two CUs per week; maximum 20 CUs."
             }
           ]
         }
       ]
     },
     {
-      "id": "ccea",
-      "label": "CCEA or The Nevada Collaboratory",
-      "description": "Use this path for CCEA/Collaboratory coursework, modules, micro-credentials, teaching, or course development.",
+      "id": "school_site",
+      "label": "School or Site Activities",
+      "description": "Choose this for school/site professional learning, PLCs, community engagement, SOT service, or schoolwide planning.",
       "roles": [
         {
-          "id": "ccea_participant",
-          "label": "I attended or completed the activity",
-          "description": "This includes CCEA/Collaboratory coursework, modules, and their professional learning offerings.",
-          "activities": [
-            {
-              "id": "ccea_pd",
-              "categoryKey": "CCEA_COLLAB_PD",
-              "label": "CCEA or Nevada Collaboratory professional development",
-              "description": "I completed professional development, coursework, modules, or micro-credentials offered through CCEA or The Nevada Collaboratory.",
-              "officialBasis": "CCEA/Nevada Collaboratory professional development; no stated category maximum."
-            }
-          ]
-        },
-        {
-          "id": "ccea_instructor",
-          "label": "I taught or facilitated the course",
-          "description": "Choose this for District-level professional development instruction through CCEA.",
-          "activities": [
-            {
-              "id": "teach_ccea",
-              "categoryKey": "TEACH_DISTRICT_PD",
-              "label": "Taught a CCEA professional development course",
-              "description": "I taught a CCEA professional development course for the required audience.",
-              "officialBasis": "Combined District-level teaching category; maximum 70 CUs."
-            }
-          ]
-        },
-        {
-          "id": "ccea_developer",
-          "label": "I wrote or developed the course",
-          "description": "Choose this for first-time development or significant revisions.",
-          "activities": [
-            {
-              "id": "write_ccea",
-              "categoryKey": "WRITE_DISTRICT_PD",
-              "label": "Developed a new CCEA professional development course",
-              "description": "I wrote or significantly revised a CCEA professional development course designed for at least 20 enrollees.",
-              "officialBasis": "Combined District-level course-development category; maximum 50 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "vegas_pbs",
-      "label": "Vegas PBS",
-      "description": "Use this path only for NVDOE-approved professional development credit courses offered through Vegas PBS.",
-      "roles": [
-        {
-          "id": "vegas_pbs_participant",
-          "label": "I completed the Vegas PBS course",
-          "description": "The completion record should include the Vegas PBS certificate and time report.",
-          "activities": [
-            {
-              "id": "vegas_pbs_pd",
-              "categoryKey": "VEGAS_PBS_PD",
-              "label": "Vegas PBS Professional Development Credit Course",
-              "description": "I completed an NVDOE-approved Vegas PBS professional development credit course in the Vegas PBS portal.",
-              "officialBasis": "Vegas PBS PD credit course; no stated category maximum."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "school_pd",
-      "label": "My school/site or an approved PLC among schools/sites",
-      "description": "Use this path for school/site professional learning, school-level instruction or course development, and approved PLC participation.",
-      "roles": [
-        {
-          "id": "school_pd_participant",
-          "label": "I attended school/site professional development",
-          "description": "Choose this for professional learning offered at the school/site that is not better described as a PLC.",
+          "id": "school_learning_participant",
+          "label": "I attended or participated in school/site professional learning",
+          "description": "Choose school/site PD or an approved PLC.",
           "activities": [
             {
               "id": "school_pd",
@@ -2713,13 +2892,20 @@ const PGS_GUIDED_FINDER = {
               "label": "School/Site Professional Development",
               "description": "I participated in professional development offered by my school/site.",
               "officialBasis": "School/site professional development; no stated category maximum."
+            },
+            {
+              "id": "plc",
+              "categoryKey": "PLC",
+              "label": "Participation in a Professional Learning Community (PLC)",
+              "description": "I participated in an approved PLC focused on professional learning, such as grading practices, AP/IB, IEP practices, CTE, research, District initiatives, ELL, equity/diversity, or another instructional focus.",
+              "officialBasis": "PLC participation; maximum 30 CUs."
             }
           ]
         },
         {
-          "id": "school_pd_instructor",
-          "label": "I taught or facilitated school/site professional development",
-          "description": "The school/site course must have at least five attendees.",
+          "id": "school_learning_leader",
+          "label": "I taught or developed school/site professional learning",
+          "description": "Choose whether you taught the course or wrote/developed it.",
           "activities": [
             {
               "id": "teach_school_pd",
@@ -2727,14 +2913,7 @@ const PGS_GUIDED_FINDER = {
               "label": "Taught a professional development course at a school/site",
               "description": "I taught school/site professional development for a minimum of five attendees.",
               "officialBasis": "School-level PD instruction; maximum 50 CUs."
-            }
-          ]
-        },
-        {
-          "id": "school_pd_developer",
-          "label": "I wrote, developed, or substantially revised school/site PD",
-          "description": "The course must be designed for at least 20 enrollees.",
-          "activities": [
+            },
             {
               "id": "write_school_pd",
               "categoryKey": "WRITE_SCHOOL_PD",
@@ -2745,30 +2924,9 @@ const PGS_GUIDED_FINDER = {
           ]
         },
         {
-          "id": "plc_participant",
-          "label": "I participated in a Professional Learning Community",
-          "description": "PLCs may be organized within or among schools/sites by grade band, content, course, or instructional focus.",
-          "activities": [
-            {
-              "id": "plc",
-              "categoryKey": "PLC",
-              "label": "Participation in a Professional Learning Community (PLC)",
-              "description": "I participated in an approved PLC focused on professional learning, such as grading practices, AP/IB, IEP practices, CTE, research, District initiatives, ELL, equity/diversity, or another instructional focus.",
-              "officialBasis": "PLC participation; maximum 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "school_community",
-      "label": "School/community leadership, planning, or governance",
-      "description": "Use this path for academic family/community engagement, SOT service, or qualifying schoolwide planning.",
-      "roles": [
-        {
-          "id": "parent_community_leader",
-          "label": "I designed, led, and conducted parent/community engagement",
-          "description": "The activity must be academic-centered, aligned to school/site needs, and beyond the required three nights.",
+          "id": "school_leadership",
+          "label": "I led community engagement, governance, or schoolwide planning",
+          "description": "Choose the schoolwide leadership activity that actually occurred.",
           "activities": [
             {
               "id": "parent_community",
@@ -2776,28 +2934,14 @@ const PGS_GUIDED_FINDER = {
               "label": "Parent or Community Engagement Leadership",
               "description": "I designed, led, and conducted academic-centered family or community engagement activities, such as seminars, family learning nights, or college/career information sessions.",
               "officialBasis": "Parent/community engagement leadership; maximum 30 CUs."
-            }
-          ]
-        },
-        {
-          "id": "sot_member",
-          "label": "I served as an official SOT member",
-          "description": "Preparation time and assignments outside the meetings do not count.",
-          "activities": [
+            },
             {
               "id": "sot",
               "categoryKey": "SOT",
               "label": "Serving on a School Organizational Team (SOT)",
               "description": "I was listed as a member of my school/site SOT or qualifying AB 469-aligned school/site decision-making body.",
               "officialBasis": "SOT service; maximum 40 CUs."
-            }
-          ]
-        },
-        {
-          "id": "schoolwide_planner",
-          "label": "I created or led a qualifying schoolwide plan or program",
-          "description": "Department, grade-level, leadership meetings, and curriculum writing are specifically excluded.",
-          "activities": [
+            },
             {
               "id": "schoolwide_planning",
               "categoryKey": "SCHOOLWIDE_PLANNING",
@@ -2810,9 +2954,9 @@ const PGS_GUIDED_FINDER = {
       ]
     },
     {
-      "id": "student_program",
-      "label": "A student program, club, tutoring, trip, or summer school",
-      "description": "Use this path for direct qualifying work with students rather than adult professional development.",
+      "id": "student_programs",
+      "label": "Student Programs, Tutoring, Trips, or Summer School",
+      "description": "Choose this for direct qualifying work with students rather than adult professional development.",
       "roles": [
         {
           "id": "coach_advisor",
@@ -2843,8 +2987,8 @@ const PGS_GUIDED_FINDER = {
           ]
         },
         {
-          "id": "academic_trip_staff",
-          "label": "I directly supervised academic sessions on an approved trip",
+          "id": "academic_trip",
+          "label": "I supervised academic sessions on an approved trip",
           "description": "Only direct academic contact time counts; travel, meals, and sleep do not.",
           "activities": [
             {
@@ -2857,7 +3001,7 @@ const PGS_GUIDED_FINDER = {
           ]
         },
         {
-          "id": "summer_school_teacher",
+          "id": "summer_school",
           "label": "I taught District credit-retrieval summer school",
           "description": "Time paid at the employee's contractual rate is excluded.",
           "activities": [
@@ -2867,318 +3011,6 @@ const PGS_GUIDED_FINDER = {
               "label": "Summer School",
               "description": "I provided instruction in District credit-retrieval summer school during qualifying time.",
               "officialBasis": "Summer school instruction; maximum 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "iep_mdt",
-      "label": "The IEP/MDT process",
-      "description": "Use this path only for the two current IEP/MDT categories.",
-      "roles": [
-        {
-          "id": "iep_writer",
-          "label": "I was the special education teacher/provider writing the IEP or MDT",
-          "description": "This applies to special education teachers and related-services special education providers writing documents on their caseload.",
-          "activities": [
-            {
-              "id": "write_iep",
-              "categoryKey": "WRITE_IEP_MDT",
-              "label": "Writing IEPs and MDTs as the responsible special education teacher/provider",
-              "description": "I wrote an IEP/MDT for a student on my caseload as the special education teacher or related-services special education provider.",
-              "officialBasis": "One CU per qualifying IEP/MDT; maximum 30 CUs."
-            }
-          ]
-        },
-        {
-          "id": "iep_team_member",
-          "label": "I participated as another member of the IEP/MDT team",
-          "description": "You must participate in the writing process and attend the meeting. The same IEP/MDT cannot be claimed in both categories.",
-          "activities": [
-            {
-              "id": "iep_team",
-              "categoryKey": "IEP_MDT_TEAM",
-              "label": "Participating as a Member of the IEP/MDT Team",
-              "description": "I participated in the IEP/MDT writing process and attended the meeting to support the student's goals.",
-              "officialBasis": "One-half CU per qualifying student; maximum 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "teacher_candidate",
-      "label": "A college/university teacher-candidate placement",
-      "description": "Use this path when a supervisor assigned a field-observation, practicum, or student-teaching candidate to you.",
-      "roles": [
-        {
-          "id": "candidate_host",
-          "label": "I served as the assigned host/master teacher",
-          "description": "Choose the candidate's official placement type.",
-          "activities": [
-            {
-              "id": "fos",
-              "categoryKey": "FOS_ASSIGNMENT",
-              "label": "Assignment of a Field Observation Student (FOS)",
-              "description": "A supervisor assigned a field-observation student who completed the required observation time with me.",
-              "officialBasis": "Two CUs per FOS; maximum 8 CUs."
-            },
-            {
-              "id": "practicum",
-              "categoryKey": "PRACTICUM_ASSIGNMENT",
-              "label": "Assignment of a Practicum Student",
-              "description": "A supervisor assigned a practicum student to me for a documented placement.",
-              "officialBasis": "Two CUs per week; maximum 20 CUs."
-            },
-            {
-              "id": "student_teacher",
-              "categoryKey": "STUDENT_TEACHER_ASSIGNMENT",
-              "label": "Assignment of a Student Teacher",
-              "description": "A supervisor assigned a student teacher to me for a documented placement.",
-              "officialBasis": "Two CUs per week; maximum 20 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "mentoring",
-      "label": "A mentoring relationship with another educator/licensed professional",
-      "description": "Use this path for a qualifying mentor or mentee relationship, not a teacher-candidate placement.",
-      "roles": [
-        {
-          "id": "mentor",
-          "label": "I served as the mentor",
-          "description": "The relationship must fit one of the official mentoring situations.",
-          "activities": [
-            {
-              "id": "mentor_activity",
-              "categoryKey": "MENTOR",
-              "label": "Participating in a Mentoring Relationship as the Mentor",
-              "description": "I mentored an eligible experienced educator needing support, a new educator, an educator new to CCSD, or an eligible long-term vacancy substitute.",
-              "officialBasis": "Mentor category; maximum 80 CUs."
-            }
-          ]
-        },
-        {
-          "id": "mentee",
-          "label": "I was the mentee",
-          "description": "The professional learning must occur within a qualifying mentoring relationship.",
-          "activities": [
-            {
-              "id": "mentee_activity",
-              "categoryKey": "MENTEE",
-              "label": "Participating in a Mentoring Relationship as the Mentee",
-              "description": "I was mentored as an eligible experienced educator needing support, a new educator, or an educator new to CCSD.",
-              "officialBasis": "Mentee category; maximum 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "external_professional_org",
-      "label": "An external professional association, conference, or webinar provider",
-      "description": "Use this path for recognized professional organizations outside the District provider categories.",
-      "roles": [
-        {
-          "id": "live_attendee",
-          "label": "I attended live, in person, or synchronously",
-          "description": "The event occurred in real time at a specific date and time.",
-          "activities": [
-            {
-              "id": "sync_conference",
-              "categoryKey": "SYNC_CONFERENCE",
-              "label": "In-person, live virtual, or synchronous conference attendance",
-              "description": "I attended a real-time conference provided by an organization recognized by my profession or content area.",
-              "officialBasis": "Synchronous conference attendance; maximum 80 CUs."
-            }
-          ]
-        },
-        {
-          "id": "async_attendee",
-          "label": "I completed an asynchronous conference or webinar",
-          "description": "The content was viewed on demand rather than at a coordinated real-time session.",
-          "activities": [
-            {
-              "id": "async_conference",
-              "categoryKey": "ASYNC_CONFERENCE_WEBINAR",
-              "label": "Asynchronous Conference or Webinar",
-              "description": "I completed an on-demand conference or webinar that did not occur in real time.",
-              "officialBasis": "Asynchronous conference/webinar; maximum 10 CUs."
-            }
-          ]
-        },
-        {
-          "id": "conference_presenter",
-          "label": "I presented at the conference",
-          "description": "The organization must be recognized by the educator's profession or content area.",
-          "activities": [
-            {
-              "id": "conference_presentation",
-              "categoryKey": "CONFERENCE_PRESENTATION",
-              "label": "Presentation at a Recognized Professional Conference",
-              "description": "I delivered a presentation at a conference recognized by my profession or content area.",
-              "officialBasis": "Up to three documented creation hours per unique presentation hour; maximum 50 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "awards_grants",
-      "label": "An award or grant organization",
-      "description": "The current guide awards CUs for receiving qualifying awards or grants, not merely applying.",
-      "roles": [
-        {
-          "id": "award_recipient",
-          "label": "I received a professional award",
-          "description": "Choose the level of the organization that issued the award.",
-          "activities": [
-            {
-              "id": "community_award",
-              "categoryKey": "COMMUNITY_AWARD",
-              "label": "Recipient of a Community-Based Award",
-              "description": "I won a qualifying award from a local agency, company, organization, or District opportunity.",
-              "officialBasis": "Five CUs for one community award; maximum 5 CUs."
-            },
-            {
-              "id": "state_award",
-              "categoryKey": "STATE_AWARD",
-              "label": "Recipient of a State Professional Award",
-              "description": "I received a state-level professional award recognizing excellence in professional practice.",
-              "officialBasis": "Fifteen CUs for one state award; maximum 15 CUs."
-            },
-            {
-              "id": "national_award",
-              "categoryKey": "NATIONAL_AWARD",
-              "label": "Recipient of a National Professional Award",
-              "description": "I received a national professional award recognizing excellence in professional practice.",
-              "officialBasis": "Twenty-five CUs for each national award."
-            }
-          ]
-        },
-        {
-          "id": "grant_recipient",
-          "label": "I received a grant",
-          "description": "The grant must directly benefit students, the school, classroom climate/environment, or school community.",
-          "activities": [
-            {
-              "id": "grant_recipient",
-              "categoryKey": "GRANT_RECIPIENT",
-              "label": "Recipient of a Grant that Directly Impacts Students, School, or Community",
-              "description": "I received a qualifying grant that directly benefits students, classroom/school climate, the school, or school community.",
-              "officialBasis": "Three CUs per received grant; maximum 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "credentials_certification",
-      "label": "Digital Promise or National Board",
-      "description": "Use this path for approved micro-credentials and the National Board process/certification.",
-      "roles": [
-        {
-          "id": "microcredential_earner",
-          "label": "I earned an approved micro-credential",
-          "description": "Only Digital Promise-approved micro-credentials qualify under this category.",
-          "activities": [
-            {
-              "id": "microcredential",
-              "categoryKey": "MICRO_CREDENTIAL",
-              "label": "Digital Promise-Approved Micro-Credential",
-              "description": "I earned a Digital Promise-approved micro-credential related to my assignment, license, or professional growth goals.",
-              "officialBasis": "Approved micro-credentials; maximum 50 CUs."
-            }
-          ]
-        },
-        {
-          "id": "nbpts_candidate",
-          "label": "I submitted all initial National Board components",
-          "description": "Choose this for the initial submission of all NBPTS components.",
-          "activities": [
-            {
-              "id": "nbpts_process",
-              "categoryKey": "NBPTS_PROCESS",
-              "label": "National Board Process - Initial Submission of All Components",
-              "description": "I completed the initial submission of all required National Board components.",
-              "officialBasis": "Initial submission may earn 133 CUs."
-            }
-          ]
-        },
-        {
-          "id": "nbpts_certified",
-          "label": "I achieved National Board certification",
-          "description": "Choose this after successful NBPTS certification.",
-          "activities": [
-            {
-              "id": "nbpts_certification",
-              "categoryKey": "NBPTS_CERTIFICATION",
-              "label": "National Board Certification",
-              "description": "I successfully achieved National Board for Professional Teaching Standards certification.",
-              "officialBasis": "Successful certification may earn an additional 92 CUs."
-            }
-          ]
-        },
-        {
-          "id": "nbpts_moc",
-          "label": "I completed National Board Maintenance of Certification",
-          "description": "Choose this after successful completion of the MOC Profile of Professional Growth.",
-          "activities": [
-            {
-              "id": "nbpts_moc",
-              "categoryKey": "NBPTS_MOC",
-              "label": "National Board Maintenance of Certification (MOC)",
-              "description": "I successfully completed the National Board Maintenance of Certification process.",
-              "officialBasis": "Maintenance of Certification earns 30 CUs."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "licensure_ceu",
-      "label": "A license, endorsement, CEU, ASCA, NDE, or Mental Health Academy provider",
-      "description": "Use this path for maintaining an eligible second endorsement or completing qualifying specialty-license CEUs.",
-      "roles": [
-        {
-          "id": "second_endorsement",
-          "label": "I maintained an endorsement outside my primary assignment",
-          "description": "The endorsement must be in an eligible area and the employee must meet the evaluation requirement.",
-          "activities": [
-            {
-              "id": "second_endorsement",
-              "categoryKey": "SECOND_ENDORSEMENT",
-              "label": "Maintaining a Second Endorsement Outside the Primary Assignment",
-              "description": "I maintained an eligible endorsement that is not required for my primary teaching/licensed assignment.",
-              "officialBasis": "Ten CUs per qualifying endorsement; maximum 20 CUs."
-            }
-          ]
-        },
-        {
-          "id": "specialty_ceu",
-          "label": "I completed continuing education for a specialty professional license",
-          "description": "This includes qualifying CEUs for OLEP and business/industry-route licensed professionals, plus NDE-issued CEUs.",
-          "activities": [
-            {
-              "id": "specialty_ceu",
-              "categoryKey": "SPECIALTY_CEU",
-              "label": "Professional/Specialty License Continuing Education Units (CEUs)",
-              "description": "I completed CEUs related to my licensed assignment, specialty professional license, or professional growth goals.",
-              "officialBasis": "Qualifying specialty-license CEUs; no stated category maximum."
-            },
-            {
-              "id": "mha_counselor",
-              "categoryKey": "SPECIALTY_CEU",
-              "specialRuleId": "MHA_COUNSELOR_2026",
-              "label": "Approved Mental Health Academy coursework as a CCSD counselor",
-              "description": "I am a CCSD counselor and completed an MHA course on the current approved list that aligns to my assignment or licensure.",
-              "officialBasis": "Current announcement requires Guidance and Counseling review and may require the Time-Based Activities form.",
-              "sourceDocument": "9/1/23 PGS Reference Guide plus CCSD and CCEA PGS Announcements",
-              "sourcePage": "10 and announcement pages 2-3",
-              "sourceDate": "March 12 and March 30, 2026"
             }
           ]
         }

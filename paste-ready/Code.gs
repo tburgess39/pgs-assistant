@@ -17,7 +17,7 @@ const ACTIVITY_HEADERS = Object.freeze([
   'Activity Category', 'Payment Status', 'Quantity', 'Unit',
   'Title I Exception', 'Estimated CUs', 'Status', 'Official Approved CUs',
   'Evidence Link', 'Activity Folder ID', 'Activity Folder URL', 'Notes',
-  'Rule Version', 'Created At', 'Updated At', 'Sessions JSON'
+  'Rule Version', 'Created At', 'Updated At', 'Sessions JSON', 'Record Type'
 ]);
 
 const RULE_HEADERS = Object.freeze([
@@ -35,10 +35,18 @@ const RULE_HEADERS = Object.freeze([
 ]);
 
 const STATUS_OPTIONS = Object.freeze([
-  'Needs evidence', 'In progress', 'Ready for ELMS', 'Submitted',
+  'Planning',
+  'Needs evidence',
+  'Ready for ELMS',
+  'Submitted to ELMS',
   'Returned for corrections',
-  'Approved — enter only after official CCSD approval', 'Denied'
+  'Approved in ELMS',
+  'Waiting to appear in ELMS',
+  'Confirmed in ELMS',
+  'Denied'
 ]);
+
+const RECORD_TYPES = Object.freeze(['self_report', 'automatic_elms']);
 
 const PAYMENT_OPTIONS = Object.freeze(['unpaid', 'paid', 'contract', 'mixed']);
 
@@ -80,6 +88,8 @@ function getBootstrapData() {
       'Category suggestions are guidance, not final CCSD eligibility decisions.',
       'Estimated CUs are not official approvals.',
       'Review special PGS announcements in addition to the Reference Guide.',
+      'Form entries are saved in a teacher-owned Google Sheet in the teacher’s Google Drive.',
+      'Evidence files are not uploaded automatically; the teacher places them in the category folder.',
       'The assistant prepares records and evidence but does not submit directly into ELMS.'
     ]
   };
@@ -99,29 +109,39 @@ function saveActivity(input) {
   }
 
   const activity = normalizeActivityInput_(input, rule);
-  applyEntryCalculations_(activity, rule);
+
+  if (activity.recordType === 'self_report') {
+    applyEntryCalculations_(activity, rule);
+  } else {
+    activity.sessions = [];
+    activity.quantity = 0;
+    activity.unit = '';
+    activity.paymentStatus = '';
+  }
 
   const existingRow = activity.id ? findActivityRow_(sheet, activity.id) : 0;
   const existing = existingRow
     ? rowToActivity_(sheet.getRange(existingRow, 1, 1, ACTIVITY_HEADERS.length).getValues()[0])
     : null;
 
-  const estimate = calculateEstimatedCUs_(activity, rule);
+  const estimate = activity.recordType === 'self_report'
+    ? calculateEstimatedCUs_(activity, rule)
+    : '';
+
   const now = new Date();
   const id = activity.id || Utilities.getUuid();
 
   let folderId = existing ? existing.activityFolderId : '';
   let folderUrl = existing ? existing.activityFolderUrl : '';
-  let evidenceLink = activity.evidenceLink || (existing ? existing.evidenceLink : '');
+  const evidenceLink = activity.evidenceLink || (existing ? existing.evidenceLink : '');
 
-  if (activity.createFolder && !folderId) {
-    const folder = createActivityFolder_(id, activity.title, activity.startDate);
+  if (activity.recordType === 'self_report' && activity.createFolder && !folderId) {
+    const folder = createCategoryFolder_(rule);
     folderId = folder.id;
     folderUrl = folder.url;
-    evidenceLink = evidenceLink || folder.url;
   }
 
-  const officialApprovedCUs = activity.status.indexOf('Approved') === 0
+  const officialApprovedCUs = shouldStoreOfficialCUs_(activity)
     ? numberOrBlank_(activity.officialApprovedCUs)
     : '';
 
@@ -150,7 +170,8 @@ function saveActivity(input) {
     ruleVersion: rule.ruleVersion,
     createdAt: existing ? existing.createdAt : formatDateTime_(now),
     updatedAt: formatDateTime_(now),
-    sessions: activity.sessions
+    sessions: activity.sessions,
+    recordType: activity.recordType
   };
 
   const rowValues = activityToRow_(record);
@@ -162,8 +183,24 @@ function saveActivity(input) {
   }
 
   applyActivityRowFormatting_(sheet);
-  appendChangeLog_(spreadsheet, existingRow ? 'UPDATED ACTIVITY' : 'CREATED ACTIVITY', id, activity.title);
-  return getBootstrapData();
+  appendChangeLog_(
+    spreadsheet,
+    existingRow ? 'UPDATED ACTIVITY' : 'CREATED ACTIVITY',
+    id,
+    activity.recordType + ': ' + activity.title
+  );
+
+  const data = getBootstrapData();
+  data.savedId = id;
+  return data;
+}
+
+function shouldStoreOfficialCUs_(activity) {
+  if (activity.recordType === 'automatic_elms') {
+    return numberOrZero_(activity.officialApprovedCUs) > 0;
+  }
+  return activity.status === 'Approved in ELMS' &&
+    numberOrZero_(activity.officialApprovedCUs) > 0;
 }
 
 function deleteActivity(activityId) {
@@ -191,6 +228,7 @@ function createWorkspaceFolders() {
 function createEvidenceFolderForActivity(activityId) {
   const spreadsheet = getOrCreateWorkbook_();
   const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+  const rules = getRules_(spreadsheet);
   const row = findActivityRow_(sheet, String(activityId || ''));
 
   if (!row) throw new Error('The activity could not be found.');
@@ -199,22 +237,23 @@ function createEvidenceFolderForActivity(activityId) {
     sheet.getRange(row, 1, 1, ACTIVITY_HEADERS.length).getValues()[0]
   );
 
-  if (record.activityFolderId) {
-    try {
-      DriveApp.getFolderById(record.activityFolderId);
-      return getBootstrapData();
-    } catch (error) {}
+  if (record.recordType === 'automatic_elms') {
+    throw new Error('Automatically entered ELMS records do not require an evidence folder.');
   }
 
-  const folder = createActivityFolder_(record.id, record.title, record.startDate);
+  const rule = rules.find(function(item) {
+    return item.categoryKey === record.categoryKey;
+  });
+
+  if (!rule) throw new Error('The category rule could not be found.');
+
+  const folder = createCategoryFolder_(rule);
   const map = getHeaderMap_(ACTIVITY_HEADERS);
   sheet.getRange(row, map['Activity Folder ID']).setValue(folder.id);
   sheet.getRange(row, map['Activity Folder URL']).setValue(folder.url);
-  if (!record.evidenceLink) {
-    sheet.getRange(row, map['Evidence Link']).setValue(folder.url);
-  }
   sheet.getRange(row, map['Updated At']).setValue(formatDateTime_(new Date()));
-  appendChangeLog_(spreadsheet, 'CREATED ACTIVITY FOLDER', record.id, folder.url);
+
+  appendChangeLog_(spreadsheet, 'CREATED / VERIFIED CATEGORY FOLDER', record.id, folder.url);
   return getBootstrapData();
 }
 
@@ -432,23 +471,39 @@ function readActivities_(spreadsheet) {
 }
 
 function rowToActivity_(row) {
+  const categoryKey = displayValue_(row[7]);
+  const storedRecordType = displayValue_(row[25]);
+
   return {
     id: displayValue_(row[0]), title: displayValue_(row[1]),
     description: displayValue_(row[2]), startDate: dateToInput_(row[3]),
     endDate: dateToInput_(row[4]), organization: displayValue_(row[5]),
-    role: displayValue_(row[6]), categoryKey: displayValue_(row[7]),
+    role: displayValue_(row[6]), categoryKey: categoryKey,
     parentCategory: displayValue_(row[8]), categoryName: displayValue_(row[9]),
     paymentStatus: displayValue_(row[10]), quantity: numberOrZero_(row[11]),
     unit: displayValue_(row[12]), titleIException: displayValue_(row[13]) || 'no',
     estimatedCUs: row[14] === '' ? '' : numberOrZero_(row[14]),
-    status: displayValue_(row[15]),
+    status: normalizeStoredStatus_(displayValue_(row[15])),
     officialApprovedCUs: row[16] === '' ? '' : numberOrZero_(row[16]),
     evidenceLink: displayValue_(row[17]), activityFolderId: displayValue_(row[18]),
     activityFolderUrl: displayValue_(row[19]), notes: displayValue_(row[20]),
     ruleVersion: displayValue_(row[21]), createdAt: dateTimeToString_(row[22]),
     updatedAt: dateTimeToString_(row[23]),
-    sessions: parseJson_(row[24], [])
+    sessions: parseJson_(row[24], []),
+    recordType: storedRecordType ||
+      (categoryKey === 'DISTRICT_PD' ? 'automatic_elms' : 'self_report')
   };
+}
+
+
+function normalizeStoredStatus_(status) {
+  const value = cleanString_(status);
+  const map = {
+    'In progress': 'Planning',
+    'Submitted': 'Submitted to ELMS',
+    'Approved — enter only after official CCSD approval': 'Approved in ELMS'
+  };
+  return map[value] || value || 'Planning';
 }
 
 function activityToRow_(a) {
@@ -463,25 +518,37 @@ function activityToRow_(a) {
     safeText_(a.activityFolderId), safeText_(a.activityFolderUrl),
     safeText_(a.notes), safeText_(a.ruleVersion),
     safeText_(a.createdAt), safeText_(a.updatedAt),
-    JSON.stringify(a.sessions || [])
+    JSON.stringify(a.sessions || []), safeText_(a.recordType)
   ];
 }
 
 function normalizeActivityInput_(input, rule) {
   const a = input || {};
+  const recordType = cleanString_(a.recordType) || 'self_report';
   const title = cleanString_(a.title);
   const description = cleanString_(a.description);
   const categoryKey = cleanString_(a.categoryKey);
   const paymentStatus = cleanString_(a.paymentStatus) || 'unpaid';
-  const status = cleanString_(a.status) || STATUS_OPTIONS[0];
+  const status = cleanString_(a.status) ||
+    (recordType === 'automatic_elms' ? 'Waiting to appear in ELMS' : 'Planning');
   const entryMode = rule.entryMode || '';
-  const sessions = entryMode === 'session_time' ? normalizeSessions_(a.sessions) : [];
+  const sessions = recordType === 'self_report' && entryMode === 'session_time'
+    ? normalizeSessions_(a.sessions)
+    : [];
+
+  if (RECORD_TYPES.indexOf(recordType) === -1) {
+    throw new Error('Select a valid record type.');
+  }
 
   if (!title) throw new Error('Activity title is required.');
-  if (!description) throw new Error('Activity description is required.');
+  if (!description) throw new Error('Enter a short activity description.');
   if (!categoryKey) throw new Error('Choose or confirm an activity category.');
-  if (PAYMENT_OPTIONS.indexOf(paymentStatus) === -1) throw new Error('Select a valid payment status.');
-  if (STATUS_OPTIONS.indexOf(status) === -1) throw new Error('Select a valid status.');
+  if (STATUS_OPTIONS.indexOf(status) === -1) throw new Error('Select a valid tracking status.');
+
+  if (recordType === 'self_report' &&
+      PAYMENT_OPTIONS.indexOf(paymentStatus) === -1) {
+    throw new Error('Select a valid payment status.');
+  }
 
   const sessionDates = sessions.map(function(session) { return session.date; }).sort();
   const startDate = sessionDates.length ? sessionDates[0] : cleanString_(a.startDate);
@@ -503,17 +570,24 @@ function normalizeActivityInput_(input, rule) {
     throw new Error('The activity end date cannot be earlier than the start date.');
   }
 
+  if (recordType === 'automatic_elms' &&
+      status === 'Confirmed in ELMS' &&
+      !(numberOrZero_(a.officialApprovedCUs) > 0)) {
+    throw new Error('Enter the CUs shown in ELMS for a confirmed automatic record.');
+  }
+
   return {
     id: cleanString_(a.id), title: title, description: description,
     startDate: startDate, endDate: endDate,
     organization: cleanString_(a.organization), role: cleanString_(a.role),
     categoryKey: categoryKey, paymentStatus: paymentStatus,
     quantity: Math.max(0, numberOrZero_(a.quantity)),
-    unit: cleanString_(a.unit), titleIException: cleanString_(a.titleIException) === 'yes' ? 'yes' : 'no',
+    unit: cleanString_(a.unit),
+    titleIException: cleanString_(a.titleIException) === 'yes' ? 'yes' : 'no',
     status: status, officialApprovedCUs: a.officialApprovedCUs,
     evidenceLink: validHttpUrlOrBlank_(a.evidenceLink),
     notes: cleanString_(a.notes), createFolder: Boolean(a.createFolder),
-    sessions: sessions
+    sessions: sessions, recordType: recordType
   };
 }
 
@@ -683,45 +757,80 @@ function calculateEstimatedCUs_(activity, rule) {
 }
 
 function buildSummary_(activities, rules) {
-  const approvedTotal = activities.reduce(function(total, item) {
+  const selfReported = activities.filter(function(item) {
+    return item.recordType !== 'automatic_elms';
+  });
+
+  const automatic = activities.filter(function(item) {
+    return item.recordType === 'automatic_elms';
+  });
+
+  const approvedSelfReported = selfReported.reduce(function(total, item) {
     return total + numberOrZero_(item.officialApprovedCUs);
   }, 0);
 
-  const categoryBalances = rules.filter(function(rule) { return rule.active; })
+  const automaticElmsTotal = automatic.reduce(function(total, item) {
+    return total + numberOrZero_(item.officialApprovedCUs);
+  }, 0);
+
+  const categoryBalances = rules
+    .filter(function(rule) { return rule.active; })
     .map(function(rule) {
-      const recorded = activities
-        .filter(function(item) { return item.categoryKey === rule.categoryKey; })
-        .reduce(function(total, item) { return total + numberOrZero_(item.estimatedCUs); }, 0);
-      const countable = rule.maximumCUs === null
-        ? recorded
-        : Math.min(recorded, rule.maximumCUs);
+      const categorySelf = selfReported.filter(function(item) {
+        return item.categoryKey === rule.categoryKey;
+      });
+
+      const categoryAutomatic = automatic.filter(function(item) {
+        return item.categoryKey === rule.categoryKey;
+      });
+
+      const estimated = categorySelf.reduce(function(total, item) {
+        return total + numberOrZero_(item.estimatedCUs);
+      }, 0);
+
+      const approved = categorySelf.reduce(function(total, item) {
+        return total + numberOrZero_(item.officialApprovedCUs);
+      }, 0);
+
+      const automaticCUs = categoryAutomatic.reduce(function(total, item) {
+        return total + numberOrZero_(item.officialApprovedCUs);
+      }, 0);
+
+      const confirmed = approved + automaticCUs;
+      const countableEstimated = rule.maximumCUs === null
+        ? estimated
+        : Math.min(estimated, rule.maximumCUs);
+
       return {
         categoryKey: rule.categoryKey,
         parentCategory: rule.parentCategory,
         category: rule.activityName,
-        recorded: roundToTwo_(recorded),
-        countable: roundToTwo_(countable),
-        overMaximum: rule.maximumCUs === null ? 0 : roundToTwo_(Math.max(0, recorded - rule.maximumCUs)),
+        estimated: roundToTwo_(estimated),
+        countableEstimated: roundToTwo_(countableEstimated),
+        approvedSelfReported: roundToTwo_(approved),
+        automaticElms: roundToTwo_(automaticCUs),
+        confirmedTotal: roundToTwo_(confirmed),
         maximum: rule.maximumCUs,
-        remaining: rule.maximumCUs === null ? null :
-          roundToTwo_(Math.max(0, rule.maximumCUs - recorded))
+        remaining: rule.maximumCUs === null
+          ? null
+          : roundToTwo_(Math.max(0, rule.maximumCUs - confirmed))
       };
     });
 
-  const rawEstimatedTotal = categoryBalances.reduce(function(total, item) {
-    return total + numberOrZero_(item.recorded);
-  }, 0);
-  const estimatedTotal = categoryBalances.reduce(function(total, item) {
-    return total + numberOrZero_(item.countable);
+  const estimatedSelfReported = categoryBalances.reduce(function(total, item) {
+    return total + numberOrZero_(item.countableEstimated);
   }, 0);
 
+  const confirmedTotal = approvedSelfReported + automaticElmsTotal;
+
   return {
-    rawEstimatedTotal: roundToTwo_(rawEstimatedTotal),
-    estimatedTotal: roundToTwo_(estimatedTotal),
-    approvedTotal: roundToTwo_(approvedTotal),
+    estimatedSelfReported: roundToTwo_(estimatedSelfReported),
+    approvedSelfReported: roundToTwo_(approvedSelfReported),
+    automaticElmsTotal: roundToTwo_(automaticElmsTotal),
+    confirmedTotal: roundToTwo_(confirmedTotal),
     goalCUs: 225,
-    percent: Math.min(100, Math.round((approvedTotal / 225) * 100)),
-    remaining: roundToTwo_(Math.max(0, 225 - approvedTotal)),
+    percent: Math.min(100, Math.round((confirmedTotal / 225) * 100)),
+    remaining: roundToTwo_(Math.max(0, 225 - confirmedTotal)),
     categoryBalances: categoryBalances
   };
 }
@@ -729,35 +838,88 @@ function buildSummary_(activities, rules) {
 function createOrGetFolderStructure_() {
   const properties = PropertiesService.getUserProperties();
   let root = getFolderByStoredId_('PGS_ROOT_FOLDER_ID');
+
   if (!root) {
     root = DriveApp.createFolder(ROOT_FOLDER_NAME);
     properties.setProperty('PGS_ROOT_FOLDER_ID', root.getId());
   }
 
-  const folders = {
-    approved: ensureChildFolder_(root, '01 Approved CU Records'),
-    submitted: ensureChildFolder_(root, '02 Submitted - Awaiting Review'),
-    ready: ensureChildFolder_(root, '03 Ready for ELMS'),
-    needs: ensureChildFolder_(root, '04 Needs Documentation'),
-    certificates: ensureChildFolder_(root, '05 Certificates and Transcripts'),
-    activities: ensureChildFolder_(root, '06 Activity Evidence')
+  const categoryEvidence = ensureChildFolder_(root, '01 Category Evidence');
+  const automaticRecords = ensureChildFolder_(root, '02 Automatic ELMS Records');
+  const receipts = ensureChildFolder_(root, '03 Advancement Receipts and Decisions');
+  const references = ensureChildFolder_(root, '04 Reference and Forms');
+
+  properties.setProperty('PGS_ACTIVITY_FOLDER_ID', categoryEvidence.getId());
+
+  return {
+    rootFolder: root,
+    activityEvidenceFolder: categoryEvidence,
+    automaticRecordsFolder: automaticRecords,
+    receiptsFolder: receipts,
+    referenceFolder: references
   };
-  properties.setProperty('PGS_ACTIVITY_FOLDER_ID', folders.activities.getId());
-  return {rootFolder: root, activityEvidenceFolder: folders.activities};
 }
 
-function createActivityFolder_(activityId, title, startDate) {
+function createCategoryFolder_(rule) {
   const parent = createOrGetFolderStructure_().activityEvidenceFolder;
-  const datePart = startDate || Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd');
-  const folder = parent.createFolder(sanitizeFolderName_(datePart + '_' + title));
+  const propertyName = 'PGS_CATEGORY_FOLDER_' + rule.categoryKey;
+  let folder = getFolderByStoredId_(propertyName);
+
+  if (!folder) {
+    const folderName = categoryFolderName_(rule);
+    folder = ensureChildFolder_(parent, folderName);
+    PropertiesService.getUserProperties().setProperty(propertyName, folder.getId());
+  }
+
   [
-    '01 Original Documentation - Do Not Alter',
-    '02 Approval Form and Signatures',
-    '03 Final Single-File ELMS Submission',
-    '04 ELMS Receipt and PGS Decision'
-  ].forEach(function(name) { folder.createFolder(name); });
-  folder.setDescription(APP_NAME + ' activity ID: ' + activityId);
+    '01 Evidence to Combine',
+    '02 Final Single File for ELMS',
+    '03 ELMS Receipt and Decision'
+  ].forEach(function(name) {
+    ensureChildFolder_(folder, name);
+  });
+
+  folder.setDescription(
+    APP_NAME + ' category folder: ' + rule.activityName +
+    ' (' + rule.categoryKey + ')'
+  );
+
   return {id: folder.getId(), url: folder.getUrl()};
+}
+
+function categoryFolderName_(rule) {
+  const names = {
+    ACADEMIC_TRIP: 'Academic Trips',
+    ASYNC_CONFERENCE_WEBINAR: 'Asynchronous Conferences and Webinars',
+    CCEA_COLLAB_PD: 'CCEA and Nevada Collaboratory',
+    COMMUNITY_AWARD: 'Community-Based Awards',
+    CONFERENCE_PRESENTATION: 'Conference Presentations',
+    CORE_TUTORING: 'Core-Content Tutoring',
+    DISTRICT_PD: 'District Professional Development',
+    EXTRACURRICULAR: 'Extracurricular Coaching and Advising',
+    FOS_ASSIGNMENT: 'Field Observation Students',
+    GRANT_RECIPIENT: 'Grant Awards',
+    IEP_MDT_TEAM: 'IEP and MDT Team Participation',
+    MENTEE: 'Mentee Hours',
+    MENTOR: 'Mentoring Hours',
+    MICRO_CREDENTIAL: 'Micro-Credentials',
+    NATIONAL_AWARD: 'National Awards',
+    PARENT_COMMUNITY_LEADERSHIP: 'Family and Community Engagement',
+    PLC: 'PLC Time',
+    PRACTICUM_ASSIGNMENT: 'Practicum Students',
+    RPDP_PD: 'RPDP Professional Development',
+    SCHOOLWIDE_PLANNING: 'Schoolwide Planning',
+    SECOND_ENDORSEMENT: 'Secondary Endorsement',
+    SPECIALTY_CEU: 'Professional and Specialty License CEUs',
+    STATE_AWARD: 'State Awards',
+    STUDENT_TEACHER_ASSIGNMENT: 'Student Teachers',
+    SUMMER_SCHOOL: 'Summer School',
+    SYNC_CONFERENCE: 'Live and Synchronous Conferences',
+    VEGAS_PBS_PD: 'Vegas PBS',
+    WRITE_IEP_MDT: 'IEPs and MDTs Written'
+  };
+
+  return sanitizeFolderName_(names[rule.categoryKey] || rule.activityName);
 }
 
 function ensureChildFolder_(parent, name) {
@@ -791,6 +953,7 @@ function updateSettingsSheet_(spreadsheet) {
   const updates = {
     'Root Folder ID': folders.rootFolderId,
     'Root Folder URL': folders.rootFolderUrl,
+    'Category Evidence Folder URL': folders.activityEvidenceFolderUrl,
     'Activity Evidence Folder URL': folders.activityEvidenceFolderUrl
   };
   sheet.getDataRange().getValues().forEach(function(row, index) {
@@ -814,6 +977,7 @@ function applyActivityRowFormatting_(sheet) {
   sheet.getRange(2, 15, sheet.getLastRow() - 1, 1).setNumberFormat('0.00');
   sheet.getRange(2, 17, sheet.getLastRow() - 1, 1).setNumberFormat('0.00');
   sheet.setColumnWidth(25, 420);
+  sheet.setColumnWidth(26, 130);
   sheet.getRange(2, 1, sheet.getLastRow() - 1, ACTIVITY_HEADERS.length).setWrap(true);
 }
 
