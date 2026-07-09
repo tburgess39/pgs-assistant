@@ -28,6 +28,59 @@ function runAllPGSTests() {
     });
   });
 
+
+  test('Guided finder covers all 43 current category keys', function() {
+    const finderKeys = [];
+    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
+      (context.roles || []).forEach(function(role) {
+        (role.activities || []).forEach(function(activity) {
+          if (activity.categoryKey) finderKeys.push(activity.categoryKey);
+        });
+      });
+    });
+
+    const currentKeys = PGS_ACTIVITY_LIBRARY.map(function(rule) {
+      return rule.categoryKey;
+    });
+
+    const missing = currentKeys.filter(function(key) {
+      return finderKeys.indexOf(key) === -1;
+    });
+
+    if (missing.length) {
+      throw new Error('Finder is missing: ' + missing.join(', '));
+    }
+  });
+
+  test('Guided finder contains only known category keys and documented choices', function() {
+    const currentKeys = PGS_ACTIVITY_LIBRARY.map(function(rule) {
+      return rule.categoryKey;
+    });
+
+    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
+      if (!context.label || !context.description) {
+        throw new Error('Incomplete context: ' + context.id);
+      }
+
+      (context.roles || []).forEach(function(role) {
+        if (!role.label || !role.description) {
+          throw new Error('Incomplete role: ' + role.id);
+        }
+
+        (role.activities || []).forEach(function(activity) {
+          if (!activity.label || !activity.description || !activity.officialBasis) {
+            throw new Error('Incomplete guided activity: ' + activity.id);
+          }
+
+          if (activity.categoryKey &&
+              currentKeys.indexOf(activity.categoryKey) === -1) {
+            throw new Error('Unknown category key: ' + activity.categoryKey);
+          }
+        });
+      });
+    });
+  });
+
   test('May 1, 2024 cutoff is enforced', function() {
     let rejected = false;
     try {

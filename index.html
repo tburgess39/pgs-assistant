@@ -3,112 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <meta http-equiv="refresh" content="1; url=https://script.google.com/macros/s/AKfycbz55RZG8wA5_1kHKOR1OVAEkAplVyhpGuIvTC6igz8/exec">
-  <title>Opening FamilyPD PGS Assistant</title>
-  <style>
-    :root {
-      --navy: #17365d;
-      --blue: #2f75b5;
-      --gold: #f2b33d;
-      --bg: #f4f7fb;
-      --muted: #64748b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at 85% 15%, rgba(47,117,181,.16), transparent 28rem),
-        var(--bg);
-      color: #1f2937;
-    }
-    .card {
-      width: min(640px, 100%);
-      padding: 34px;
-      border: 1px solid #d9e1ea;
-      border-radius: 22px;
-      background: white;
-      box-shadow: 0 18px 45px rgba(23,54,93,.14);
-      text-align: center;
-    }
-    .mark {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 18px;
-      display: grid;
-      place-items: center;
-      border-radius: 18px;
-      background: var(--navy);
-      color: white;
-      font-weight: 900;
-      font-size: 24px;
-    }
-    h1 {
-      margin: 0 0 10px;
-      color: var(--navy);
-      font-size: clamp(28px, 6vw, 42px);
-      line-height: 1.05;
-    }
-    p {
-      margin: 0 auto 22px;
-      max-width: 510px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 12px 18px;
-      border-radius: 12px;
-      background: var(--gold);
-      color: #0b2139;
-      text-decoration: none;
-      font-weight: 900;
-    }
-    .spinner {
-      width: 38px;
-      height: 38px;
-      margin: 18px auto 0;
-      border: 4px solid #dce8f2;
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    small {
-      display: block;
-      margin-top: 20px;
-      color: var(--muted);
-    }
-  </style>
-  <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      window.setTimeout(function () {
-        window.location.replace('https://script.google.com/macros/s/AKfycbz55RZG8wA5_1kHKOR1OVAEkAplVyhpGuIvTC6igz8/exec');
-      }, 250);
-    });
-  </script>
+  <meta name="description" content="FamilyPD PGS Assistant: unofficial educator-created guidance for organizing CCSD Professional Growth System contact-unit activities completed on or after May 1, 2024.">
+  <meta name="theme-color" content="#17365d">
+  <title>FamilyPD PGS Assistant</title>
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-  <main class="card">
-    <div class="mark">CU</div>
-    <h1>Opening your PGS Assistant</h1>
-    <p>
-      You are being securely redirected to the private FamilyPD PGS dashboard.
-      Google may ask you to sign in with an authorized account.
-    </p>
-    <a class="button" href="https://script.google.com/macros/s/AKfycbz55RZG8wA5_1kHKOR1OVAEkAplVyhpGuIvTC6igz8/exec">Open the PGS Dashboard</a>
-    <div class="spinner" aria-hidden="true"></div>
-    <small>
-      This assistant applies only to activities occurring on or after May 1, 2024.
-    </small>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#home" aria-label="FamilyPD PGS Assistant home">
+        <span class="brand-mark">CU</span>
+        <span>
+          <strong>FamilyPD PGS Assistant</strong>
+          <small>Identify • Document • Prepare</small>
+        </span>
+      </a>
+
+      <button class="menu-button" id="menuButton" type="button"
+        aria-expanded="false" aria-controls="siteNav">
+        Menu
+      </button>
+
+      <nav id="siteNav" aria-label="Primary navigation">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#deadlines">Deadlines</a>
+        <a href="#categories">Activities</a>
+        <a href="#videos">Videos</a>
+        <a href="#sources">Official Sources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <div class="eyebrow">An open-source FamilyPD educator project</div>
+        <h1>Make PGS easier.<br><span>Enter once. Organize everything.</span></h1>
+        <p class="hero-copy">
+          A guided workspace designed to help CCSD licensed educators identify
+          a likely activity category, understand documentation expectations,
+          organize evidence, estimate Contact Units, and prepare for ELMS.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button primary" id="assistantButton" href="#assistant-status">
+            Assistant setup in progress
+          </a>
+          <a class="button secondary"
+             href="https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs"
+             target="_blank" rel="noopener">
+            Open Official CCSD PGS Resources
+          </a>
+        </div>
+
+        <div class="hero-points" aria-label="Project highlights">
+          <span>✓ Guided category matching</span>
+          <span>✓ One master activity record</span>
+          <span>✓ Evidence and ELMS preparation</span>
+        </div>
+      </div>
+
+      <div class="hero-panel" aria-label="PGS workflow preview">
+        <div class="panel-label">ONE-ENTRY WORKFLOW</div>
+        <div class="workflow-preview">
+          <div><span>1</span><p><strong>Describe</strong>Your professional activity</p></div>
+          <div><span>2</span><p><strong>Match</strong>Compare likely PGS activities</p></div>
+          <div><span>3</span><p><strong>Document</strong>Prepare the right evidence</p></div>
+          <div><span>4</span><p><strong>Submit</strong>Use the ELMS-ready record</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="scope-banner" aria-labelledby="scope-heading">
+      <div class="scope-icon" aria-hidden="true">📅</div>
+      <div>
+        <h2 id="scope-heading">Applies only to activities occurring on or after May 1, 2024</h2>
+        <p>
+          The assistant, calculator, category matcher, evidence guidance,
+          folder tools, and ELMS-preparation tools use the current PGS rule era.
+          Activities completed before May 1, 2024 must be reviewed under the
+          guide and maximums that applied at that time.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="section-heading">
+        <div class="eyebrow">Designed around teachers—not spreadsheets</div>
+        <h2>One activity record powers the full process</h2>
+        <p>
+          Teachers should not have to enter the same activity into a dashboard,
+          spreadsheet, evidence checklist, and document generator separately.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon blue">🧭</div>
+          <h3>Find My Category</h3>
+          <p>
+            Describe the work in plain language. The assistant recommends the
+            strongest match, explains why, and shows close alternatives.
+          </p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon green">🧮</div>
+          <h3>Estimate Carefully</h3>
+          <p>
+            Use activity-specific calculations, maximums, fixed values,
+            payment rules, exceptions, and manual-review warnings.
+          </p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon gold">📎</div>
+          <h3>Prepare Evidence</h3>
+          <p>
+            See the required documentation, form timing, signatures,
+            limitations, and final single-file submission expectations.
+          </p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon purple">📊</div>
+          <h3>Track One Record</h3>
+          <p>
+            The private workspace will use one teacher-owned Activity Log to
+            support totals, Drive links, evidence status, and ELMS preparation.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section deadlines-section" id="deadlines">
+      <div class="section-heading">
+        <div class="eyebrow">Annual advancement timeline</div>
+        <h2>Three deadlines teachers cannot afford to miss</h2>
+        <p>Always confirm the current dates on the official CCSD PGS page.</p>
+      </div>
+
+      <div class="deadline-grid">
+        <article class="deadline-card">
+          <div class="deadline-date"><span>JUN</span><strong>1</strong></div>
+          <div>
+            <h3>Request Column Advancement</h3>
+            <p>
+              Submit the request for advancement for the next contract year.
+            </p>
+          </div>
+        </article>
+        <article class="deadline-card">
+          <div class="deadline-date"><span>AUG</span><strong>31</strong></div>
+          <div>
+            <h3>Complete Requirements</h3>
+            <p>
+              Finish all hours and coursework being used for the current
+              advancement cycle.
+            </p>
+          </div>
+        </article>
+        <article class="deadline-card">
+          <div class="deadline-date"><span>OCT</span><strong>1</strong></div>
+          <div>
+            <h3>Submit Documentation</h3>
+            <p>
+              Submit required activity documentation through ELMS by the
+              annual deadline.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <div class="deadline-warning">
+        <strong>Original-document warning:</strong>
+        CCSD requires original, unaltered documentation from the issuing
+        organization. The assistant will help organize evidence; it must never
+        be used to alter an official certificate, transcript, award notice, or
+        other issuing-organization document.
+      </div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="section-heading">
+        <div class="eyebrow">Complete current activity library</div>
+        <h2>More than a short dropdown</h2>
+        <p>
+          The private matcher maps 43 current activity options across the major
+          PGS families below, while keeping removed historical activities out of
+          the current-choice list.
+        </p>
+      </div>
+
+      <div class="category-grid">
+        <article><span>🎓</span><h3>College Coursework</h3><p>Approved and non-approved universities, education and non-education courses, and multicultural coursework.</p></article>
+        <article><span>🏫</span><h3>District & School PD</h3><p>District courses, RPDP, CCEA, Vegas PBS, school/site PD, teaching, course development, and PLCs.</p></article>
+        <article><span>👥</span><h3>Student-Based Activities</h3><p>IEP/MDT work, extracurricular advising, coaching, academic trips, tutoring, and summer school.</p></article>
+        <article><span>🏛️</span><h3>School & Community</h3><p>Parent/community engagement, SOT service, schoolwide planning, and university-student assignments.</p></article>
+        <article><span>🤝</span><h3>Mentoring</h3><p>Qualifying mentor and mentee relationships with role-specific documentation and limits.</p></article>
+        <article><span>🏆</span><h3>Awards & Grants</h3><p>Community, state, and national awards plus grants that directly benefit students, school, or community.</p></article>
+        <article><span>🌐</span><h3>External Professional Learning</h3><p>Conferences, webinars, presentations, micro-credentials, and National Board activities.</p></article>
+        <article><span>📜</span><h3>Licensure & Specialty CEUs</h3><p>Additional endorsements and qualifying continuing education for specialty licensed professionals.</p></article>
+      </div>
+    </section>
+
+    <section class="section assistant-status" id="assistant-status">
+      <div>
+        <div class="eyebrow">Private teacher workspace</div>
+        <h2 id="assistantStatusHeading">The assistant is being connected</h2>
+        <p id="assistantStatusText">
+          The public site is live. The next deployment connects the private
+          Google Workspace assistant, which creates a teacher-owned Sheet and
+          Drive workspace without placing private teacher records in GitHub.
+        </p>
+      </div>
+      <a class="button primary disabled" id="assistantStatusButton"
+         href="#assistant-status" aria-disabled="true">
+        Private workspace coming next
+      </a>
+    </section>
+
+    <section class="section" id="videos">
+      <div class="section-heading">
+        <div class="eyebrow">FamilyPD video library</div>
+        <h2>Short lessons for each major decision</h2>
+        <p>
+          Videos will follow the same workflow as the assistant so teachers can
+          watch only the step they need.
+        </p>
+      </div>
+
+      <div class="video-grid">
+        <article class="video-card">
+          <div class="video-thumb navy">PGS<br>101</div>
+          <div><span>FOUNDATIONS</span><h3>PGS, CUs, and Column Advancement</h3><p>What the system is and where the assistant fits.</p></div>
+        </article>
+        <article class="video-card">
+          <div class="video-thumb blue">🧭</div>
+          <div><span>CATEGORIES</span><h3>How to Classify an Activity</h3><p>Learn why similar-looking work may fall under different activity options.</p></div>
+        </article>
+        <article class="video-card">
+          <div class="video-thumb green">📎</div>
+          <div><span>EVIDENCE</span><h3>Build the Submission Packet</h3><p>Forms, signatures, supporting evidence, sharing, and single-file preparation.</p></div>
+        </article>
+      </div>
+      <p class="coming-soon">Video links will be added as each FamilyPD tutorial is published.</p>
+    </section>
+
+    <section class="section sources-section" id="sources">
+      <div class="section-heading">
+        <div class="eyebrow">Use official guidance as the authority</div>
+        <h2>Official sources and support</h2>
+      </div>
+
+      <div class="source-grid">
+        <a href="https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs"
+           target="_blank" rel="noopener">
+          <strong>CCSD Professional Growth System</strong>
+          <span>Reference guides, forms, documentation requirements, announcements, deadlines, and tutorials ↗</span>
+        </a>
+        <a href="https://www.ccsd.net/resources/elms"
+           target="_blank" rel="noopener">
+          <strong>CCSD ELMS</strong>
+          <span>District professional-development registration and official PGS documentation tracking ↗</span>
+        </a>
+        <div>
+          <strong>PGS Department</strong>
+          <span>702-799-4747<br>pgs@nv.ccsd.net</span>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>FamilyPD PGS Assistant</strong>
+      <p>An unofficial educator-created, open-source guidance project.</p>
+    </div>
+    <p>
+      This project does not replace CCSD, CCEA, the official PGS Reference
+      Guide, ELMS, Human Resources guidance, or final PGS approval.
+    </p>
+  </footer>
+
+  <script src="assets/js/site-config.js"></script>
+  <script src="assets/js/site.js"></script>
 </body>
 </html>

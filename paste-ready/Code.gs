@@ -69,9 +69,10 @@ function getBootstrapData() {
     activities: activities,
     summary: buildSummary_(activities, rules),
     specialRules: PGS_SPECIAL_RULES,
+    finderData: PGS_GUIDED_FINDER,
     expiredActivityNames: PGS_EXPIRED_ACTIVITY_NAMES,
     libraryCount: rules.filter(function(rule) { return rule.active; }).length,
-    ruleAudit: {sourceDocument: '9/1/23 PGS Reference Guide', lastVerified: '2026-07-09', currentOptions: 43},
+    ruleAudit: {sourceDocument: '9/1/23 PGS Reference Guide', lastVerified: '2026-07-10', currentOptions: 43},
     warnings: [
       'This assistant and its associated tools apply only to activities occurring on or after May 1, 2024.',
       'Category suggestions are guidance, not final CCSD eligibility decisions.',

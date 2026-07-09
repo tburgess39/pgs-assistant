@@ -97,59 +97,71 @@
 
     <section id="matcher" class="view">
       <div class="card form">
-        <h3>Activity Category Matcher</h3>
-        <p>Use plain language. The assistant returns the strongest matches and explains the differences.</p><div class="notice warn"><strong>Date requirement:</strong> Do not use this matcher for activities that occurred before May 1, 2024.</div>
-        <div class="fg">
-          <div class="field full">
-            <label for="matcherDescription">Describe what you did</label>
-            <textarea id="matcherDescription" placeholder="Example: I attended weekly CTE PLC meetings after school where we analyzed WRS data and planned instructional interventions."></textarea>
+        <div class="heading-actions">
+          <div>
+            <h3>Guided Activity Category Finder</h3>
+            <p>Each step limits the next step to combinations supported by the current official PGS documentation.</p>
           </div>
-          <div class="field">
-            <label for="matcherPath">What best describes the activity?</label>
-            <select id="matcherPath">
-              <option value="">Not sure</option>
-              <option value="college">College or university coursework</option>
-              <option value="professional_learning">Professional learning / training</option>
-              <option value="conference">Conference or webinar</option>
-              <option value="students">Direct work with students</option>
-              <option value="iep">IEP / MDT work</option>
-              <option value="school_community">School or community leadership / planning</option>
-              <option value="mentor">I mentored someone</option>
-              <option value="mentee">I was mentored</option>
-              <option value="university_student">I supported a university student / teacher candidate</option>
-              <option value="award_credential">Award, grant, credential, certification, or endorsement</option>
-            </select>
+          <span class="verified-badge">43 current categories covered</span>
+        </div>
+
+        <div class="notice warn">
+          <strong>Date requirement:</strong> Use this finder only for activities occurring on or after May 1, 2024.
+        </div>
+
+        <div class="finder-steps">
+          <div class="finder-step">
+            <span class="step-number">1</span>
+            <div class="field">
+              <label for="matcherContext">Where did the activity occur, or through whom was it provided or assigned?</label>
+              <select id="matcherContext">
+                <option value="">Choose the setting or provider</option>
+              </select>
+              <small id="matcherContextHelp">Start here. The remaining choices will be limited automatically.</small>
+            </div>
           </div>
-          <div class="field">
-            <label for="matcherRole">What was your main role?</label>
-            <select id="matcherRole">
-              <option value="">Not sure</option>
-              <option value="attended">Attended / participated</option>
-              <option value="taught">Taught / presented / facilitated</option>
-              <option value="designed">Designed / wrote / developed</option>
-              <option value="coach_advisor">Coached / advised / coordinated</option>
-              <option value="committee">Served on a team / committee</option>
-              <option value="recipient">Received something</option>
-            </select>
+
+          <div class="finder-step">
+            <span class="step-number">2</span>
+            <div class="field">
+              <label for="matcherRole">What was your role?</label>
+              <select id="matcherRole" disabled>
+                <option value="">Choose the setting/provider first</option>
+              </select>
+              <small id="matcherRoleHelp">Only roles supported for the selected setting will appear.</small>
+            </div>
           </div>
-          <div class="field">
-            <label for="matcherContext">Where or through whom?</label>
-            <select id="matcherContext">
-              <option value="">Not sure</option>
-              <option value="district">District / RPDP / CCEA / Vegas PBS</option>
-              <option value="school">My school or site</option>
-              <option value="external">External professional organization</option>
-              <option value="college">College or university</option>
-              <option value="students">With students</option>
-            </select>
+
+          <div class="finder-step activity-step">
+            <span class="step-number">3</span>
+            <div class="field full">
+              <label>Which official activity description most closely matches what happened?</label>
+              <input id="matcherActivity" type="hidden">
+              <div id="matcherActivityList" class="finder-activity-list">
+                <div class="empty-choice">Choose the setting/provider and your role to see the valid official activities.</div>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <label for="matcherDate">Activity date</label>
-            <input id="matcherDate" type="date" min="2024-05-01" required>
+
+          <div class="finder-step">
+            <span class="step-number">4</span>
+            <div class="fg compact-grid">
+              <div class="field">
+                <label for="matcherDate">Activity date</label>
+                <input id="matcherDate" type="date" min="2024-05-01" required>
+              </div>
+              <div class="field">
+                <label for="matcherDescription">Optional details that help confirm the match</label>
+                <textarea id="matcherDescription" placeholder="Example: The PLC met after school to analyze WRS data and plan instructional interventions."></textarea>
+              </div>
+            </div>
           </div>
         </div>
+
+        <div id="matcherSelectionHelp" class="selection-summary" hidden></div>
+
         <div class="actions" style="justify-content:flex-end;margin-top:18px">
-          <button id="matchButton" class="btn blue" type="button">Find the Best Matches</button>
+          <button id="matchButton" class="btn blue" type="button" disabled>Review the Official Match</button>
         </div>
       </div>
 

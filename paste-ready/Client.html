@@ -26,7 +26,7 @@ const unitLabels = {
 
 const state = {
   activities: [], rules: [], workspace: {}, summary: {},
-  warnings: [], specialRules: [], expiredActivityNames: [], ruleAudit: {}
+  warnings: [], specialRules: [], expiredActivityNames: [], ruleAudit: {}, finder: {contexts: []}
 };
 
 const elements = {};
@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
   [
     'loading','loadingText','toast','mobileNav','heading','sub','workspaceStatus',
     'workspaceDetails','workbookLink','rootFolderLink','libraryCount','estimated',
-    'approved','remaining','warningBox','matcherDescription','matcherPath',
-    'matcherRole','matcherContext','matcherDate','matchButton','specialAlertArea',
+    'approved','remaining','warningBox','matcherDescription','matcherRole',
+    'matcherContext','matcherActivity','matcherActivityList','matcherDate','matchButton',
+    'matcherContextHelp','matcherRoleHelp','matcherSelectionHelp','specialAlertArea',
     'matchResults','activityForm','activityId','title','description','startDate',
     'endDate','organization','role','categoryKey','categoryGuidance','paymentStatus',
     'quantity','quantityLabel','unit','titleIException','status','officialApprovedCUs',
@@ -59,6 +60,10 @@ function bindEvents() {
     button.addEventListener('click', function() { showView(button.dataset.view); });
   });
   elements.mobileNav.addEventListener('change', function(event) { showView(event.target.value); });
+  elements.matcherContext.addEventListener('change', populateFinderRoles);
+  elements.matcherRole.addEventListener('change', renderFinderActivities);
+  elements.matcherActivityList.addEventListener('change', selectFinderActivity);
+  elements.matcherDate.addEventListener('change', updateFinderButton);
   elements.matchButton.addEventListener('click', runMatcher);
   elements.categoryKey.addEventListener('change', function() {
     configureCategory(elements.categoryKey.value);
@@ -127,10 +132,12 @@ function applyBootstrap(data) {
   state.summary = data.summary || {};
   state.warnings = data.warnings || [];
   state.specialRules = data.specialRules || [];
+  state.finder = data.finderData || {contexts: []};
   state.expiredActivityNames = data.expiredActivityNames || [];
   state.ruleAudit = data.ruleAudit || {};
 
   populateCategories();
+  initializeGuidedFinder();
   renderWorkspace();
   renderDashboard(data.libraryCount || state.rules.length);
   renderDirectory();
@@ -162,11 +169,167 @@ function populateCategories() {
   }
 }
 
+function initializeGuidedFinder() {
+  const contexts = state.finder.contexts || [];
+  elements.matcherContext.innerHTML =
+    '<option value="">Choose the setting or provider</option>' +
+    contexts.map(function(context) {
+      return '<option value="' + escapeHtml(context.id) + '">' +
+        escapeHtml(context.label) + '</option>';
+    }).join('');
+
+  elements.matcherRole.innerHTML =
+    '<option value="">Choose the setting/provider first</option>';
+  elements.matcherRole.disabled = true;
+  elements.matcherActivity.value = '';
+  elements.matcherActivityList.innerHTML =
+    '<div class="empty-choice">Choose the setting/provider and your role to see the valid official activities.</div>';
+  elements.matcherSelectionHelp.hidden = true;
+  elements.matchResults.innerHTML = '';
+  elements.specialAlertArea.innerHTML = '';
+  updateFinderButton();
+}
+
+function getFinderContext() {
+  return (state.finder.contexts || []).find(function(context) {
+    return context.id === elements.matcherContext.value;
+  });
+}
+
+function getFinderRole() {
+  const context = getFinderContext();
+  if (!context) return null;
+  return (context.roles || []).find(function(role) {
+    return role.id === elements.matcherRole.value;
+  });
+}
+
+function getFinderActivity() {
+  const role = getFinderRole();
+  if (!role) return null;
+  return (role.activities || []).find(function(activity) {
+    return activity.id === elements.matcherActivity.value;
+  });
+}
+
+function populateFinderRoles() {
+  const context = getFinderContext();
+
+  elements.matcherActivity.value = '';
+  elements.matcherActivityList.innerHTML =
+    '<div class="empty-choice">Choose your role to see the valid official activities.</div>';
+  elements.matcherSelectionHelp.hidden = true;
+  elements.matchResults.innerHTML = '';
+  elements.specialAlertArea.innerHTML = '';
+
+  if (!context) {
+    elements.matcherRole.innerHTML =
+      '<option value="">Choose the setting/provider first</option>';
+    elements.matcherRole.disabled = true;
+    elements.matcherContextHelp.textContent =
+      'Start here. The remaining choices will be limited automatically.';
+    elements.matcherRoleHelp.textContent =
+      'Only roles supported for the selected setting will appear.';
+    updateFinderButton();
+    return;
+  }
+
+  elements.matcherContextHelp.textContent = context.description;
+  elements.matcherRole.disabled = false;
+  elements.matcherRole.innerHTML =
+    '<option value="">Choose your role</option>' +
+    (context.roles || []).map(function(role) {
+      return '<option value="' + escapeHtml(role.id) + '">' +
+        escapeHtml(role.label) + '</option>';
+    }).join('');
+
+  elements.matcherRoleHelp.textContent =
+    'Choose what you actually did. Unrelated roles have been removed.';
+  updateFinderButton();
+}
+
+function renderFinderActivities() {
+  const role = getFinderRole();
+  elements.matcherActivity.value = '';
+  elements.matcherSelectionHelp.hidden = true;
+  elements.matchResults.innerHTML = '';
+  elements.specialAlertArea.innerHTML = '';
+
+  if (!role) {
+    elements.matcherActivityList.innerHTML =
+      '<div class="empty-choice">Choose your role to see the valid official activities.</div>';
+    elements.matcherRoleHelp.textContent =
+      'Only roles supported for the selected setting will appear.';
+    updateFinderButton();
+    return;
+  }
+
+  elements.matcherRoleHelp.textContent = role.description;
+
+  elements.matcherActivityList.innerHTML = (role.activities || []).map(function(activity) {
+    return '<label class="finder-activity-card">' +
+      '<input type="radio" name="finderActivityChoice" value="' +
+      escapeHtml(activity.id) + '">' +
+      '<span><strong>' + escapeHtml(activity.label) + '</strong>' +
+      '<p>' + escapeHtml(activity.description) + '</p>' +
+      '<small>' + escapeHtml(activity.officialBasis) + '</small></span>' +
+      '</label>';
+  }).join('');
+
+  updateFinderButton();
+}
+
+function selectFinderActivity(event) {
+  const radio = event.target.closest('input[name="finderActivityChoice"]');
+  if (!radio) return;
+
+  elements.matcherActivity.value = radio.value;
+
+  elements.matcherActivityList
+    .querySelectorAll('.finder-activity-card')
+    .forEach(function(card) {
+      const input = card.querySelector('input[name="finderActivityChoice"]');
+      card.classList.toggle('selected', Boolean(input && input.checked));
+    });
+
+  const context = getFinderContext();
+  const role = getFinderRole();
+  const activity = getFinderActivity();
+
+  if (context && role && activity) {
+    elements.matcherSelectionHelp.hidden = false;
+    elements.matcherSelectionHelp.innerHTML =
+      '<strong>Selected path:</strong> ' +
+      escapeHtml(context.label) + ' -> ' +
+      escapeHtml(role.label) + ' -> ' +
+      escapeHtml(activity.label) +
+      '<br><small>' + escapeHtml(activity.description) + '</small>';
+  }
+
+  updateFinderButton();
+}
+
+function updateFinderButton() {
+  elements.matchButton.disabled =
+    !getFinderContext() ||
+    !getFinderRole() ||
+    !getFinderActivity() ||
+    !elements.matcherDate.value;
+}
+
 function runMatcher() {
   const activityDate = elements.matcherDate.value;
+  const context = getFinderContext();
+  const role = getFinderRole();
+  const selected = getFinderActivity();
+
+  if (!context || !role || !selected) {
+    showToast('Complete the setting, role, and official activity-description steps.', true);
+    return;
+  }
 
   if (!activityDate) {
-    showToast('Enter the activity date. The matcher applies only to activities occurring on or after May 1, 2024.', true);
+    showToast('Enter the activity date.', true);
     elements.matcherDate.focus();
     return;
   }
@@ -174,84 +337,91 @@ function runMatcher() {
   if (activityDate < MIN_ACTIVITY_DATE) {
     showToast('This assistant applies only to activities occurring on or after May 1, 2024.', true);
     elements.matchResults.innerHTML =
-      '<div class="notice danger"><strong>Outside the scope of this assistant:</strong> Activities before May 1, 2024 must be reviewed using the rules and documentation that applied at that time.</div>';
+      '<div class="notice danger"><strong>Outside the scope of this assistant:</strong> ' +
+      'Activities before May 1, 2024 must be reviewed using the rules and documentation ' +
+      'that applied at that time.</div>';
     return;
   }
 
   const description = elements.matcherDescription.value.trim().toLowerCase();
-  const selectedTags = [
-    elements.matcherPath.value, elements.matcherRole.value, elements.matcherContext.value
-  ].filter(Boolean);
+  renderSpecialAlerts(description, selected.specialRuleId || '');
 
-  const scored = state.rules.map(function(rule) {
-    let score = 0;
-    const reasons = [];
-    selectedTags.forEach(function(tag) {
-      if ((rule.matchTags || []).indexOf(tag) >= 0) {
-        score += 12;
-        reasons.push('Matches "' + tag.split('_').join(' ') + '"');
-      }
-    });
-    (rule.keywords || []).forEach(function(keyword) {
-      if (description && description.indexOf(String(keyword).toLowerCase()) >= 0) {
-        score += 5;
-        reasons.push('Description mentions "' + keyword + '"');
-      }
-    });
-    const activityWords = rule.activityName.toLowerCase().split(/\W+/).filter(function(word) {
-      return word.length > 4;
-    });
-    activityWords.forEach(function(word) {
-      if (description.indexOf(word) >= 0) score += 1;
-    });
-    return {rule: rule, score: score, reasons: unique(reasons)};
-  }).sort(function(a, b) { return b.score - a.score; });
-
-  renderSpecialAlerts(description);
-  const results = scored.filter(function(item) { return item.score > 0; }).slice(0, 5);
-  if (!results.length) {
+  if (selected.workflowOnly) {
     elements.matchResults.innerHTML =
-      '<div class="notice warn">No strong match yet. Add more detail or browse the complete Category Directory.</div>';
+      '<div class="match-card best">' +
+      '<div class="match-head"><div><div class="parent-label">Special workflow</div>' +
+      '<h3>' + escapeHtml(selected.label) + '</h3></div>' +
+      '<div class="score-pill">Official announcement</div></div>' +
+      '<div class="match-path"><span>' + escapeHtml(context.label) + '</span>' +
+      '<span>' + escapeHtml(role.label) + '</span></div>' +
+      '<p>' + escapeHtml(selected.description) + '</p>' +
+      '<div class="notice info"><strong>What to do:</strong> ' +
+      escapeHtml(selected.officialBasis) + '</div>' +
+      '<div class="source-proof"><strong>Official basis</strong>' +
+      escapeHtml((selected.sourceDocument || 'CCSD and CCEA PGS Announcements') +
+      (selected.sourcePage ? ', page ' + selected.sourcePage : '') +
+      (selected.sourceDate ? ' (' + selected.sourceDate + ')' : '')) +
+      '</div></div>';
     return;
   }
 
-  elements.matchResults.innerHTML = results.map(function(item, index) {
-    const rule = item.rule;
-    const maxText = rule.maximumCUs === null ? 'No stated category maximum' : rule.maximumCUs + ' CU maximum';
-    return '<div class="match-card ' + (index === 0 ? 'best' : '') + '">' +
-      '<div class="match-head"><div><div class="parent-label">' +
-      escapeHtml(rule.parentCategory) + '</div><h3>' + escapeHtml(rule.activityName) +
-      '</h3></div><div class="score-pill">' + (index === 0 ? 'Best match' : 'Alternative') +
-      '</div></div>' +
-      '<p><strong>Why it matched:</strong> ' +
-      escapeHtml(item.reasons.slice(0, 3).join('; ') || 'Similar activity language') + '</p>' +
-      '<div class="match-details">' +
+  const rule = getRule(selected.categoryKey);
+  if (!rule) {
+    showToast('The selected official category is not available in the current library.', true);
+    return;
+  }
+
+  const maxText = rule.maximumCUs === null
+    ? 'No stated category maximum'
+    : rule.maximumCUs + ' CU maximum';
+
+  const sourceDocument = selected.sourceDocument || rule.sourceDocument;
+  const sourcePage = selected.sourcePage || rule.sourcePage;
+
+  elements.matchResults.innerHTML =
+    '<div class="match-card best">' +
+    '<div class="match-head"><div><div class="parent-label">' +
+    escapeHtml(rule.parentCategory) + '</div><h3>' +
+    escapeHtml(rule.activityName) + '</h3></div>' +
+    '<div class="score-pill">Official-path match</div></div>' +
+    '<div class="match-path"><span>' + escapeHtml(context.label) + '</span>' +
+    '<span>' + escapeHtml(role.label) + '</span>' +
+    '<span>' + escapeHtml(selected.label) + '</span></div>' +
+    '<p><strong>Why this matches:</strong> ' +
+    escapeHtml(selected.description) + '</p>' +
+    '<div class="match-details">' +
+      '<div class="detail-box"><strong>Official description / limitation</strong>' +
+      escapeHtml(rule.limitations) + '</div>' +
       '<div class="detail-box"><strong>Calculation / maximum</strong>' +
-      escapeHtml(calculationSummary(rule) + '  |  ' + maxText) + '</div>' +
+      escapeHtml(calculationSummary(rule) + ' | ' + maxText) + '</div>' +
       '<div class="detail-box"><strong>Submission path</strong>' +
       escapeHtml(submissionLabel(rule.submissionMode)) + '</div>' +
       '<div class="detail-box"><strong>Required documentation</strong>' +
       escapeHtml(rule.documentation) + '</div>' +
-      '<div class="detail-box"><strong>Important limitations</strong>' +
-      escapeHtml(rule.limitations) + '</div></div>' +
-      '<button class="btn blue" type="button" data-use-category="' +
-      escapeHtml(rule.categoryKey) + '">Use This Category</button></div>';
-  }).join('');
+    '</div>' +
+    '<div class="source-proof"><strong>Recommendation source</strong>' +
+    escapeHtml(sourceDocument + ', page ' + sourcePage) +
+    '<br><small>Rule library verified ' + escapeHtml(rule.lastVerified || '') +
+    '. Final eligibility and approval remain with CCSD.</small></div>' +
+    '<button class="btn blue" type="button" data-use-category="' +
+    escapeHtml(rule.categoryKey) + '">Use This Official Category</button></div>';
 }
 
-function renderSpecialAlerts(description) {
+function renderSpecialAlerts(description, selectedRuleId) {
   const date = elements.matcherDate.value;
   const matches = state.specialRules.filter(function(rule) {
+    const explicitlySelected = selectedRuleId && rule.id === selectedRuleId;
     const keywordMatch = (rule.keywords || []).some(function(keyword) {
       return description.indexOf(String(keyword).toLowerCase()) >= 0;
     });
     const dateMatch = !date || !rule.effectiveDate || date >= rule.effectiveDate;
-    return keywordMatch && dateMatch;
+    return (explicitlySelected || keywordMatch) && dateMatch;
   });
 
   elements.specialAlertArea.innerHTML = matches.map(function(rule) {
     return '<div class="notice danger"><strong>' + escapeHtml(rule.title) +
-      '</strong><br>' + escapeHtml(rule.message) + '</div>';
+      '</strong><br>' + escapeHtml(rule.message) +
+      '<br><small>Source: ' + escapeHtml(rule.source) + '</small></div>';
   }).join('');
 }
 
@@ -259,8 +429,10 @@ function useCategory(categoryKey) {
   const rule = getRule(categoryKey);
   if (!rule) return;
   elements.categoryKey.value = categoryKey;
+  const selectedFinderActivity = getFinderActivity();
   elements.description.value = elements.description.value ||
-    elements.matcherDescription.value.trim();
+    elements.matcherDescription.value.trim() ||
+    (selectedFinderActivity ? selectedFinderActivity.description : '');
   if (elements.matcherDate.value) {
     elements.startDate.value = elements.startDate.value || elements.matcherDate.value;
     elements.endDate.value = elements.endDate.value || elements.matcherDate.value;

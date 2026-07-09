@@ -25,3 +25,11 @@
 Run `runAllPGSTests()` from `apps-script/Tests.gs` after installing the Apps Script files.
 The test suite checks library count, unique keys, required metadata, cutoff enforcement,
 and representative calculations.
+
+
+## Guided Finder Audit - 2026-07-10
+
+The cascading finder was mapped against all 43 active categories in
+`PGS_ACTIVITY_LIBRARY`. Automated tests fail if an active category is missing,
+if a guided choice references an unknown category, or if a context, role, or
+activity lacks descriptive/source-basis text.
