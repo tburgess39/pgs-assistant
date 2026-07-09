@@ -41,7 +41,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -51,7 +51,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "COLLEGE_APPROVED_NONED",
@@ -95,7 +103,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -105,7 +113,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "COLLEGE_NONAPPROVED_ED",
@@ -149,7 +165,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -159,7 +175,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "COLLEGE_NONAPPROVED_NONED",
@@ -203,7 +227,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -213,7 +237,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "COLLEGE_MULTI_200PLUS",
@@ -254,7 +286,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "Matcher should ask approved/non-approved university before calculating.",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -264,7 +296,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office. A 200-level course requires prior supervisor approval.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit_review",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "COLLEGE_MULTI_100",
@@ -305,7 +345,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "Matcher should ask approved/non-approved university before calculating.",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
     "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
     "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
@@ -315,7 +355,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Official university transcript sent directly to the PGS office and prior supervisor approval using the Lower-Level College Coursework form.",
       "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
       "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
-    ]
+    ],
+    "entryMode": "credit_review",
+    "dateLabel": "Course start date",
+    "endDateLabel": "Course completion date",
+    "showEndDate": true,
+    "quantityLabel": "Number of college credits",
+    "quantityHelp": "Enter semester or quarter credits exactly as shown on the official transcript.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "College coursework is measured by transcripted semester or quarter credits, not clock hours. Exact start/end times are not required."
   },
   {
     "categoryKey": "DISTRICT_PD",
@@ -354,7 +402,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Do not create a self-reported ELMS submission when the activity is automatically recorded. Verify that it appears in Advancement Status.",
@@ -364,7 +412,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "No self-reported submission. The District course is recorded in the District PD report in ELMS.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Do not create a self-reported ELMS submission when the activity is automatically recorded. Verify that it appears in Advancement Status."
-    ]
+    ],
+    "entryMode": "automatic",
+    "dateLabel": "Course completion date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Recorded automatically",
+    "quantityHelp": "No self-reported hour entry is needed.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "District Professional Development is recorded in the District PD report in ELMS and CUs are calculated automatically. Do not create a duplicate self-reported submission."
   },
   {
     "categoryKey": "VEGAS_PBS_PD",
@@ -402,7 +458,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -412,7 +468,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Vegas PBS certificate of completion and the Time Report from the Vegas PBS My Classroom tab.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "duration_hours",
+    "dateLabel": "Completion or activity date",
+    "endDateLabel": "Optional end date",
+    "showEndDate": true,
+    "quantityLabel": "Documented duration",
+    "quantityHelp": "Enter the hours/duration shown on the certificate, transcript, time report, or issuing-organization record. Do not invent start/end times.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "The official evidence requirement relies on a certificate, transcript, time report, or provider record showing hours/duration. Enter the documented total rather than reconstructing times that are not on the evidence."
   },
   {
     "categoryKey": "RPDP_PD",
@@ -449,7 +513,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -459,7 +523,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Certificate, transcript, or responsible-organization record showing completion and hours/duration.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "duration_hours",
+    "dateLabel": "Completion or activity date",
+    "endDateLabel": "Optional end date",
+    "showEndDate": true,
+    "quantityLabel": "Documented duration",
+    "quantityHelp": "Enter the hours/duration shown on the certificate, transcript, time report, or issuing-organization record. Do not invent start/end times.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "The official evidence requirement relies on a certificate, transcript, time report, or provider record showing hours/duration. Enter the documented total rather than reconstructing times that are not on the evidence."
   },
   {
     "categoryKey": "CCEA_COLLAB_PD",
@@ -497,7 +569,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -507,7 +579,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Certificate, transcript, or responsible-organization record showing completion and hours/duration.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "duration_hours",
+    "dateLabel": "Completion or activity date",
+    "endDateLabel": "Optional end date",
+    "showEndDate": true,
+    "quantityLabel": "Documented duration",
+    "quantityHelp": "Enter the hours/duration shown on the certificate, transcript, time report, or issuing-organization record. Do not invent start/end times.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "The official evidence requirement relies on a certificate, transcript, time report, or provider record showing hours/duration. Enter the documented total rather than reconstructing times that are not on the evidence."
   },
   {
     "categoryKey": "TEACH_DISTRICT_PD",
@@ -547,7 +627,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -557,7 +637,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form documenting time, plus agendas showing session start/end times.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "WRITE_DISTRICT_PD",
@@ -596,7 +684,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -606,7 +694,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form documenting creation time, plus agendas from each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "SCHOOL_PD",
@@ -645,7 +741,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -655,7 +751,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form with administrative approval and a description of activities.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "TEACH_SCHOOL_PD",
@@ -694,7 +798,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -704,7 +808,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form documenting time, plus agendas showing session start/end times.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "WRITE_SCHOOL_PD",
@@ -742,7 +854,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -752,7 +864,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form documenting creation time, plus agendas from each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "PLC",
@@ -793,7 +913,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -803,7 +923,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form with administrative approval and agendas from each PLC session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "WRITE_IEP_MDT",
@@ -841,7 +969,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -851,7 +979,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Signature page from each IEP with all parent/student information and signatures redacted.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Beginning of IEP/MDT activity period",
+    "endDateLabel": "End of activity period",
+    "showEndDate": true,
+    "quantityLabel": "Number of qualifying IEPs/MDTs written",
+    "quantityHelp": "Enter the number written for students on your caseload. Each qualifying IEP/MDT earns 1 CU; maximum 30 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the number of qualifying IEPs/MDTs written, supported by redacted signature pages. It is not calculated from hours and may occur during or outside the contractual workday."
   },
   {
     "categoryKey": "IEP_MDT_TEAM",
@@ -889,7 +1025,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -899,7 +1035,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Signature page from each IEP with all parent/student information and signatures redacted.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Beginning of IEP/MDT activity period",
+    "endDateLabel": "End of activity period",
+    "showEndDate": true,
+    "quantityLabel": "Number of qualifying students/cases",
+    "quantityHelp": "Enter the number of students for whom you participated in writing and attended the meeting. Each qualifying student earns 0.5 CU.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on qualifying students/cases, supported by redacted signature pages. It is not time-based, and the same IEP/MDT cannot be claimed in both IEP categories."
   },
   {
     "categoryKey": "EXTRACURRICULAR",
@@ -940,7 +1084,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -950,7 +1094,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form signed by the athletic/activity administrator.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "PARENT_COMMUNITY_LEADERSHIP",
@@ -990,7 +1142,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1000,7 +1152,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form with administrative approval and agendas from the sessions.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "SOT",
@@ -1038,7 +1198,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1048,7 +1208,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form with administrative approval and agendas from each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "SCHOOLWIDE_PLANNING",
@@ -1087,7 +1255,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1097,7 +1265,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form with administrative approval and agendas from each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "ACADEMIC_TRIP",
@@ -1135,7 +1311,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1145,7 +1321,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form, signed CCF-145 or CCF-798, and academic-trip itinerary.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "FOS_ASSIGNMENT",
@@ -1183,7 +1367,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - University Student Assignment",
     "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1193,7 +1377,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
       "Complete and obtain supervisor approval before the university student assignment begins.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Placement start date",
+    "endDateLabel": "Placement end date",
+    "showEndDate": true,
+    "quantityLabel": "Number of assigned FOS students",
+    "quantityHelp": "Enter the number of supervisor-assigned Field Observation Students completed. Each earns 2 CUs; maximum 8 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the number of assigned FOS students, not hours. University assignment approval and completion documentation are required."
   },
   {
     "categoryKey": "PRACTICUM_ASSIGNMENT",
@@ -1230,7 +1422,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - University Student Assignment",
     "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1240,7 +1432,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
       "Complete and obtain supervisor approval before the university student assignment begins.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Placement start date",
+    "endDateLabel": "Placement end date",
+    "showEndDate": true,
+    "quantityLabel": "Number of qualifying placement weeks",
+    "quantityHelp": "Enter the number of documented weeks in the supervisor-assigned placement. Each qualifying week earns 2 CUs; maximum 20 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is measured by documented assignment weeks, not daily clock hours. University assignment approval and completion documentation are required."
   },
   {
     "categoryKey": "STUDENT_TEACHER_ASSIGNMENT",
@@ -1277,7 +1477,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - University Student Assignment",
     "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1287,7 +1487,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
       "Complete and obtain supervisor approval before the university student assignment begins.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Placement start date",
+    "endDateLabel": "Placement end date",
+    "showEndDate": true,
+    "quantityLabel": "Number of qualifying placement weeks",
+    "quantityHelp": "Enter the number of documented weeks in the supervisor-assigned placement. Each qualifying week earns 2 CUs; maximum 20 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is measured by documented assignment weeks, not daily clock hours. University assignment approval and completion documentation are required."
   },
   {
     "categoryKey": "CORE_TUTORING",
@@ -1326,7 +1534,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1336,7 +1544,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form and a copy of the educator's license showing the core-content endorsement.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "SUMMER_SCHOOL",
@@ -1373,7 +1589,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1383,7 +1599,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form signed by the District-approved credit-retrieval summer school administrator.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "COMMUNITY_AWARD",
@@ -1421,7 +1645,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1431,7 +1655,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Award notification or certificate.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of community awards received",
+    "quantityHelp": "Enter awards actually received. The category is 5 CUs for one qualifying community award; maximum 5 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the documented number received, earned, or maintained\u2014not the hours spent applying, preparing, or completing related work."
   },
   {
     "categoryKey": "STATE_AWARD",
@@ -1468,7 +1700,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1478,7 +1710,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Award notification or certificate.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of state professional awards received",
+    "quantityHelp": "Enter awards actually received. The category is 15 CUs for one qualifying state award; maximum 15 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the documented number received, earned, or maintained\u2014not the hours spent applying, preparing, or completing related work."
   },
   {
     "categoryKey": "NATIONAL_AWARD",
@@ -1515,7 +1755,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1525,7 +1765,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Award notification or certificate.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of national professional awards received",
+    "quantityHelp": "Enter each qualifying national award received. Each earns 25 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the documented number received, earned, or maintained\u2014not the hours spent applying, preparing, or completing related work."
   },
   {
     "categoryKey": "MENTOR",
@@ -1563,7 +1811,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1573,7 +1821,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form identifying the mentor and mentee, with specific activities for each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "MENTEE",
@@ -1611,7 +1867,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
     "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1621,7 +1877,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities approval form identifying the mentor and mentee, with specific activities for each session.",
       "Complete after the activity and obtain the required supervising administrator signature.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "GRANT_RECIPIENT",
@@ -1658,7 +1922,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1668,7 +1932,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Notification or evidence that the grant was awarded.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of grants received",
+    "quantityHelp": "Enter grants that were actually awarded and directly benefit students, the classroom/school, or school community. Each earns 3 CUs; maximum 30 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "Grant CUs are based on the number of grants actually received\u2014not hours spent writing or applying. Evidence that the grant was awarded is required."
   },
   {
     "categoryKey": "SYNC_CONFERENCE",
@@ -1708,7 +1980,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1718,7 +1990,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Certificate, transcript, or other attendance evidence showing sessions/time and proof of registration.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "ASYNC_CONFERENCE_WEBINAR",
@@ -1759,7 +2039,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities when required by the documentation rule",
     "approvalTiming": "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1769,7 +2049,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Certificate/transcript showing hours. If duration is missing, also provide the activity description with estimated time and a Time-Based Activities form; administrator approval is not required.",
       "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "duration_hours",
+    "dateLabel": "Completion or activity date",
+    "endDateLabel": "Optional end date",
+    "showEndDate": true,
+    "quantityLabel": "Documented duration",
+    "quantityHelp": "Enter the hours/duration shown on the certificate, transcript, time report, or issuing-organization record. Do not invent start/end times.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "The official evidence requirement relies on a certificate, transcript, time report, or provider record showing hours/duration. Enter the documented total rather than reconstructing times that are not on the evidence."
   },
   {
     "categoryKey": "CONFERENCE_PRESENTATION",
@@ -1807,7 +2095,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "Contact Unit Approval Form - Time-Based Activities when required by the documentation rule",
     "approvalTiming": "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1817,7 +2105,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Time-Based Activities form documenting creation/presentation time; administrator approval is not required. Also provide the conference agenda naming the presenter/session.",
       "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "session_time",
+    "dateLabel": "Session date",
+    "endDateLabel": "Derived from session log",
+    "showEndDate": false,
+    "quantityLabel": "Calculated hours",
+    "quantityHelp": "Enter each date, start time, end time, break, and payment status. The assistant calculates net hours.",
+    "quantityStep": 0.25,
+    "evidenceInputBasis": "This category uses documented time. Enter exact session dates and start/end times so the record can support the Time-Based Activities form, agenda, itinerary, or session documentation required for this category."
   },
   {
     "categoryKey": "MICRO_CREDENTIAL",
@@ -1855,7 +2151,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1865,7 +2161,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Evidence of the digital badge or credential from Digital Promise.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of approved micro-credentials earned",
+    "quantityHelp": "Enter Digital Promise-approved micro-credentials actually earned. Each earns 5 CUs; maximum 50 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the documented number received, earned, or maintained\u2014not the hours spent applying, preparing, or completing related work."
   },
   {
     "categoryKey": "NBPTS_PROCESS",
@@ -1902,7 +2206,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1912,7 +2216,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Evidence that all four NBPTS components were submitted.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "fixed",
+    "dateLabel": "Submission or certification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Fixed official value",
+    "quantityHelp": "The CU value is fixed by the guide; no hour or count entry is needed.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category has a fixed CU value based on documented submission, certification, or maintenance of certification\u2014not hours."
   },
   {
     "categoryKey": "NBPTS_CERTIFICATION",
@@ -1949,7 +2261,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -1959,7 +2271,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Evidence of NBPTS certification.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "fixed",
+    "dateLabel": "Submission or certification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Fixed official value",
+    "quantityHelp": "The CU value is fixed by the guide; no hour or count entry is needed.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category has a fixed CU value based on documented submission, certification, or maintenance of certification\u2014not hours."
   },
   {
     "categoryKey": "NBPTS_MOC",
@@ -1996,7 +2316,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -2006,7 +2326,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Evidence of successful NBPTS Maintenance of Certification.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "fixed",
+    "dateLabel": "Submission or certification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Fixed official value",
+    "quantityHelp": "The CU value is fixed by the guide; no hour or count entry is needed.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category has a fixed CU value based on documented submission, certification, or maintenance of certification\u2014not hours."
   },
   {
     "categoryKey": "SECOND_ENDORSEMENT",
@@ -2045,7 +2373,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -2055,7 +2383,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Current NVDOE license and the most recent evaluation page showing effective or highly effective status.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "count",
+    "dateLabel": "Award, completion, or verification date",
+    "endDateLabel": "",
+    "showEndDate": false,
+    "quantityLabel": "Number of qualifying second endorsements maintained",
+    "quantityHelp": "Enter eligible endorsements outside the primary assignment. Each earns 10 CUs; maximum 20 CUs.",
+    "quantityStep": 1,
+    "evidenceInputBasis": "This category is based on the documented number received, earned, or maintained\u2014not the hours spent applying, preparing, or completing related work."
   },
   {
     "categoryKey": "SPECIALTY_CEU",
@@ -2100,7 +2436,7 @@ const PGS_ACTIVITY_LIBRARY = [
     "active": true,
     "notes": "",
     "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
-    "lastVerified": "2026-07-09",
+    "lastVerified": "2026-07-10",
     "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
     "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
     "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
@@ -2110,7 +2446,15 @@ const PGS_ACTIVITY_LIBRARY = [
       "Certificate or transcript from the responsible organization showing hours or CEUs.",
       "Follow the category-specific documentation and current PGS announcements.",
       "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
-    ]
+    ],
+    "entryMode": "ceu_or_hours",
+    "dateLabel": "Completion date",
+    "endDateLabel": "Optional end date",
+    "showEndDate": true,
+    "quantityLabel": "Documented hours or CEUs",
+    "quantityHelp": "Choose documented clock hours or CEUs and enter the amount exactly as shown on the certificate/transcript.",
+    "quantityStep": 0.1,
+    "evidenceInputBasis": "This category is measured by hours or CEUs printed on the responsible organization\u2019s certificate/transcript. Exact session times are not required unless a current department workflow specifically asks for a Time-Based Activities form."
   }
 ];
 

@@ -92,3 +92,10 @@ show the official category, description/limitations, calculation, documentation,
 submission path, source document, and source page. Current announcement-only
 workflows such as LinkedIn Learning for CTE teachers are shown without forcing
 an inaccurate self-reported category.
+
+
+## Milestone 2.7 - Evidence-driven activity inputs
+
+The Add Activity form and Guided Finder now use the official documentation requirement to choose the input model. Categories requiring the Time-Based Activities form or session agendas use exact session start/end times. Categories supported by certificates or transcripts showing duration use documented total hours. Grants, IEPs, awards, assignments, micro-credentials, endorsements, college credits, CEUs, and fixed National Board values no longer display an inappropriate time log.
+
+The evidence guide and finder result both explain how the selected category is measured and what the teacher should enter.

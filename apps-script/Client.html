@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'directorySearch','directoryGroups','expiredList','openWorkbookButton',
     'createFoldersButton','recordsBody','categoryBody','evidenceActivitySelect',
     'evidenceGuideOutput','elmsReadinessOutput','ruleAuditLabel',
-    'startDateField','endDateField','paymentStatusField','quantityField','unitField',
+    'startDateField','endDateField','startDateLabel','endDateLabel','paymentStatusField',
+    'quantityField','quantityHelp','unitField','titleIField','sessionInputBasis',
     'sessionSection','sessionRows','addSessionButton','sessionTotal','sessionWarning'
   ].forEach(function(id) { elements[id] = document.getElementById(id); });
 
@@ -389,6 +390,8 @@ function runMatcher() {
     '<span>' + escapeHtml(selected.label) + '</span></div>' +
     '<p><strong>Why this matches:</strong> ' +
     escapeHtml(selected.description) + '</p>' +
+    '<div class="notice info"><strong>How to record it:</strong> ' +
+    escapeHtml(rule.evidenceInputBasis || measurementSummary(rule)) + '</div>' +
     '<div class="match-details">' +
       '<div class="detail-box"><strong>Official description / limitation</strong>' +
       escapeHtml(rule.limitations) + '</div>' +
@@ -438,6 +441,13 @@ function useCategory(categoryKey) {
     elements.endDate.value = elements.endDate.value || elements.matcherDate.value;
   }
   configureCategory(categoryKey);
+
+  if (rule.entryMode === 'session_time' && elements.matcherDate.value) {
+    const firstDate = elements.sessionRows.querySelector('.session-date');
+    if (firstDate && !firstDate.value) firstDate.value = elements.matcherDate.value;
+    updateSessionTotals();
+  }
+
   showView('activity');
   elements.title.focus();
 }
@@ -449,51 +459,80 @@ function configureCategory(categoryKey) {
     return;
   }
 
+  const mode = rule.entryMode || '';
   const units = rule.units && rule.units.length ? rule.units : ['hours'];
+
   elements.unit.innerHTML = units.map(function(unit) {
     return '<option value="' + escapeHtml(unit) + '">' +
       escapeHtml(unitLabels[unit] || unit) + '</option>';
   }).join('');
-  elements.quantityLabel.textContent = quantityLabelFor(units[0]);
-  elements.unit.onchange = function() {
-    elements.quantityLabel.textContent = quantityLabelFor(elements.unit.value);
-  };
 
-  const isHourly = rule.calculationType === 'hours';
-  elements.sessionSection.hidden = !isHourly;
-  elements.startDateField.hidden = isHourly;
-  elements.endDateField.hidden = isHourly;
-  elements.paymentStatusField.hidden = isHourly;
-  elements.quantityField.hidden = isHourly;
-  elements.unitField.hidden = isHourly;
+  elements.startDateLabel.textContent = rule.dateLabel || 'Activity date';
+  elements.endDateLabel.textContent = rule.endDateLabel || 'End date';
+  elements.quantityLabel.textContent = rule.quantityLabel || quantityLabelFor(units[0]);
+  elements.quantityHelp.textContent = rule.quantityHelp || '';
+  elements.quantity.step = String(rule.quantityStep || 1);
 
-  elements.startDate.required = !isHourly;
-  elements.paymentStatus.disabled = isHourly || rule.calculationType !== 'hours';
+  const isSession = mode === 'session_time';
+  const isDuration = mode === 'duration_hours';
+  const isAutomatic = mode === 'automatic';
+  const isFixed = mode === 'fixed';
+  const showsQuantity = ['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0;
+  const showsPayment = isSession || isDuration;
+
+  elements.sessionSection.hidden = !isSession;
+  elements.startDateField.hidden = isSession;
+  elements.endDateField.hidden = isSession || !rule.showEndDate;
+  elements.paymentStatusField.hidden = !showsPayment;
+  elements.quantityField.hidden = !showsQuantity;
+  elements.unitField.hidden = !showsQuantity;
+  elements.titleIField.hidden = !rule.titleIExceptionAllowed;
+
+  elements.startDate.required = !isSession;
+  elements.paymentStatus.disabled = !showsPayment;
   elements.titleIException.disabled = !rule.titleIExceptionAllowed;
 
   if (!rule.titleIExceptionAllowed) elements.titleIException.value = 'no';
 
-  if (isHourly) {
+  if (isSession) {
     elements.unit.innerHTML = '<option value="hours">Hours</option>';
     elements.unit.value = 'hours';
+    elements.sessionInputBasis.textContent = rule.evidenceInputBasis ||
+      'Enter each qualifying session with exact start and end times.';
     if (!elements.sessionRows.children.length) addSessionRow();
     updateSessionTotals();
   }
+
+  if (isDuration) {
+    elements.unit.innerHTML = '<option value="hours">Documented clock hours</option>';
+    elements.unit.value = 'hours';
+  }
+
+  elements.unit.onchange = function() {
+    elements.quantityLabel.textContent = rule.quantityLabel || quantityLabelFor(elements.unit.value);
+  };
 
   const maxText = rule.maximumCUs === null ? 'No stated maximum' : rule.maximumCUs + ' CU maximum';
   elements.categoryGuidance.hidden = false;
   elements.categoryGuidance.innerHTML =
     '<h4>' + escapeHtml(rule.parentCategory + ': ' + rule.activityName) + '</h4>' +
+    '<p><strong>How this activity is measured:</strong> ' +
+      escapeHtml(measurementSummary(rule)) + '</p>' +
+    '<div class="notice info"><strong>What to enter:</strong> ' +
+      escapeHtml(rule.evidenceInputBasis || '') + '</div>' +
     '<p><strong>Calculation:</strong> ' + escapeHtml(calculationSummary(rule)) +
-    ' <strong> |  ' + escapeHtml(maxText) + '</strong></p>' +
+    ' <strong> | ' + escapeHtml(maxText) + '</strong></p>' +
     '<p><strong>Documentation:</strong> ' + escapeHtml(rule.documentation) + '</p>' +
     '<p><strong>Watch for:</strong> ' + escapeHtml(rule.limitations) + '</p>' +
-    (rule.submissionMode === 'automatic'
-      ? '<div class="notice info"><strong>Automatic ELMS activity:</strong> normally do not self-report this category.</div>'
+    (isAutomatic
+      ? '<div class="notice warn"><strong>Automatic ELMS activity:</strong> Save only as a personal tracking record. Do not create a duplicate self-reported submission.</div>'
       : '') +
-    (rule.calculationType === 'manual'
-      ? '<div class="notice warn">This category needs additional verification before the assistant can provide a firm estimate.</div>'
+    (mode === 'credit_review' || mode === 'ceu_or_hours'
+      ? '<div class="notice warn">The final CU value may require category-specific review of the transcript, approval status, hours, or CEUs.</div>'
       : '');
+
+  elements.saveButton.textContent = isAutomatic ? 'Save Tracking Record' :
+    (elements.activityId.value ? 'Recalculate & Update' : 'Calculate & Save Once');
 }
 
 
@@ -777,6 +816,8 @@ function renderEvidenceGuide() {
     '<h3>' + escapeHtml(activity.title) + '</h3>' +
     '<p><strong>Confirmed category:</strong> ' + escapeHtml(rule.activityName) + '</p>' +
     '<div class="grid g2">' +
+      '<div class="detail-box"><strong>How this category is measured</strong>' + escapeHtml(measurementSummary(rule)) + '</div>' +
+      '<div class="detail-box"><strong>What the teacher should enter</strong>' + escapeHtml(rule.evidenceInputBasis || '') + '</div>' +
       '<div class="detail-box"><strong>Approval form</strong>' + escapeHtml(rule.approvalForm) + '</div>' +
       '<div class="detail-box"><strong>Approval timing</strong>' + escapeHtml(rule.approvalTiming) + '</div>' +
       '<div class="detail-box"><strong>Required documentation</strong>' + escapeHtml(rule.documentation) + '</div>' +
@@ -829,8 +870,14 @@ async function saveActivity(event) {
   event.preventDefault();
 
   const selectedRule = getRule(elements.categoryKey.value);
+  if (!selectedRule) {
+    showToast('Choose or confirm an activity category.', true);
+    return;
+  }
 
-  if (selectedRule && selectedRule.calculationType === 'hours') {
+  const mode = selectedRule.entryMode || '';
+
+  if (mode === 'session_time') {
     const sessions = collectSessions().filter(function(session) {
       return session.date || session.startTime || session.endTime;
     });
@@ -854,7 +901,7 @@ async function saveActivity(event) {
     updateSessionTotals();
   } else {
     if (!elements.startDate.value) {
-      showToast('Enter the activity start date. This assistant applies only to activities occurring on or after May 1, 2024.', true);
+      showToast('Enter the activity date. This assistant applies only to activities occurring on or after May 1, 2024.', true);
       elements.startDate.focus();
       return;
     }
@@ -869,6 +916,13 @@ async function saveActivity(event) {
       showToast('The activity end date cannot be earlier than the start date.', true);
       return;
     }
+
+    if (['duration_hours','count','credit','credit_review','ceu_or_hours'].indexOf(mode) >= 0 &&
+        !(Number(elements.quantity.value) > 0)) {
+      showToast((selectedRule.quantityLabel || 'Quantity') + ' must be greater than zero.', true);
+      elements.quantity.focus();
+      return;
+    }
   }
 
   const payload = {
@@ -879,7 +933,7 @@ async function saveActivity(event) {
     paymentStatus: elements.paymentStatus.value, quantity: Number(elements.quantity.value || 0),
     unit: elements.unit.value, titleIException: elements.titleIException.value,
     sessions: getRule(elements.categoryKey.value) &&
-      getRule(elements.categoryKey.value).calculationType === 'hours'
+      getRule(elements.categoryKey.value).entryMode === 'session_time'
         ? collectSessions()
         : [],
     status: elements.status.value, officialApprovedCUs: elements.officialApprovedCUs.value,
@@ -917,17 +971,20 @@ function editActivity(id) {
   elements.categoryKey.value = a.categoryKey;
   configureCategory(a.categoryKey);
 
+  const editingRule = getRule(a.categoryKey);
   elements.sessionRows.innerHTML = '';
-  if (a.sessions && a.sessions.length) {
-    a.sessions.forEach(function(session) { addSessionRow(session); });
-  } else if (getRule(a.categoryKey) && getRule(a.categoryKey).calculationType === 'hours') {
-    addSessionRow();
+  if (editingRule && editingRule.entryMode === 'session_time') {
+    if (a.sessions && a.sessions.length) {
+      a.sessions.forEach(function(session) { addSessionRow(session); });
+    } else {
+      addSessionRow();
+    }
   }
 
   elements.paymentStatus.value = a.paymentStatus;
   elements.quantity.value = a.quantity;
   elements.unit.value = a.unit;
-  updateSessionTotals();
+  if (editingRule && editingRule.entryMode === 'session_time') updateSessionTotals();
   elements.titleIException.value = a.titleIException || 'no';
   elements.status.value = a.status;
   elements.officialApprovedCUs.value = a.officialApprovedCUs;
@@ -987,6 +1044,10 @@ function resetFormState() {
   elements.paymentStatusField.hidden = false;
   elements.quantityField.hidden = false;
   elements.unitField.hidden = false;
+  elements.titleIField.hidden = true;
+  elements.startDateLabel.textContent = 'Start date';
+  elements.endDateLabel.textContent = 'End date';
+  elements.quantityHelp.textContent = '';
   elements.formHeading.textContent = 'Add a Professional Activity';
   elements.saveButton.textContent = 'Calculate & Save Once';
   elements.categoryGuidance.hidden = true;
@@ -1018,6 +1079,17 @@ function groupBy(items, key) {
 }
 function unique(items) { return Array.from(new Set(items)); }
 function quantityLabelFor(unit) { return unitLabels[unit] || 'Quantity'; }
+function measurementSummary(rule) {
+  const mode = rule.entryMode || '';
+  if (mode === 'session_time') return 'Exact dated sessions with start time, end time, breaks, and payment status.';
+  if (mode === 'duration_hours') return 'Documented total hours/duration from the certificate, transcript, time report, or provider record.';
+  if (mode === 'count') return rule.quantityLabel || 'Number of qualifying items completed or received.';
+  if (mode === 'credit' || mode === 'credit_review') return 'Semester or quarter credits shown on the official transcript.';
+  if (mode === 'fixed') return 'Fixed CU value established by the official guide.';
+  if (mode === 'ceu_or_hours') return 'Hours or CEUs exactly as shown on the responsible organization certificate/transcript.';
+  if (mode === 'automatic') return 'Automatically calculated and recorded through the District PD report in ELMS.';
+  return 'Category-specific documentation review.';
+}
 function calculationSummary(rule) {
   if (rule.calculationType === 'hours') {
     return 'Normally 1 CU per ' + rule.unpaidHoursPerCU + ' unpaid hours or ' +

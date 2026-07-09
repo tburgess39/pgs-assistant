@@ -29,6 +29,43 @@ function runAllPGSTests() {
   });
 
 
+
+  test('Every current category has an evidence-driven entry mode', function() {
+    const allowed = ['automatic','session_time','duration_hours','count','credit','credit_review','fixed','ceu_or_hours'];
+    PGS_ACTIVITY_LIBRARY.forEach(function(rule) {
+      if (allowed.indexOf(rule.entryMode) === -1) {
+        throw new Error(rule.categoryKey + ' has invalid entry mode: ' + rule.entryMode);
+      }
+      if (!rule.quantityLabel || !rule.quantityHelp || !rule.evidenceInputBasis) {
+        throw new Error(rule.categoryKey + ' is missing evidence-driven input guidance.');
+      }
+    });
+  });
+
+  test('Grant and IEP categories are count based, not time based', function() {
+    const grant = findRuleForTest_('GRANT_RECIPIENT');
+    const writer = findRuleForTest_('WRITE_IEP_MDT');
+    const team = findRuleForTest_('IEP_MDT_TEAM');
+    assertEqual_(grant.entryMode, 'count');
+    assertEqual_(grant.perUnitCUs, 3);
+    assertEqual_(writer.entryMode, 'count');
+    assertEqual_(writer.perUnitCUs, 1);
+    assertEqual_(team.entryMode, 'count');
+    assertEqual_(team.perUnitCUs, 0.5);
+  });
+
+  test('Time-Based Activities categories require exact session times', function() {
+    ['PLC','SCHOOL_PD','TEACH_DISTRICT_PD','MENTOR','CORE_TUTORING'].forEach(function(key) {
+      assertEqual_(findRuleForTest_(key).entryMode, 'session_time');
+    });
+  });
+
+  test('Certificate-duration categories do not require invented times', function() {
+    ['VEGAS_PBS_PD','RPDP_PD','CCEA_COLLAB_PD','ASYNC_CONFERENCE_WEBINAR'].forEach(function(key) {
+      assertEqual_(findRuleForTest_(key).entryMode, 'duration_hours');
+    });
+  });
+
   test('Guided finder covers all 43 current category keys', function() {
     const finderKeys = [];
     (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
@@ -89,7 +126,7 @@ function runAllPGSTests() {
         categoryKey: 'PLC', paymentStatus: 'unpaid', status: 'Needs evidence',
         startDate: '2024-04-30', endDate: '2024-04-30', quantity: 3,
         unit: 'hours', titleIException: 'no'
-      });
+      }, findRuleForTest_('PLC'));
     } catch (error) {
       rejected = error.message.indexOf('May 1, 2024') >= 0;
     }

@@ -29,7 +29,9 @@ const RULE_HEADERS = Object.freeze([
   'Source URL', 'Required Documentation', 'Limitations', 'Match Tags JSON',
   'Keywords JSON', 'Notes', 'Approval Form', 'Approval Timing',
   'Packet Instructions', 'Evidence Checklist JSON', 'Source Document',
-  'Last Verified'
+  'Last Verified', 'Entry Mode', 'Date Label', 'End Date Label',
+  'Show End Date', 'Quantity Label', 'Quantity Help', 'Quantity Step',
+  'Evidence Input Basis'
 ]);
 
 const STATUS_OPTIONS = Object.freeze([
@@ -87,16 +89,17 @@ function saveActivity(input) {
   const spreadsheet = getOrCreateWorkbook_();
   const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
   const rules = getRules_(spreadsheet);
-  const activity = normalizeActivityInput_(input);
+  const requestedCategoryKey = cleanString_(input && input.categoryKey);
   const rule = rules.find(function(item) {
-    return item.categoryKey === activity.categoryKey && item.active;
+    return item.categoryKey === requestedCategoryKey && item.active;
   });
 
   if (!rule) {
     throw new Error('The selected activity category does not have an active rule.');
   }
 
-  applySessionCalculations_(activity, rule);
+  const activity = normalizeActivityInput_(input, rule);
+  applyEntryCalculations_(activity, rule);
 
   const existingRow = activity.id ? findActivityRow_(sheet, activity.id) : 0;
   const existing = existingRow
@@ -283,10 +286,10 @@ function ensureWorkbookStructure_(spreadsheet) {
   });
 
   const rulesSheet = spreadsheet.getSheetByName(SHEETS.RULES);
-  if (rulesSheet.getLastRow() < 2) {
-    const rows = PGS_ACTIVITY_LIBRARY.map(activityRuleToRow_);
-    rulesSheet.getRange(2, 1, rows.length, RULE_HEADERS.length).setValues(rows);
-  }
+  rulesSheet.clearContents();
+  rulesSheet.getRange(1, 1, 1, RULE_HEADERS.length).setValues([RULE_HEADERS]);
+  const rows = PGS_ACTIVITY_LIBRARY.map(activityRuleToRow_);
+  rulesSheet.getRange(2, 1, rows.length, RULE_HEADERS.length).setValues(rows);
 
   styleWorkbook_(spreadsheet);
   applyValidations_(spreadsheet);
@@ -309,7 +312,10 @@ function activityRuleToRow_(rule) {
     JSON.stringify(rule.matchTags || []), JSON.stringify(rule.keywords || []),
     rule.notes || '', rule.approvalForm || '', rule.approvalTiming || '',
     rule.packetInstructions || '', JSON.stringify(rule.evidenceChecklist || []),
-    rule.sourceDocument || '', rule.lastVerified || ''
+    rule.sourceDocument || '', rule.lastVerified || '',
+    rule.entryMode || '', rule.dateLabel || '', rule.endDateLabel || '',
+    Boolean(rule.showEndDate), rule.quantityLabel || '', rule.quantityHelp || '',
+    rule.quantityStep || 1, rule.evidenceInputBasis || ''
   ];
 }
 
@@ -402,7 +408,15 @@ function getRules_(spreadsheet) {
         packetInstructions: displayValue_(row[26]),
         evidenceChecklist: parseJson_(row[27], []),
         sourceDocument: displayValue_(row[28]),
-        lastVerified: dateToInput_(row[29]) || displayValue_(row[29])
+        lastVerified: dateToInput_(row[29]) || displayValue_(row[29]),
+        entryMode: displayValue_(row[30]),
+        dateLabel: displayValue_(row[31]),
+        endDateLabel: displayValue_(row[32]),
+        showEndDate: booleanValue_(row[33]),
+        quantityLabel: displayValue_(row[34]),
+        quantityHelp: displayValue_(row[35]),
+        quantityStep: numberOrZero_(row[36]) || 1,
+        evidenceInputBasis: displayValue_(row[37])
       };
     });
 }
@@ -453,14 +467,15 @@ function activityToRow_(a) {
   ];
 }
 
-function normalizeActivityInput_(input) {
+function normalizeActivityInput_(input, rule) {
   const a = input || {};
   const title = cleanString_(a.title);
   const description = cleanString_(a.description);
   const categoryKey = cleanString_(a.categoryKey);
   const paymentStatus = cleanString_(a.paymentStatus) || 'unpaid';
   const status = cleanString_(a.status) || STATUS_OPTIONS[0];
-  const sessions = normalizeSessions_(a.sessions);
+  const entryMode = rule.entryMode || '';
+  const sessions = entryMode === 'session_time' ? normalizeSessions_(a.sessions) : [];
 
   if (!title) throw new Error('Activity title is required.');
   if (!description) throw new Error('Activity description is required.');
@@ -560,32 +575,57 @@ function normalizeSessions_(input) {
     });
 }
 
-function applySessionCalculations_(activity, rule) {
-  if (rule.calculationType !== 'hours') {
-    activity.sessions = [];
+function applyEntryCalculations_(activity, rule) {
+  const mode = rule.entryMode || '';
+
+  if (mode === 'session_time') {
+    if (!activity.sessions.length) {
+      throw new Error('Add at least one dated session with a start time and end time.');
+    }
+
+    const totalMinutes = activity.sessions.reduce(function(total, session) {
+      return total + session.minutes;
+    }, 0);
+
+    const paymentStatuses = activity.sessions
+      .map(function(session) { return session.paymentStatus; })
+      .filter(function(value, index, array) { return array.indexOf(value) === index; });
+
+    activity.quantity = totalMinutes / 60;
+    activity.unit = 'hours';
+    activity.paymentStatus = paymentStatuses.length === 1 ? paymentStatuses[0] : 'mixed';
+
+    const dates = activity.sessions.map(function(session) { return session.date; }).sort();
+    activity.startDate = dates[0];
+    activity.endDate = dates[dates.length - 1];
     return activity;
   }
 
-  if (!activity.sessions.length) {
-    throw new Error('Add at least one dated session with a start time and end time.');
+  activity.sessions = [];
+
+  if (mode === 'automatic') {
+    activity.quantity = 0;
+    activity.unit = '';
+    return activity;
   }
 
-  const totalMinutes = activity.sessions.reduce(function(total, session) {
-    return total + session.minutes;
-  }, 0);
+  if (mode === 'fixed') {
+    activity.quantity = 1;
+    activity.unit = (rule.units || ['submission'])[0];
+    return activity;
+  }
 
-  const paymentStatuses = activity.sessions
-    .map(function(session) { return session.paymentStatus; })
-    .filter(function(value, index, array) { return array.indexOf(value) === index; });
+  if (['duration_hours', 'count', 'credit', 'credit_review', 'ceu_or_hours'].indexOf(mode) >= 0) {
+    if (!(activity.quantity > 0)) {
+      throw new Error(rule.quantityLabel + ' must be greater than zero.');
+    }
+  }
 
-  activity.quantity = totalMinutes / 60;
-  activity.unit = 'hours';
-  activity.paymentStatus = paymentStatuses.length === 1 ? paymentStatuses[0] : 'mixed';
+  if (mode === 'count' && Math.floor(activity.quantity) !== activity.quantity) {
+    throw new Error(rule.quantityLabel + ' must be a whole number.');
+  }
 
-  const dates = activity.sessions.map(function(session) { return session.date; }).sort();
-  activity.startDate = dates[0];
-  activity.endDate = dates[dates.length - 1];
-
+  if (mode === 'duration_hours') activity.unit = 'hours';
   return activity;
 }
 
@@ -599,6 +639,8 @@ function timeToMinutes_(value) {
 
 function calculateEstimatedCUs_(activity, rule) {
   let result = '';
+
+  if (rule.entryMode === 'automatic') return '';
 
   if (rule.calculationType === 'hours') {
     if (activity.sessions && activity.sessions.length) {

@@ -190,11 +190,11 @@
               <textarea id="description" required></textarea>
             </div>
             <div class="field" id="startDateField">
-              <label for="startDate">Start date</label>
+              <label id="startDateLabel" for="startDate">Start date</label>
               <input id="startDate" type="date" min="2024-05-01" required>
             </div>
             <div class="field" id="endDateField">
-              <label for="endDate">End date</label>
+              <label id="endDateLabel" for="endDate">End date</label>
               <input id="endDate" type="date" min="2024-05-01">
             </div>
             <div class="field">
@@ -219,9 +219,8 @@
                 </div>
                 <button class="btn small ghost" id="addSessionButton" type="button">+ Add Session</button>
               </div>
-              <div class="session-note">
-                Use separate activity records when the work belongs to different PGS categories.
-                Payment status may vary by session.
+              <div class="session-note" id="sessionInputBasis">
+                Use separate activity records when the work belongs to different PGS categories. Payment status may vary by session.
               </div>
               <div class="session-table-wrap">
                 <table class="session-table">
@@ -255,13 +254,14 @@
             </div>
             <div class="field" id="quantityField">
               <label id="quantityLabel" for="quantity">Quantity</label>
-              <input id="quantity" type="number" min="0" step=".25" value="0">
+              <input id="quantity" type="number" min="0" step="1" value="0">
+              <small id="quantityHelp"></small>
             </div>
             <div class="field" id="unitField">
               <label for="unit">Calculation unit</label>
               <select id="unit"><option value="hours">Hours</option></select>
             </div>
-            <div class="field">
+            <div class="field" id="titleIField">
               <label for="titleIException">Title I paid exception applicable?</label>
               <select id="titleIException">
                 <option value="no">No / Not sure</option>
