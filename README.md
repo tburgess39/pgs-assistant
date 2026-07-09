@@ -64,3 +64,17 @@ test to fail even though the calculation and evidence tests passed.
 The workbook remains owned by the teacher. These controls prevent accidental
 changes; the owner can still override warnings or unhide sheets, so the web app
 continues to be the recommended editing interface.
+
+
+## Milestone 3.2 - Carryover / Rollover
+
+The ELMS tracking workflow now includes a special `Carryover / Rollover` option.
+
+Carryover:
+
+- is entered as an automatic ELMS tracking record,
+- is separate from the 43 current activity categories,
+- does not create an evidence folder,
+- does not use a category maximum,
+- is displayed separately from automatic activity CUs,
+- counts toward total confirmed CUs and the remaining amount toward 225.

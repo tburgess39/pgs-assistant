@@ -103,9 +103,14 @@
           <small>District/department activities confirmed in Advancement Status</small>
         </div>
         <div class="card stat">
+          <div class="label">Carryover / Rollover</div>
+          <div class="value" id="carryoverTotal">0.00</div>
+          <small>PGS-office carryover confirmed in the current ELMS round</small>
+        </div>
+        <div class="card stat">
           <div class="label">Total Confirmed</div>
           <div class="value" id="confirmedTotal">0.00</div>
-          <small>Approved self-reported plus automatic ELMS CUs</small>
+          <small>Approved self-reported, automatic ELMS, and carryover CUs</small>
         </div>
         <div class="card stat">
           <div class="label">Remaining to 225</div>
@@ -206,7 +211,7 @@
           <div class="field full">
             <label for="categoryKey">Activity category
   <button class="help-tip" type="button" aria-label="About activity category"
-    data-help="Choose the official PGS category that matches what you actually completed. Use Find My Category when you are unsure.">?</button>
+    data-help="Choose the official PGS category that matches what you completed. When tracking CUs already in ELMS, you may also select Carryover / Rollover.">?</button>
 </label>
             <select id="categoryKey" required>
               <option value="">Loading categories...</option>

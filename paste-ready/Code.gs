@@ -3,6 +3,45 @@ const WORKBOOK_NAME = 'PGS CU Assistant Data';
 const ROOT_FOLDER_NAME = 'PGS Column Advancement';
 const TIME_ZONE = 'America/Los_Angeles';
 const MIN_ACTIVITY_DATE = '2024-05-01';
+const CARRYOVER_CATEGORY_KEY = 'CARRYOVER';
+
+const CARRYOVER_RULE = Object.freeze({
+  categoryKey: CARRYOVER_CATEGORY_KEY,
+  parentCategory: 'PGS Office / ELMS',
+  activityName: 'Carryover / Rollover',
+  maximumCUs: null,
+  calculationType: 'manual',
+  units: [],
+  unitRates: {},
+  unpaidHoursPerCU: 0,
+  paidHoursPerCU: 0,
+  perUnitCUs: 0,
+  fixedCUs: 0,
+  titleIExceptionAllowed: false,
+  contractTimeAllowed: true,
+  submissionMode: 'automatic',
+  active: true,
+  effectiveDate: MIN_ACTIVITY_DATE,
+  ruleVersion: 'ELMS-CARRYOVER-1.0',
+  sourcePage: 'Advancement Status carryover row',
+  sourceUrl: '',
+  sourceDocument: 'CCSD ELMS Advancement Status',
+  documentation: 'No evidence folder is required. Enter the carryover amount exactly as shown in ELMS.',
+  limitations: 'Carryover is entered by the PGS office after an approved advancement round. It is not an activity category and has no category maximum.',
+  approvalForm: 'None',
+  approvalTiming: 'After the prior advancement round is approved',
+  packetInstructions: 'No ELMS evidence submission is created for this tracker record.',
+  evidenceChecklist: [],
+  lastVerified: '2026-07-10',
+  entryMode: 'automatic',
+  dateLabel: 'Date carryover appeared in ELMS',
+  endDateLabel: 'End date',
+  showEndDate: false,
+  quantityLabel: 'Official carryover CUs',
+  quantityHelp: 'Enter the amount exactly as it appears in ELMS.',
+  quantityStep: 0.01,
+  evidenceInputBasis: 'ELMS Advancement Status carryover row'
+});
 
 const SHEETS = Object.freeze({
   START_HERE: 'START HERE',
@@ -91,6 +130,7 @@ function getBootstrapData() {
       'Review special PGS announcements in addition to the Reference Guide.',
       'Form entries are saved in a teacher-owned Google Sheet in the teacher’s Google Drive.',
       'Evidence files are not uploaded automatically; the teacher places them in the category folder.',
+      'Carryover/rollover should be entered only from the official amount shown in ELMS.',
       'The assistant prepares records and evidence but does not submit directly into ELMS.'
     ]
   };
@@ -101,9 +141,13 @@ function saveActivity(input) {
   const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
   const rules = getRules_(spreadsheet);
   const requestedCategoryKey = cleanString_(input && input.categoryKey);
-  const rule = rules.find(function(item) {
-    return item.categoryKey === requestedCategoryKey && item.active;
-  });
+  const requestedRecordType = cleanString_(input && input.recordType) || 'self_report';
+  const rule = requestedRecordType === 'automatic_elms' &&
+      requestedCategoryKey === CARRYOVER_CATEGORY_KEY
+    ? CARRYOVER_RULE
+    : rules.find(function(item) {
+        return item.categoryKey === requestedCategoryKey && item.active;
+      });
 
   if (!rule) {
     throw new Error('The selected activity category does not have an active rule.');
@@ -882,7 +926,13 @@ function buildSummary_(activities, rules) {
   });
 
   const automatic = activities.filter(function(item) {
-    return item.recordType === 'automatic_elms';
+    return item.recordType === 'automatic_elms' &&
+      item.categoryKey !== CARRYOVER_CATEGORY_KEY;
+  });
+
+  const carryover = activities.filter(function(item) {
+    return item.recordType === 'automatic_elms' &&
+      item.categoryKey === CARRYOVER_CATEGORY_KEY;
   });
 
   const approvedSelfReported = selfReported.reduce(function(total, item) {
@@ -890,6 +940,10 @@ function buildSummary_(activities, rules) {
   }, 0);
 
   const automaticElmsTotal = automatic.reduce(function(total, item) {
+    return total + numberOrZero_(item.officialApprovedCUs);
+  }, 0);
+
+  const carryoverTotal = carryover.reduce(function(total, item) {
     return total + numberOrZero_(item.officialApprovedCUs);
   }, 0);
 
@@ -941,12 +995,13 @@ function buildSummary_(activities, rules) {
     return total + numberOrZero_(item.countableEstimated);
   }, 0);
 
-  const confirmedTotal = approvedSelfReported + automaticElmsTotal;
+  const confirmedTotal = approvedSelfReported + automaticElmsTotal + carryoverTotal;
 
   return {
     estimatedSelfReported: roundToTwo_(estimatedSelfReported),
     approvedSelfReported: roundToTwo_(approvedSelfReported),
     automaticElmsTotal: roundToTwo_(automaticElmsTotal),
+    carryoverTotal: roundToTwo_(carryoverTotal),
     confirmedTotal: roundToTwo_(confirmedTotal),
     goalCUs: 225,
     percent: Math.min(100, Math.round((confirmedTotal / 225) * 100)),

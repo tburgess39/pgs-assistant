@@ -133,6 +133,12 @@ function runAllPGSTests() {
         categoryKey: 'TEST',
         estimatedCUs: '',
         officialApprovedCUs: 9
+      },
+      {
+        recordType: 'automatic_elms',
+        categoryKey: CARRYOVER_CATEGORY_KEY,
+        estimatedCUs: '',
+        officialApprovedCUs: 30.18
       }
     ];
 
@@ -140,8 +146,16 @@ function runAllPGSTests() {
     assertEqual_(summary.estimatedSelfReported, 12);
     assertEqual_(summary.approvedSelfReported, 6);
     assertEqual_(summary.automaticElmsTotal, 9);
-    assertEqual_(summary.confirmedTotal, 15);
+    assertEqual_(summary.carryoverTotal, 30.18);
+    assertEqual_(summary.confirmedTotal, 45.18);
     assertEqual_(summary.categoryBalances[0].remaining, 15);
+  });
+
+  test('Carryover is tracked separately and has no category maximum', function() {
+    assertEqual_(CARRYOVER_RULE.categoryKey, 'CARRYOVER');
+    assertEqual_(CARRYOVER_RULE.submissionMode, 'automatic');
+    assertEqual_(CARRYOVER_RULE.maximumCUs, null);
+    assertEqual_(CARRYOVER_RULE.entryMode, 'automatic');
   });
 
   test('Category folders are reused and final evidence links stay separate', function() {

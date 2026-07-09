@@ -2,6 +2,7 @@
 'use strict';
 
 const MIN_ACTIVITY_DATE = '2024-05-01';
+const CARRYOVER_CATEGORY_KEY = 'CARRYOVER';
 
 const pageMeta = {
   dashboard: ['Dashboard', 'Track self-reported and automatically entered ELMS CUs in one place.'],
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
   [
     'loading','loadingText','toast','mobileNav','heading','sub',
     'workspaceStatus','workspaceDetails','workbookLink','rootFolderLink',
-    'estimatedSelf','approvedSelf','automaticElms','confirmedTotal','remaining',
+    'estimatedSelf','approvedSelf','automaticElms','carryoverTotal','confirmedTotal','remaining',
     'warningBox','dashboardFindButton','dashboardSelfButton','dashboardAutoButton',
     'matcherContext','matcherContextHelp','matcherRole','matcherRoleHelp',
     'matcherActivity','matcherActivityList','matcherDate','specialAlertArea','matchResults',
@@ -257,6 +258,7 @@ function renderDashboard() {
   elements.estimatedSelf.textContent = numberText(state.summary.estimatedSelfReported);
   elements.approvedSelf.textContent = numberText(state.summary.approvedSelfReported);
   elements.automaticElms.textContent = numberText(state.summary.automaticElmsTotal);
+  elements.carryoverTotal.textContent = numberText(state.summary.carryoverTotal);
   elements.confirmedTotal.textContent = numberText(state.summary.confirmedTotal);
   elements.remaining.textContent = numberText(state.summary.remaining);
 
@@ -267,8 +269,18 @@ function renderDashboard() {
 
 function populateCategories() {
   const selected = elements.categoryKey.value;
+  const automaticRecord = elements.recordType &&
+    elements.recordType.value === 'automatic_elms';
   const groups = groupBy(state.rules, 'parentCategory');
+
   let html = '<option value="">Choose the official category</option>';
+
+  if (automaticRecord) {
+    html += '<optgroup label="PGS Office / ELMS">' +
+      '<option value="' + CARRYOVER_CATEGORY_KEY + '">' +
+      'Carryover / Rollover from a Prior Approved Round</option>' +
+      '</optgroup>';
+  }
 
   Object.keys(groups).sort(function(a, b) {
     return a.localeCompare(b);
@@ -289,7 +301,9 @@ function populateCategories() {
 
   elements.categoryKey.innerHTML = html;
 
-  if (state.rules.some(function(rule) {
+  if (selected === CARRYOVER_CATEGORY_KEY && automaticRecord) {
+    elements.categoryKey.value = selected;
+  } else if (state.rules.some(function(rule) {
     return rule.categoryKey === selected;
   })) {
     elements.categoryKey.value = selected;
@@ -554,7 +568,7 @@ function configureRecordType() {
     : 'Add a Self-Reported Activity';
 
   elements.formSubheading.textContent = automatic
-    ? 'Choose the category shown in Advancement Status, then enter the CU amount from ELMS.'
+    ? 'Choose an activity category or Carryover / Rollover, then enter the official CU amount shown in ELMS.'
     : 'First enter only the information used to calculate this category.';
 
   elements.switchRecordTypeButton.textContent = automatic
@@ -565,6 +579,7 @@ function configureRecordType() {
   elements.saveAutomaticButton.hidden = !automatic;
   elements.createFolderLine.hidden = automatic;
 
+  populateCategories();
   populateStatusOptions();
   configureCategory(elements.categoryKey.value);
   updateWizardIndicators();
@@ -609,6 +624,32 @@ function configureCategory(categoryKey) {
   }
 
   elements.categoryGuidance.hidden = false;
+
+  if (categoryKey === CARRYOVER_CATEGORY_KEY) {
+    elements.categoryGuidance.innerHTML =
+      '<div class="simple-guidance">' +
+        '<div><strong>Enter</strong><span>' +
+          'Enter the carryover/rollover CUs exactly as they appear in your ELMS Advancement Status.' +
+        '</span></div>' +
+        '<div><strong>Evidence</strong><span>' +
+          'No evidence folder or ELMS submission is required for this tracker record.' +
+        '</span></div>' +
+        '<div><strong>Important</strong><span>' +
+          'Carryover is a PGS-office ELMS entry from a prior approved round. It does not use an activity-category maximum.' +
+        '</span></div>' +
+      '</div>';
+
+    elements.title.value = elements.title.value || 'Carryover / Rollover';
+    elements.description.value = elements.description.value ||
+      'CUs carried over from a prior approved advancement round.';
+    elements.organization.value = elements.organization.value || 'PGS Office / ELMS';
+    elements.role.value = elements.role.value || 'Carryover';
+    elements.startDateLabel.textContent = 'Date carryover appeared in ELMS';
+    elements.startDateField.hidden = false;
+    elements.endDateField.hidden = true;
+    return;
+  }
+
   elements.categoryGuidance.innerHTML =
     '<div class="simple-guidance">' +
       '<div><strong>Enter</strong><span>' +
@@ -884,6 +925,7 @@ function shortActivityTitle(rule) {
   if (!rule) return '';
 
   const shortNames = {
+    CARRYOVER: 'Carryover / Rollover',
     WRITE_IEP_MDT: 'IEPs/MDTs Written',
     IEP_MDT_TEAM: 'IEP/MDT Team Participation',
     GRANT_RECIPIENT: 'Grant Awards',
@@ -1233,9 +1275,11 @@ function editActivity(id) {
   updateOfficialField();
 
   elements.formHeading.textContent =
-    activity.recordType === 'automatic_elms'
-      ? 'Edit ELMS Tracking Record'
-      : 'Edit Self-Reported Activity';
+    activity.categoryKey === CARRYOVER_CATEGORY_KEY
+      ? 'Edit Carryover / Rollover'
+      : (activity.recordType === 'automatic_elms'
+        ? 'Edit ELMS Tracking Record'
+        : 'Edit Self-Reported Activity');
 
   showActivityStep(1);
   showView('activity');
@@ -1323,10 +1367,14 @@ function renderRecords() {
           escapeHtml(activity.id) + '">Create Folder</button>'
         : '';
 
+      const typeLabel = activity.categoryKey === CARRYOVER_CATEGORY_KEY
+        ? 'Carryover / Rollover'
+        : (automatic ? 'Automatic ELMS' : 'Self-reported');
+
       return '<tr>' +
         '<td><strong>' + escapeHtml(activity.title) + '</strong><br><small>' +
           escapeHtml(truncate(activity.description, 75)) + '</small></td>' +
-        '<td>' + (automatic ? 'Automatic ELMS' : 'Self-reported') + '</td>' +
+        '<td>' + typeLabel + '</td>' +
         '<td>' + escapeHtml(activity.categoryName) + '</td>' +
         '<td>' + estimateText(activity.estimatedCUs) + '</td>' +
         '<td>' + (activity.officialApprovedCUs === ''
@@ -1365,6 +1413,16 @@ function renderRecords() {
       '</tr>';
     }).join('')
     : '<tr><td colspan="7">Category totals will appear after records are saved.</td></tr>';
+
+  if (Number(state.summary.carryoverTotal || 0) > 0) {
+    elements.categoryBody.innerHTML +=
+      '<tr class="carryover-row">' +
+        '<td><strong>Carryover / Rollover</strong><br><small>PGS Office / ELMS</small></td>' +
+        '<td>-</td><td>-</td><td>-</td>' +
+        '<td>' + numberText(state.summary.carryoverTotal) + '</td>' +
+        '<td>No category max</td><td>-</td>' +
+      '</tr>';
+  }
 }
 
 function populateEvidenceActivities() {
@@ -1488,6 +1546,29 @@ function showView(viewId) {
 }
 
 function getRule(key) {
+  if (key === CARRYOVER_CATEGORY_KEY) {
+    return {
+      categoryKey: CARRYOVER_CATEGORY_KEY,
+      parentCategory: 'PGS Office / ELMS',
+      activityName: 'Carryover / Rollover',
+      maximumCUs: null,
+      calculationType: 'manual',
+      entryMode: 'automatic',
+      submissionMode: 'automatic',
+      documentation: 'No evidence folder is required. Enter the official amount exactly as it appears in ELMS.',
+      limitations: 'Carryover is entered by the PGS office after a prior advancement round is approved. It is not tied to an activity-category maximum.',
+      sourceDocument: 'CCSD ELMS Advancement Status',
+      sourcePage: 'Carryover row',
+      dateLabel: 'Date carryover appeared in ELMS',
+      endDateLabel: 'End date',
+      showEndDate: false,
+      units: [],
+      titleIExceptionAllowed: false,
+      quantityLabel: 'Official carryover CUs',
+      quantityHelp: 'Enter the amount exactly as it appears in ELMS.'
+    };
+  }
+
   return state.rules.find(function(rule) {
     return rule.categoryKey === key;
   });
