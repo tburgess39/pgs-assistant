@@ -78,3 +78,29 @@ Carryover:
 - does not use a category maximum,
 - is displayed separately from automatic activity CUs,
 - counts toward total confirmed CUs and the remaining amount toward 225.
+
+
+## Milestone 4.0 - Approval-form packets and Assistant Documentation
+
+The Evidence and ELMS page can now generate assistant-prepared draft packets for:
+
+- Contact Unit Approval Form - Time Based
+- Contact Unit Approval Form - University Student Assignment
+- Contact Unit Approval Form - Lower-Level College Coursework
+
+The generator groups eligible entries from the same category, separates incompatible
+payment/CU-rate groups, enforces the official row capacity, creates additional pages,
+and saves both a Google Doc and PDF in the category's `01 Evidence to Combine` folder.
+
+Row capacities:
+
+- Time-Based Activities: 20 activity rows per page
+- University Student Assignment: 5 assignment rows per page
+- Lower-Level College Coursework: 5 course rows per page
+
+Packet records are stored in the hidden `Generated Packets` sheet. Packets marked
+Signed or Included in final ELMS file lock their included entry keys so later packets
+do not duplicate them.
+
+The new Assistant Documentation page explains the workflow, unofficial status,
+privacy boundaries, generated drafts, Drive folders, and ELMS preparation.

@@ -181,6 +181,61 @@ function runAllPGSTests() {
     });
   });
 
+
+  test('Official approval-form row capacities are enforced', function() {
+    assertEqual_(FORM_CAPACITIES.time_based, 20);
+    assertEqual_(FORM_CAPACITIES.university_assignment, 5);
+    assertEqual_(FORM_CAPACITIES.lower_level_college, 5);
+  });
+
+  test('Time-based packet pagination creates additional pages', function() {
+    const items = [];
+    for (let index = 0; index < 21; index += 1) items.push(index);
+    const chunks = chunkArray_(items, FORM_CAPACITIES.time_based);
+    assertEqual_(chunks.length, 2);
+    assertEqual_(chunks[0].length, 20);
+    assertEqual_(chunks[1].length, 1);
+  });
+
+  test('Packet form type follows official approval-form metadata', function() {
+    assertEqual_(approvalFormType_(findRuleForTest_('PLC')), 'time_based');
+    assertEqual_(approvalFormType_(findRuleForTest_('PRACTICUM_ASSIGNMENT')), 'university_assignment');
+    assertEqual_(approvalFormType_(findRuleForTest_('COLLEGE_MULTI_100')), 'lower_level_college');
+    assertEqual_(approvalFormType_(findRuleForTest_('GRANT_RECIPIENT')), '');
+  });
+
+  test('Session descriptions are preserved for generated forms', function() {
+    const sessions = normalizeSessions_([
+      {
+        date: '2026-07-08',
+        startTime: '15:00',
+        endTime: '16:00',
+        breakMinutes: 0,
+        paymentStatus: 'unpaid',
+        description: 'Reviewed PLC data and planned interventions.'
+      }
+    ]);
+    assertEqual_(sessions[0].description, 'Reviewed PLC data and planned interventions.');
+  });
+
+  test('Signed packet keys remain locked from later packets', function() {
+    const locked = packetLockedKeys_([
+      {
+        categoryKey: 'PLC',
+        status: 'Signed',
+        includedKeys: ['session:a:0']
+      },
+      {
+        categoryKey: 'PLC',
+        status: 'Draft',
+        includedKeys: ['session:b:0']
+      }
+    ], 'PLC');
+
+    assertEqual_(locked.length, 1);
+    assertEqual_(locked[0], 'session:a:0');
+  });
+
   test('May 1, 2024 cutoff is enforced', function() {
     let rejected = false;
     try {

@@ -25,6 +25,7 @@
       <button data-view="records">My CU Records</button>
       <button data-view="evidence">Evidence and ELMS</button>
       <button data-view="workspace">My Google Workspace</button>
+      <button data-view="documentation">Assistant Documentation</button>
     </nav>
     <div class="note">
       <strong>Your private workspace</strong><br>
@@ -40,6 +41,7 @@
       <option value="records">My CU Records</option>
       <option value="evidence">Evidence and ELMS</option>
       <option value="workspace">My Google Workspace</option>
+      <option value="documentation">Assistant Documentation</option>
     </select>
 
     <div class="top">
@@ -233,7 +235,7 @@
                 <thead>
                   <tr>
                     <th>Date</th><th>Start</th><th>End</th><th>Break</th>
-                    <th>Payment</th><th>Hours</th><th></th>
+                    <th>Payment</th><th>Description</th><th>Hours</th><th></th>
                   </tr>
                 </thead>
                 <tbody id="sessionRows"></tbody>
@@ -453,6 +455,7 @@
         </div>
       </div>
       <div id="evidenceGuideOutput" style="margin-top:17px"></div>
+      <div id="packetGeneratorOutput" style="margin-top:17px"></div>
     </section>
 
     <section id="workspace" class="view">
@@ -482,9 +485,105 @@
         Internal tabs and technical columns are hidden, and protected areas display a warning before manual edits.
       </div>
 
+      <form class="card form" id="profileForm" style="margin-top:17px">
+        <h3>Approval Form Profile</h3>
+        <p>Enter this once. The assistant uses it on generated approval-form drafts.</p>
+        <div class="grid g2">
+          <div class="field">
+            <label for="profileFullName">Full name</label>
+            <input id="profileFullName" required>
+          </div>
+          <div class="field">
+            <label for="profileSchoolSite">School/site</label>
+            <input id="profileSchoolSite" required>
+          </div>
+          <div class="field">
+            <label for="profileSupervisor">Supervisor</label>
+            <input id="profileSupervisor" required>
+          </div>
+          <div class="field">
+            <label for="profileAdvancementCycle">Advancement cycle</label>
+            <input id="profileAdvancementCycle" placeholder="Example: 2026-2027 Round 1">
+          </div>
+          <div class="field">
+            <label for="profileContractStart">Contract start time</label>
+            <input id="profileContractStart" type="time">
+          </div>
+          <div class="field">
+            <label for="profileContractEnd">Contract end time</label>
+            <input id="profileContractEnd" type="time">
+          </div>
+        </div>
+        <div class="actions" style="justify-content:flex-end">
+          <button class="btn blue" id="saveProfileButton">Save Profile</button>
+        </div>
+      </form>
+
       <div class="notice warn" style="margin-top:17px">
         <strong>ELMS file-link reminder:</strong>
         Submit the link to the final combined evidence file. Do not submit the category folder link.
+      </div>
+    </section>
+
+    <section id="documentation" class="view">
+      <div class="card documentation-page">
+        <div class="notice danger">
+          <strong>Unofficial Guide</strong><br>
+          The FamilyPD PGS Assistant is an educator-created planning and documentation tool.
+          It is not an official CCSD, CCEA, PGS, or ELMS application. CCSD makes every final
+          eligibility, documentation, calculation, and approval decision.
+        </div>
+
+        <h3>How to Use the Assistant</h3>
+        <div class="documentation-steps">
+          <div><span>1</span><p><strong>Find or choose the category.</strong><br>Use Find My Category when unsure.</p></div>
+          <div><span>2</span><p><strong>Enter only the category-specific quantity.</strong><br>Examples include sessions, IEPs, grants, weeks, or credits.</p></div>
+          <div><span>3</span><p><strong>Add activity details.</strong><br>Use your own accurate activity name and description.</p></div>
+          <div><span>4</span><p><strong>Save the record.</strong><br>The information is stored in your teacher-owned Google Sheet.</p></div>
+          <div><span>5</span><p><strong>Upload evidence.</strong><br>Place required files in the category folder created in your Google Drive.</p></div>
+          <div><span>6</span><p><strong>Prepare for ELMS.</strong><br>Combine evidence into one final file and submit that file link in ELMS.</p></div>
+        </div>
+
+        <h3>Generated Approval-Form Packets</h3>
+        <p>
+          For supported categories, the assistant groups eligible entries from the same category,
+          separates incompatible paid/unpaid calculation groups, and creates a Google Doc and PDF draft.
+        </p>
+        <ul class="documentation-list">
+          <li>Time-Based form: maximum 20 activity records per page.</li>
+          <li>University Student Assignment form: maximum 5 assignments per page.</li>
+          <li>Lower-Level College Coursework form: maximum 5 courses per page.</li>
+          <li>Extra entries automatically continue onto additional pages.</li>
+          <li>Signed or final packets are not overwritten or duplicated in later packets.</li>
+        </ul>
+        <div class="notice warn">
+          Generated forms are assistant-prepared drafts. Review every name, date, time, description,
+          payment designation, total, and category before signing or submitting. Use the current official
+          form when CCSD requires the original form.
+        </div>
+
+        <h3>What Is Saved Where?</h3>
+        <div class="simple-guidance">
+          <div><strong>Google Sheet</strong><span>Activity entries, calculations, statuses, profile information, and generated-packet records.</span></div>
+          <div><strong>Google Drive folders</strong><span>Evidence files and generated Google Doc/PDF drafts. Evidence is not uploaded automatically.</span></div>
+          <div><strong>ELMS</strong><span>The assistant does not submit to ELMS. The teacher completes the official ELMS submission.</span></div>
+        </div>
+
+        <h3>Privacy and Student Information</h3>
+        <p>
+          Do not enter student names, student ID numbers, parent names, signatures, or other protected
+          information into this assistant. IEP/MDT signature pages must be fully redacted before they are
+          uploaded as evidence.
+        </p>
+
+        <h3>Before You Submit</h3>
+        <ul class="documentation-list">
+          <li>Verify the category against current official PGS resources and announcements.</li>
+          <li>Confirm the evidence requirements and category maximum.</li>
+          <li>Review the CU total against the official ELMS record.</li>
+          <li>Share the final evidence file so authorized CCSD users with the link can view it.</li>
+          <li>Submit the final file link, not the category-folder link.</li>
+        </ul>
       </div>
     </section>
 

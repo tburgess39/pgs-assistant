@@ -10,7 +10,8 @@ const pageMeta = {
   activity: ['Add or Track Activity', 'Enter only the information required for the selected category.'],
   records: ['My CU Records', 'Review estimated, approved, and automatic ELMS CUs.'],
   evidence: ['Evidence and ELMS', 'See exactly what belongs in the category folder.'],
-  workspace: ['My Google Workspace', 'Your Sheet stores entries; your folders store evidence files.']
+  workspace: ['My Google Workspace', 'Your Sheet stores entries; your folders store evidence files.'],
+  documentation: ['Assistant Documentation', 'How to use this unofficial planning and documentation tool.']
 };
 
 const unitLabels = {
@@ -54,6 +55,8 @@ const state = {
   warnings: [],
   specialRules: [],
   finder: {contexts: []},
+  profile: {},
+  generatedPackets: [],
   currentStep: 1
 };
 
@@ -80,7 +83,10 @@ document.addEventListener('DOMContentLoaded', function() {
     'createFolderLine','createFolder','evidenceLink','notes','backToDetailsButton',
     'saveButton','result','resultCategory','resultCUs','resultStatus',
     'resultFolderLink','resultWorkbookLink','recordsAddButton','recordsBody','categoryBody',
-    'evidenceActivitySelect','evidenceGuideOutput','openWorkbookButton','createFoldersButton'
+    'evidenceActivitySelect','evidenceGuideOutput','packetGeneratorOutput',
+    'openWorkbookButton','createFoldersButton','profileForm','profileFullName',
+    'profileSchoolSite','profileSupervisor','profileContractStart','profileContractEnd',
+    'profileAdvancementCycle','saveProfileButton'
   ].forEach(function(id) {
     elements[id] = document.getElementById(id);
   });
@@ -182,6 +188,24 @@ function bindEvents() {
   });
 
   elements.createFoldersButton.addEventListener('click', createWorkspaceFolders);
+  elements.profileForm.addEventListener('submit', saveProfile);
+
+  elements.packetGeneratorOutput.addEventListener('click', function(event) {
+    const generateButton = event.target.closest('[data-generate-packet]');
+    if (generateButton) {
+      generatePacket(generateButton.dataset.generatePacket);
+      return;
+    }
+
+    const statusButton = event.target.closest('[data-update-packet]');
+    if (statusButton) {
+      const packetId = statusButton.dataset.updatePacket;
+      const select = elements.packetGeneratorOutput.querySelector(
+        'select[data-packet-status="' + cssEscape(packetId) + '"]'
+      );
+      if (select) updatePacketStatus(packetId, select.value);
+    }
+  });
 }
 
 function runServer(method, payload) {
@@ -198,6 +222,12 @@ function runServer(method, payload) {
     else if (method === 'createWorkspaceFolders') runner.createWorkspaceFolders();
     else if (method === 'createEvidenceFolderForActivity') {
       runner.createEvidenceFolderForActivity(payload);
+    } else if (method === 'saveUserProfile') {
+      runner.saveUserProfile(payload);
+    } else if (method === 'generateApprovalPacket') {
+      runner.generateApprovalPacket(payload);
+    } else if (method === 'updateGeneratedPacketStatus') {
+      runner.updateGeneratedPacketStatus(payload);
     } else {
       reject(new Error('Unknown server method.'));
     }
@@ -225,12 +255,15 @@ function applyBootstrap(data) {
   state.warnings = data.warnings || [];
   state.specialRules = data.specialRules || [];
   state.finder = data.finderData || {contexts: []};
+  state.profile = data.profile || {};
+  state.generatedPackets = data.generatedPackets || [];
 
   populateCategories();
   initializeGuidedFinder();
   renderWorkspace();
   renderDashboard();
   renderRecords();
+  renderProfile();
   populateEvidenceActivities();
   renderEvidenceGuide();
 
@@ -880,13 +913,13 @@ function validateCalculationStep() {
 
     const invalid = sessions.find(function(session) {
       return !session.date || !session.startTime || !session.endTime ||
-        calculateSessionMinutes(session).error;
+        !session.description || calculateSessionMinutes(session).error;
     });
 
     if (invalid) {
       showToast(
         calculateSessionMinutes(invalid).error ||
-        'Every session needs a date, start time, and end time.',
+        'Every session needs a date, start time, end time, and brief description.',
         true
       );
       return false;
@@ -1032,6 +1065,9 @@ function addSessionRow(session) {
       '" aria-label="Break minutes"></td>' +
     '<td><select class="session-payment" aria-label="Payment status">' +
       paymentOptionsHtml(data.paymentStatus || 'unpaid') + '</select></td>' +
+    '<td><input class="session-description" type="text" maxlength="180" value="' +
+      escapeHtml(data.description || '') +
+      '" placeholder="Brief description for this date" aria-label="Session description"></td>' +
     '<td><span class="session-hours">0.00</span></td>' +
     '<td><button class="icon-button" type="button" data-remove-session ' +
       'aria-label="Remove session">x</button></td>';
@@ -1061,7 +1097,8 @@ function collectSessions() {
       startTime: row.querySelector('.session-start').value,
       endTime: row.querySelector('.session-end').value,
       breakMinutes: Number(row.querySelector('.session-break').value || 0),
-      paymentStatus: row.querySelector('.session-payment').value
+      paymentStatus: row.querySelector('.session-payment').value,
+      description: row.querySelector('.session-description').value.trim()
     };
   });
 }
@@ -1105,7 +1142,8 @@ function updateSessionTotals() {
       startTime: row.querySelector('.session-start').value,
       endTime: row.querySelector('.session-end').value,
       breakMinutes: row.querySelector('.session-break').value,
-      paymentStatus: row.querySelector('.session-payment').value
+      paymentStatus: row.querySelector('.session-payment').value,
+      description: row.querySelector('.session-description').value.trim()
     };
 
     const result = calculateSessionMinutes(session);
@@ -1453,6 +1491,7 @@ function renderEvidenceGuide() {
   if (!id) {
     elements.evidenceGuideOutput.innerHTML =
       '<div class="notice info">Choose a self-reported activity to see its evidence requirements.</div>';
+    elements.packetGeneratorOutput.innerHTML = '';
     return;
   }
 
@@ -1465,6 +1504,7 @@ function renderEvidenceGuide() {
   if (!activity || !rule) {
     elements.evidenceGuideOutput.innerHTML =
       '<div class="notice danger">The saved category rule could not be found.</div>';
+    elements.packetGeneratorOutput.innerHTML = '';
     return;
   }
 
@@ -1505,6 +1545,206 @@ function renderEvidenceGuide() {
     createButton.addEventListener('click', function() {
       createCategoryFolder(createButton.dataset.createGuideFolder);
     });
+  }
+
+  renderPacketGenerator(activity, rule);
+}
+
+
+function renderProfile() {
+  elements.profileFullName.value = state.profile.fullName || '';
+  elements.profileSchoolSite.value = state.profile.schoolSite || '';
+  elements.profileSupervisor.value = state.profile.supervisor || '';
+  elements.profileContractStart.value = state.profile.contractStart || '';
+  elements.profileContractEnd.value = state.profile.contractEnd || '';
+  elements.profileAdvancementCycle.value = state.profile.advancementCycle || '';
+}
+
+async function saveProfile(event) {
+  event.preventDefault();
+
+  const payload = {
+    fullName: elements.profileFullName.value.trim(),
+    schoolSite: elements.profileSchoolSite.value.trim(),
+    supervisor: elements.profileSupervisor.value.trim(),
+    contractStart: elements.profileContractStart.value,
+    contractEnd: elements.profileContractEnd.value,
+    advancementCycle: elements.profileAdvancementCycle.value.trim()
+  };
+
+  setLoading(true, 'Saving your approval-form profile...');
+
+  try {
+    applyBootstrap(await runServer('saveUserProfile', payload));
+    showToast('Approval-form profile saved.');
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function approvalFormType(rule) {
+  const form = String(rule && rule.approvalForm || '').toLowerCase();
+  if (form.indexOf('time-based') >= 0) return 'time_based';
+  if (form.indexOf('university student assignment') >= 0) return 'university_assignment';
+  if (form.indexOf('lower-level college coursework') >= 0) return 'lower_level_college';
+  return '';
+}
+
+function formTypeLabel(type) {
+  const labels = {
+    time_based: 'Time-Based Activities',
+    university_assignment: 'University Student Assignment',
+    lower_level_college: 'Lower-Level College Coursework'
+  };
+  return labels[type] || type;
+}
+
+function formCapacity(type) {
+  const capacities = {
+    time_based: 20,
+    university_assignment: 5,
+    lower_level_college: 5
+  };
+  return capacities[type] || 0;
+}
+
+function renderPacketGenerator(activity, rule) {
+  const formType = approvalFormType(rule);
+
+  if (!formType) {
+    elements.packetGeneratorOutput.innerHTML =
+      '<div class="card"><h3>Approval Form Generator</h3>' +
+      '<p>The official evidence table does not list one of the supported approval forms for this category.</p></div>';
+    return;
+  }
+
+  const packets = state.generatedPackets.filter(function(packet) {
+    return packet.categoryKey === activity.categoryKey;
+  });
+
+  const missingProfile = [];
+  if (!state.profile.fullName) missingProfile.push('full name');
+  if (!state.profile.schoolSite) missingProfile.push('school/site');
+  if (!state.profile.supervisor) missingProfile.push('supervisor');
+
+  if (formType === 'time_based') {
+    if (!state.profile.contractStart) missingProfile.push('contract start time');
+    if (!state.profile.contractEnd) missingProfile.push('contract end time');
+  }
+
+  const packetRows = packets.length
+    ? packets.map(function(packet) {
+        return '<div class="packet-row">' +
+          '<div><strong>' + escapeHtml(packet.categoryName) + '</strong>' +
+          '<small>' + escapeHtml(formTypeLabel(packet.formType)) +
+          ' | ' + packet.pageCount + ' page(s) | ' +
+          numberText(packet.estimatedCUs) + ' estimated CUs</small></div>' +
+          '<div class="packet-links">' +
+            (packet.docUrl
+              ? '<a href="' + escapeHtml(packet.docUrl) +
+                '" target="_blank" rel="noopener">Google Doc</a>'
+              : '') +
+            (packet.pdfUrl
+              ? '<a href="' + escapeHtml(packet.pdfUrl) +
+                '" target="_blank" rel="noopener">PDF</a>'
+              : '') +
+          '</div>' +
+          '<div class="packet-status-control">' +
+            '<select data-packet-status="' + escapeHtml(packet.packetId) + '">' +
+              packetStatusOptions(packet.status) +
+            '</select>' +
+            '<button class="btn small ghost" type="button" data-update-packet="' +
+              escapeHtml(packet.packetId) + '">Update</button>' +
+          '</div>' +
+        '</div>';
+      }).join('')
+    : '<p class="muted">No packet has been generated for this category yet.</p>';
+
+  const profileNotice = missingProfile.length
+    ? '<div class="notice warn"><strong>Profile needed:</strong> Complete ' +
+      escapeHtml(missingProfile.join(', ')) +
+      ' on My Google Workspace before generating the packet.</div>'
+    : '<div class="notice info">Your saved profile will be placed on every generated page.</div>';
+
+  elements.packetGeneratorOutput.innerHTML =
+    '<div class="card packet-generator">' +
+      '<div class="heading-actions"><div><h3>Approval Form Generator</h3>' +
+      '<p>' + escapeHtml(formTypeLabel(formType)) +
+      ' | maximum ' + formCapacity(formType) + ' record lines per page</p></div>' +
+      '<button class="btn blue" type="button" data-generate-packet="' +
+        escapeHtml(activity.id) + '"' +
+        (missingProfile.length ? ' disabled' : '') +
+      '>Generate New Draft Packet</button></div>' +
+      profileNotice +
+      '<div class="notice warn"><strong>Unofficial draft:</strong> Review the generated pages against the current official form before signing or submitting.</div>' +
+      '<div class="packet-list">' + packetRows + '</div>' +
+    '</div>';
+}
+
+function packetStatusOptions(selected) {
+  const statuses = [
+    'Draft',
+    'Needs signatures',
+    'Signed',
+    'Included in final ELMS file',
+    'Superseded'
+  ];
+
+  return statuses.map(function(status) {
+    return '<option value="' + escapeHtml(status) + '"' +
+      (status === selected ? ' selected' : '') + '>' +
+      escapeHtml(status) + '</option>';
+  }).join('');
+}
+
+async function generatePacket(activityId) {
+  setLoading(true, 'Generating the approval-form packet...');
+
+  try {
+    const data = await runServer('generateApprovalPacket', {
+      activityId: activityId
+    });
+
+    applyBootstrap(data);
+    elements.evidenceActivitySelect.value = activityId;
+    renderEvidenceGuide();
+
+    const packet = state.generatedPackets.find(function(item) {
+      return item.packetId === data.generatedPacketId;
+    });
+
+    showToast('Approval-form draft packet generated.');
+
+    if (packet && packet.pdfUrl) {
+      const link = elements.packetGeneratorOutput.querySelector(
+        'a[href="' + cssEscape(packet.pdfUrl) + '"]'
+      );
+      if (link) link.focus();
+    }
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function updatePacketStatus(packetId, status) {
+  setLoading(true, 'Updating packet status...');
+
+  try {
+    applyBootstrap(await runServer('updateGeneratedPacketStatus', {
+      packetId: packetId,
+      status: status
+    }));
+
+    renderEvidenceGuide();
+    showToast('Packet status updated.');
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
   }
 }
 
