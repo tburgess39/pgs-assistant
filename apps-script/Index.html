@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="description" content="Private PGS CU Assistant with a complete category matcher and teacher-owned Google workspace.">
+  <style><?!= include('Styles'); ?></style>
+</head>
+<body>
+<div id="loading" class="loading">
+  <div><div class="spinner"></div><div id="loadingText">Opening your PGS workspace…</div></div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div class="shell">
+  <aside>
+    <div class="brand">
+      <div class="logo">CU</div>
+      <div><h1>PGS CU Assistant</h1><small>Identify • Document • Prepare</small></div>
+    </div>
+    <nav>
+      <button class="active" data-view="dashboard">🏠 Dashboard</button>
+      <button data-view="matcher">🧭 Find My Category</button>
+      <button data-view="activity">➕ Add Activity</button>
+      <button data-view="directory">📚 Category Directory</button>
+      <button data-view="workspace">📁 Workspace Setup</button>
+      <button data-view="evidence">📎 Evidence Guide</button>
+      <button data-view="elms">✅ Prepare for ELMS</button>
+      <button data-view="records">📊 Activity Records</button>
+    </nav>
+    <div class="note">
+      <strong>Private Workspace Build</strong><br>
+      The matcher recommends categories, but CCSD makes all final eligibility and approval decisions.
+    </div>
+  </aside>
+
+  <main>
+    <select class="mobile" id="mobileNav">
+      <option value="dashboard">Dashboard</option>
+      <option value="matcher">Find My Category</option>
+      <option value="activity">Add Activity</option>
+      <option value="directory">Category Directory</option>
+      <option value="workspace">Workspace Setup</option>
+      <option value="evidence">Evidence Guide</option>
+      <option value="elms">Prepare for ELMS</option>
+      <option value="records">Activity Records</option>
+    </select>
+
+    <div class="top">
+      <div><h2 id="heading">Dashboard</h2><p id="sub">One activity record powers the entire workflow.</p></div>
+      <a class="link" target="_blank" rel="noopener" href="https://ccsd.net/employees/current/employment/growth.php">Official CCSD PGS Resources ↗</a>
+    </div>
+
+    <div class="workspace-banner">
+      <div>
+        <strong id="workspaceStatus">Connecting to your teacher-owned workspace…</strong>
+        <div class="muted" id="workspaceDetails">The first opening creates the workbook automatically.</div>
+      </div>
+      <div class="workspace-links">
+        <a id="workbookLink" href="#" target="_blank" rel="noopener" hidden>Open Sheet</a>
+        <a id="rootFolderLink" href="#" target="_blank" rel="noopener" hidden>Open PGS Folder</a>
+      </div>
+    </div>
+
+    <div class="cutoff-banner" role="note">
+      <div class="cutoff-icon">📅</div>
+      <div>
+        <strong>Applicability Notice</strong>
+        <p>This assistant, calculator, category matcher, evidence guidance, folder tools, and ELMS-preparation tools apply only to activities occurring on or after <strong>May 1, 2024</strong>.</p>
+      </div>
+    </div>
+
+    <section id="dashboard" class="view active">
+      <div class="hero">
+        <h3>Describe the work. Let the assistant narrow the category.</h3>
+        <p>Teachers should not need to memorize all PGS activity names. For activities occurring on or after May 1, 2024, the matcher compares the activity against the complete current category library, explains the recommendation, and shows the documentation before the record is saved.</p>
+        <div class="actions">
+          <button class="btn gold" type="button" onclick="showView('matcher')">Find My Category</button>
+          <button class="btn white" type="button" onclick="showView('activity')">I Already Know It</button>
+        </div>
+      </div>
+
+      <div class="grid g4 stats">
+        <div class="card stat"><div class="label">Current Activity Options</div><div class="value" id="libraryCount">0</div><small>Loaded from the full current guide</small></div>
+        <div class="card stat"><div class="label">Estimated CUs</div><div class="value" id="estimated">0.00</div><small>All activity estimates</small></div>
+        <div class="card stat"><div class="label">Approved CUs</div><div class="value" id="approved">0.00</div><small>Only official approvals entered</small></div>
+        <div class="card stat"><div class="label">Remaining</div><div class="value" id="remaining">225.00</div><small>Based on approved CUs</small></div>
+      </div>
+      <div id="warningBox" class="notice warn"></div>
+    </section>
+
+    <section id="matcher" class="view">
+      <div class="card form">
+        <h3>Activity Category Matcher</h3>
+        <p>Use plain language. The assistant returns the strongest matches and explains the differences.</p><div class="notice warn"><strong>Date requirement:</strong> Do not use this matcher for activities that occurred before May 1, 2024.</div>
+        <div class="fg">
+          <div class="field full">
+            <label for="matcherDescription">Describe what you did</label>
+            <textarea id="matcherDescription" placeholder="Example: I attended weekly CTE PLC meetings after school where we analyzed WRS data and planned instructional interventions."></textarea>
+          </div>
+          <div class="field">
+            <label for="matcherPath">What best describes the activity?</label>
+            <select id="matcherPath">
+              <option value="">Not sure</option>
+              <option value="college">College or university coursework</option>
+              <option value="professional_learning">Professional learning / training</option>
+              <option value="conference">Conference or webinar</option>
+              <option value="students">Direct work with students</option>
+              <option value="iep">IEP / MDT work</option>
+              <option value="school_community">School or community leadership / planning</option>
+              <option value="mentor">I mentored someone</option>
+              <option value="mentee">I was mentored</option>
+              <option value="university_student">I supported a university student / teacher candidate</option>
+              <option value="award_credential">Award, grant, credential, certification, or endorsement</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="matcherRole">What was your main role?</label>
+            <select id="matcherRole">
+              <option value="">Not sure</option>
+              <option value="attended">Attended / participated</option>
+              <option value="taught">Taught / presented / facilitated</option>
+              <option value="designed">Designed / wrote / developed</option>
+              <option value="coach_advisor">Coached / advised / coordinated</option>
+              <option value="committee">Served on a team / committee</option>
+              <option value="recipient">Received something</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="matcherContext">Where or through whom?</label>
+            <select id="matcherContext">
+              <option value="">Not sure</option>
+              <option value="district">District / RPDP / CCEA / Vegas PBS</option>
+              <option value="school">My school or site</option>
+              <option value="external">External professional organization</option>
+              <option value="college">College or university</option>
+              <option value="students">With students</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="matcherDate">Activity date</label>
+            <input id="matcherDate" type="date" min="2024-05-01" required>
+          </div>
+        </div>
+        <div class="actions" style="justify-content:flex-end;margin-top:18px">
+          <button id="matchButton" class="btn blue" type="button">Find the Best Matches</button>
+        </div>
+      </div>
+
+      <div id="specialAlertArea"></div>
+      <div id="matchResults" class="match-results"></div>
+    </section>
+
+    <section id="activity" class="view">
+      <div class="card form">
+        <div class="heading-actions">
+          <div>
+            <h3 id="formHeading">Add a Professional Activity</h3>
+            <p>Choose directly or return to the matcher for help.</p><div class="notice warn"><strong>Only current-cycle rules:</strong> This form accepts activities occurring on or after May 1, 2024.</div>
+          </div>
+          <button class="btn ghost" type="button" onclick="showView('matcher')">Help Me Choose</button>
+        </div>
+        <form id="activityForm">
+          <input id="activityId" type="hidden">
+          <div class="fg">
+            <div class="field full">
+              <label for="title">Activity title</label>
+              <input id="title" required placeholder="Example: BSU Student Success PLC Meeting">
+            </div>
+            <div class="field full">
+              <label for="description">What did you do?</label>
+              <textarea id="description" required></textarea>
+            </div>
+            <div class="field">
+              <label for="startDate">Start date</label>
+              <input id="startDate" type="date" min="2024-05-01" required>
+            </div>
+            <div class="field">
+              <label for="endDate">End date</label>
+              <input id="endDate" type="date" min="2024-05-01">
+            </div>
+            <div class="field">
+              <label for="organization">Organization / site</label>
+              <input id="organization">
+            </div>
+            <div class="field">
+              <label for="role">Your role</label>
+              <input id="role" placeholder="Participant, advisor, presenter…">
+            </div>
+            <div class="field full">
+              <label for="categoryKey">Confirmed activity category</label>
+              <select id="categoryKey" required><option value="">Loading full category library…</option></select>
+            </div>
+            <div id="categoryGuidance" class="category-guidance full" hidden></div>
+            <div class="field">
+              <label for="paymentStatus">Payment status</label>
+              <select id="paymentStatus">
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid stipend / supplemental rate</option>
+                <option value="contract">Regular contractual rate</option>
+              </select>
+            </div>
+            <div class="field">
+              <label id="quantityLabel" for="quantity">Quantity</label>
+              <input id="quantity" type="number" min="0" step=".25" value="0">
+            </div>
+            <div class="field">
+              <label for="unit">Calculation unit</label>
+              <select id="unit"><option value="hours">Hours</option></select>
+            </div>
+            <div class="field">
+              <label for="titleIException">Title I paid exception applicable?</label>
+              <select id="titleIException">
+                <option value="no">No / Not sure</option>
+                <option value="yes">Yes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="status">Status</label>
+              <select id="status">
+                <option>Needs evidence</option>
+                <option>In progress</option>
+                <option>Ready for ELMS</option>
+                <option>Submitted</option>
+                <option>Returned for corrections</option>
+                <option>Approved — enter only after official CCSD approval</option>
+                <option>Denied</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="officialApprovedCUs">Official approved CUs</label>
+              <input id="officialApprovedCUs" type="number" min="0" step=".01">
+            </div>
+            <div class="field full">
+              <label for="evidenceLink">Google Drive evidence link</label>
+              <input id="evidenceLink" type="url" placeholder="https://drive.google.com/...">
+            </div>
+            <div class="field full">
+              <label for="notes">Private notes</label>
+              <textarea id="notes"></textarea>
+            </div>
+            <label class="checkline full">
+              <input id="createFolder" type="checkbox">
+              Create a Google Drive evidence folder when saving.
+            </label>
+          </div>
+          <div class="actions" style="justify-content:flex-end;margin-top:18px">
+            <button type="reset" class="btn ghost">Clear</button>
+            <button id="saveButton" class="btn blue">Calculate & Save Once</button>
+          </div>
+        </form>
+        <div class="result" id="result">
+          <h3>Saved Result</h3>
+          <div class="rg">
+            <div class="rb"><small>Category</small><strong id="resultCategory">—</strong></div>
+            <div class="rb"><small>Estimated CUs</small><strong id="resultCUs">—</strong></div>
+            <div class="rb"><small>Rule version</small><strong id="resultRule">—</strong></div>
+            <div class="rb"><small>Status</small><strong id="resultStatus">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="directory" class="view">
+      <div class="card">
+        <div class="heading-actions">
+          <div><h3>Complete Current Category Directory</h3><p id="directoryCount">Loading…</p></div>
+          <input id="directorySearch" class="search-box" placeholder="Search categories, examples, or keywords">
+        </div>
+        <div id="directoryGroups"></div>
+      </div>
+      <details class="card" style="margin-top:17px">
+        <summary><strong>Historical categories no longer shown as current choices</strong></summary>
+        <p>These remain in the project archive so the system does not lose the history, but they are not presented as current categories.</p>
+        <div id="expiredList" class="columns-list"></div>
+      </details>
+    </section>
+
+    <section id="workspace" class="view">
+      <div class="grid g2">
+        <div class="card"><h3>Teacher-Owned Workbook</h3><p>One Activity Log, complete Category Rules, Settings, and Change Log.</p><button id="openWorkbookButton" class="btn blue" type="button">Open My Workbook</button></div>
+        <div class="card"><h3>Drive Folder Structure</h3><p>Create the PGS folders once; each activity can receive its own evidence folder.</p><button id="createFoldersButton" class="btn green" type="button">Create / Verify Folders</button></div>
+      </div>
+    </section>
+
+    <section id="evidence" class="view">
+      <div class="notice info">The selected category now supplies its own documentation list and limitations before the teacher saves the activity.</div>
+    </section>
+
+    <section id="elms" class="view">
+      <div class="grid g2">
+        <div class="card"><h3>Before Opening ELMS</h3><p>Confirm the activity category, calculation inputs, documentation, signatures, single-file Drive packet, sharing permissions, and deadlines.</p></div>
+        <div class="card"><h3>Current Boundary</h3><p>The assistant organizes and prepares the record. It does not directly submit into ELMS.</p></div>
+      </div>
+    </section>
+
+    <section id="records" class="view">
+      <div class="card">
+        <h3>Activity Records</h3>
+        <div style="overflow:auto">
+          <table>
+            <thead><tr><th>Activity</th><th>Category</th><th>Quantity</th><th>Estimated</th><th>Official</th><th>Status</th><th>Evidence</th><th>Actions</th></tr></thead>
+            <tbody id="recordsBody"><tr><td colspan="8">Loading records…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" style="margin-top:17px">
+        <h3>Category Balances</h3>
+        <div style="overflow:auto"><table><thead><tr><th>Category</th><th>Recorded</th><th>Maximum</th><th>Remaining</th></tr></thead><tbody id="categoryBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <footer><strong>Disclaimer:</strong> Unofficial educator-created guidance. The matcher does not guarantee eligibility or approval. Verify current CCSD PGS guidance and announcements.</footer>
+  </main>
+</div>
+<script><?!= include('Client'); ?></script>
+</body>
+</html>

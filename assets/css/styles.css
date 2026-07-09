@@ -48,3 +48,15 @@ footer{border-top:1px solid var(--line);margin-top:30px;padding-top:18px;color:v
 .btn.small{padding:7px 10px;font-size:12px}
 .btn.danger-button{background:#fff;border:1px solid #e5aaaa;color:#9d2929}
 .muted{color:var(--muted)}
+
+.cutoff-banner{
+  margin-bottom:16px;
+  padding:15px 17px;
+  border:2px solid var(--gold);
+  border-left:8px solid var(--red);
+  border-radius:12px;
+  background:#fff8e5;
+  color:#4b3a00;
+  line-height:1.5;
+}
+.cutoff-banner strong{color:#8a2d2d}

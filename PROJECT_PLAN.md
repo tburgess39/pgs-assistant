@@ -1,70 +1,48 @@
-# PGS CU Assistant — Build Plan
+# PGS CU Assistant - Build Plan
 
-## Product principle
+## Completed
 
-Teachers enter each activity once.
+### Milestone 1
+Static GitHub dashboard and browser-storage prototype.
 
-The assistant is the teacher-facing interface. A spreadsheet may be used as the
-backend database and administrative console, but teachers should not manually
-maintain a duplicate tracker.
+### Milestone 2
+Teacher-owned Google Sheet, Drive folders, Activity Log, rules, settings, and
+change tracking.
 
-## Milestone 1 — Static GitHub prototype
+### Milestone 2.1
+Complete current category library and guided activity matcher.
 
-- Split HTML, CSS, JavaScript, and rule data into separate files
-- Publish through GitHub Pages
-- Keep the dashboard usable on desktop and mobile
-- Save temporary test records in browser storage
-- Add edit and delete controls
+## Category architecture
 
-## Milestone 2 — Complete data model
+1. **Current activity library**
+   Exact current activity choices from the 9/1/23 PGS Reference Guide.
 
-Each activity record should eventually include:
+2. **Announcement overlays**
+   Date-, provider-, role-, or department-specific changes that modify
+   eligibility or submission workflow.
 
-- Unique activity ID
-- Teacher account
-- Activity title and description
-- Start and end dates
-- Hours
-- Payment and contract-time status
-- Category and rule version
-- Estimated CUs
-- Evidence folder and document links
-- Approval form requirements
-- ELMS-ready description
-- Submission status and date
-- Officially approved CUs
-- Reviewer notes
-- Created and updated timestamps
+3. **Historical archive**
+   Categories removed or absorbed into other categories. These remain
+   documented but are not shown as current choices.
 
-## Milestone 3 — Google Sheets backend
+4. **Human confirmation**
+   The matcher recommends; the teacher confirms. Ambiguous activities display
+   multiple options and the differences between them.
 
-- Create one teacher-owned workbook
-- Use an Activity Log tab as the single source of truth
-- Store rules on a separate protected tab
-- Let the app read and write records automatically
-- Keep manual spreadsheet editing optional
+## Next milestone
 
-## Milestone 4 — Google Drive automation
+- Verify each library row against the official documents line by line
+- Add more conditional questions for ambiguous pairs
+- Add rule tests for every calculation type
+- Generate the category-specific evidence checklist
+- Generate an ELMS-ready description from the saved Activity Log record
 
-- Create a main PGS folder
-- Create one folder per activity
-- Apply consistent file names
-- Track missing evidence
-- Preserve original documents
 
-## Milestone 5 — Document preparation
+## Applicability safeguard
 
-- Generate activity summaries
-- Populate permitted fields in official forms
-- Track signatures and approval requirements
-- Produce an ELMS-ready copy-and-paste packet
-
-## Milestone 6 — Production safeguards
-
-- Version every calculation rule
-- Display source and last-verified date
-- Separate estimates from official approvals
-- Warn about duplicate or overlapping hours
-- Add accessibility testing
-- Add privacy and security review
-- Add backups and export tools
+- Persistent May 1, 2024 notice on public and private interfaces
+- Required activity start date
+- Minimum date enforced in HTML inputs
+- Client-side rejection of earlier dates
+- Server-side rejection of earlier dates
+- Clear direction that older activities require historical-rule review

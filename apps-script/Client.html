@@ -1,0 +1,577 @@
+'use strict';
+
+const MIN_ACTIVITY_DATE = '2024-05-01';
+
+const pageMeta = {
+  dashboard: ['Dashboard', 'One activity record powers the entire workflow.'],
+  matcher: ['Find My Category', 'Describe the work and compare the strongest current category matches.'],
+  activity: ['Add Activity', 'Confirm the category, calculation details, and evidence record.'],
+  directory: ['Category Directory', 'Browse every current activity option in the library.'],
+  workspace: ['Workspace Setup', 'Create the teacher-owned Sheet and Drive structure.'],
+  evidence: ['Evidence Guide', 'Use category-specific documentation guidance.'],
+  elms: ['Prepare for ELMS', 'Gather everything before entering the official district system.'],
+  records: ['Activity Records', 'Review progress, evidence, and category balances.']
+};
+
+const unitLabels = {
+  hours: 'Hours', semester_credit: 'Semester credits',
+  quarter_credit: 'Quarter credits', iep_mdt: 'IEPs / MDTs written',
+  student_case: 'Students / cases', fos_student: 'FOS students',
+  week: 'Weeks', award: 'Awards', grant: 'Grants',
+  microcredential: 'Micro-credentials', submission: 'Submission',
+  certification: 'Certification', endorsement: 'Endorsements',
+  documented_hours: 'Documented clock hours', ceu: 'CEUs listed on certificate'
+};
+
+const state = {
+  activities: [], rules: [], workspace: {}, summary: {},
+  warnings: [], specialRules: [], expiredActivityNames: []
+};
+
+const elements = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+  [
+    'loading','loadingText','toast','mobileNav','heading','sub','workspaceStatus',
+    'workspaceDetails','workbookLink','rootFolderLink','libraryCount','estimated',
+    'approved','remaining','warningBox','matcherDescription','matcherPath',
+    'matcherRole','matcherContext','matcherDate','matchButton','specialAlertArea',
+    'matchResults','activityForm','activityId','title','description','startDate',
+    'endDate','organization','role','categoryKey','categoryGuidance','paymentStatus',
+    'quantity','quantityLabel','unit','titleIException','status','officialApprovedCUs',
+    'evidenceLink','notes','createFolder','saveButton','formHeading','result',
+    'resultCategory','resultCUs','resultRule','resultStatus','directoryCount',
+    'directorySearch','directoryGroups','expiredList','openWorkbookButton',
+    'createFoldersButton','recordsBody','categoryBody'
+  ].forEach(function(id) { elements[id] = document.getElementById(id); });
+
+  bindEvents();
+  loadBootstrap();
+});
+
+function bindEvents() {
+  document.querySelectorAll('nav button').forEach(function(button) {
+    button.addEventListener('click', function() { showView(button.dataset.view); });
+  });
+  elements.mobileNav.addEventListener('change', function(event) { showView(event.target.value); });
+  elements.matchButton.addEventListener('click', runMatcher);
+  elements.categoryKey.addEventListener('change', function() {
+    configureCategory(elements.categoryKey.value);
+  });
+  elements.directorySearch.addEventListener('input', renderDirectory);
+  elements.activityForm.addEventListener('submit', saveActivity);
+  elements.activityForm.addEventListener('reset', function() { setTimeout(resetFormState, 0); });
+  elements.openWorkbookButton.addEventListener('click', function() {
+    if (state.workspace.spreadsheetUrl) window.open(state.workspace.spreadsheetUrl, '_blank', 'noopener');
+  });
+  elements.createFoldersButton.addEventListener('click', createWorkspaceFolders);
+  elements.recordsBody.addEventListener('click', function(event) {
+    const button = event.target.closest('button[data-action]');
+    if (!button) return;
+    if (button.dataset.action === 'edit') editActivity(button.dataset.id);
+    if (button.dataset.action === 'delete') removeActivity(button.dataset.id);
+    if (button.dataset.action === 'folder') createActivityFolder(button.dataset.id);
+  });
+  document.body.addEventListener('click', function(event) {
+    const useButton = event.target.closest('button[data-use-category]');
+    if (useButton) useCategory(useButton.dataset.useCategory);
+  });
+}
+
+function runServer(method, payload) {
+  return new Promise(function(resolve, reject) {
+    const runner = google.script.run.withSuccessHandler(resolve)
+      .withFailureHandler(function(error) {
+        reject(new Error(error && error.message ? error.message : String(error)));
+      });
+    if (method === 'getBootstrapData') runner.getBootstrapData();
+    else if (method === 'saveActivity') runner.saveActivity(payload);
+    else if (method === 'deleteActivity') runner.deleteActivity(payload);
+    else if (method === 'createWorkspaceFolders') runner.createWorkspaceFolders();
+    else if (method === 'createEvidenceFolderForActivity') runner.createEvidenceFolderForActivity(payload);
+    else reject(new Error('Unknown server method.'));
+  });
+}
+
+async function loadBootstrap() {
+  setLoading(true, 'Loading the complete PGS category library…');
+  try {
+    applyBootstrap(await runServer('getBootstrapData'));
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function applyBootstrap(data) {
+  state.activities = data.activities || [];
+  state.rules = (data.rules || []).filter(function(rule) { return rule.active; });
+  state.workspace = data.workspace || {};
+  state.summary = data.summary || {};
+  state.warnings = data.warnings || [];
+  state.specialRules = data.specialRules || [];
+  state.expiredActivityNames = data.expiredActivityNames || [];
+
+  populateCategories();
+  renderWorkspace();
+  renderDashboard(data.libraryCount || state.rules.length);
+  renderDirectory();
+  renderExpired();
+  renderRecords();
+}
+
+function populateCategories() {
+  const selected = elements.categoryKey.value;
+  const groups = groupBy(state.rules, 'parentCategory');
+  let html = '<option value="">Choose a category or use the matcher</option>';
+
+  Object.keys(groups).sort().forEach(function(parent) {
+    html += '<optgroup label="' + escapeHtml(parent) + '">';
+    groups[parent].forEach(function(rule) {
+      html += '<option value="' + escapeHtml(rule.categoryKey) + '">' +
+        escapeHtml(rule.activityName) + '</option>';
+    });
+    html += '</optgroup>';
+  });
+
+  elements.categoryKey.innerHTML = html;
+  if (state.rules.some(function(rule) { return rule.categoryKey === selected; })) {
+    elements.categoryKey.value = selected;
+  }
+}
+
+function runMatcher() {
+  const activityDate = elements.matcherDate.value;
+
+  if (!activityDate) {
+    showToast('Enter the activity date. The matcher applies only to activities occurring on or after May 1, 2024.', true);
+    elements.matcherDate.focus();
+    return;
+  }
+
+  if (activityDate < MIN_ACTIVITY_DATE) {
+    showToast('This assistant applies only to activities occurring on or after May 1, 2024.', true);
+    elements.matchResults.innerHTML =
+      '<div class="notice danger"><strong>Outside this assistant\'s scope:</strong> Activities before May 1, 2024 must be reviewed using the rules and documentation that applied at that time.</div>';
+    return;
+  }
+
+  const description = elements.matcherDescription.value.trim().toLowerCase();
+  const selectedTags = [
+    elements.matcherPath.value, elements.matcherRole.value, elements.matcherContext.value
+  ].filter(Boolean);
+
+  const scored = state.rules.map(function(rule) {
+    let score = 0;
+    const reasons = [];
+    selectedTags.forEach(function(tag) {
+      if ((rule.matchTags || []).indexOf(tag) >= 0) {
+        score += 12;
+        reasons.push('Matches "' + tag.replaceAll('_', ' ') + '"');
+      }
+    });
+    (rule.keywords || []).forEach(function(keyword) {
+      if (description && description.indexOf(String(keyword).toLowerCase()) >= 0) {
+        score += 5;
+        reasons.push('Description mentions "' + keyword + '"');
+      }
+    });
+    const activityWords = rule.activityName.toLowerCase().split(/\W+/).filter(function(word) {
+      return word.length > 4;
+    });
+    activityWords.forEach(function(word) {
+      if (description.indexOf(word) >= 0) score += 1;
+    });
+    return {rule: rule, score: score, reasons: unique(reasons)};
+  }).sort(function(a, b) { return b.score - a.score; });
+
+  renderSpecialAlerts(description);
+  const results = scored.filter(function(item) { return item.score > 0; }).slice(0, 5);
+  if (!results.length) {
+    elements.matchResults.innerHTML =
+      '<div class="notice warn">No strong match yet. Add more detail or browse the complete Category Directory.</div>';
+    return;
+  }
+
+  elements.matchResults.innerHTML = results.map(function(item, index) {
+    const rule = item.rule;
+    const maxText = rule.maximumCUs === null ? 'No stated category maximum' : rule.maximumCUs + ' CU maximum';
+    return '<div class="match-card ' + (index === 0 ? 'best' : '') + '">' +
+      '<div class="match-head"><div><div class="parent-label">' +
+      escapeHtml(rule.parentCategory) + '</div><h3>' + escapeHtml(rule.activityName) +
+      '</h3></div><div class="score-pill">' + (index === 0 ? 'Best match' : 'Alternative') +
+      '</div></div>' +
+      '<p><strong>Why it matched:</strong> ' +
+      escapeHtml(item.reasons.slice(0, 3).join('; ') || 'Similar activity language') + '</p>' +
+      '<div class="match-details">' +
+      '<div class="detail-box"><strong>Calculation / maximum</strong>' +
+      escapeHtml(calculationSummary(rule) + ' • ' + maxText) + '</div>' +
+      '<div class="detail-box"><strong>Submission path</strong>' +
+      escapeHtml(submissionLabel(rule.submissionMode)) + '</div>' +
+      '<div class="detail-box"><strong>Required documentation</strong>' +
+      escapeHtml(rule.documentation) + '</div>' +
+      '<div class="detail-box"><strong>Important limitations</strong>' +
+      escapeHtml(rule.limitations) + '</div></div>' +
+      '<button class="btn blue" type="button" data-use-category="' +
+      escapeHtml(rule.categoryKey) + '">Use This Category</button></div>';
+  }).join('');
+}
+
+function renderSpecialAlerts(description) {
+  const date = elements.matcherDate.value;
+  const matches = state.specialRules.filter(function(rule) {
+    const keywordMatch = (rule.keywords || []).some(function(keyword) {
+      return description.indexOf(String(keyword).toLowerCase()) >= 0;
+    });
+    const dateMatch = !date || !rule.effectiveDate || date >= rule.effectiveDate;
+    return keywordMatch && dateMatch;
+  });
+
+  elements.specialAlertArea.innerHTML = matches.map(function(rule) {
+    return '<div class="notice danger"><strong>' + escapeHtml(rule.title) +
+      '</strong><br>' + escapeHtml(rule.message) + '</div>';
+  }).join('');
+}
+
+function useCategory(categoryKey) {
+  const rule = getRule(categoryKey);
+  if (!rule) return;
+  elements.categoryKey.value = categoryKey;
+  elements.description.value = elements.description.value ||
+    elements.matcherDescription.value.trim();
+  if (elements.matcherDate.value) {
+    elements.startDate.value = elements.startDate.value || elements.matcherDate.value;
+    elements.endDate.value = elements.endDate.value || elements.matcherDate.value;
+  }
+  configureCategory(categoryKey);
+  showView('activity');
+  elements.title.focus();
+}
+
+function configureCategory(categoryKey) {
+  const rule = getRule(categoryKey);
+  if (!rule) {
+    elements.categoryGuidance.hidden = true;
+    return;
+  }
+
+  const units = rule.units && rule.units.length ? rule.units : ['hours'];
+  elements.unit.innerHTML = units.map(function(unit) {
+    return '<option value="' + escapeHtml(unit) + '">' +
+      escapeHtml(unitLabels[unit] || unit) + '</option>';
+  }).join('');
+  elements.quantityLabel.textContent = quantityLabelFor(units[0]);
+  elements.unit.onchange = function() {
+    elements.quantityLabel.textContent = quantityLabelFor(elements.unit.value);
+  };
+
+  elements.paymentStatus.disabled = rule.calculationType !== 'hours';
+  elements.titleIException.disabled = !rule.titleIExceptionAllowed;
+  if (!rule.titleIExceptionAllowed) elements.titleIException.value = 'no';
+
+  const maxText = rule.maximumCUs === null ? 'No stated maximum' : rule.maximumCUs + ' CU maximum';
+  elements.categoryGuidance.hidden = false;
+  elements.categoryGuidance.innerHTML =
+    '<h4>' + escapeHtml(rule.parentCategory + ': ' + rule.activityName) + '</h4>' +
+    '<p><strong>Calculation:</strong> ' + escapeHtml(calculationSummary(rule)) +
+    ' <strong>• ' + escapeHtml(maxText) + '</strong></p>' +
+    '<p><strong>Documentation:</strong> ' + escapeHtml(rule.documentation) + '</p>' +
+    '<p><strong>Watch for:</strong> ' + escapeHtml(rule.limitations) + '</p>' +
+    (rule.submissionMode === 'automatic'
+      ? '<div class="notice info"><strong>Automatic ELMS activity:</strong> normally do not self-report this category.</div>'
+      : '') +
+    (rule.calculationType === 'manual'
+      ? '<div class="notice warn">This category needs additional verification before the assistant can provide a firm estimate.</div>'
+      : '');
+}
+
+function renderDirectory() {
+  const query = elements.directorySearch.value.trim().toLowerCase();
+  const filtered = state.rules.filter(function(rule) {
+    const haystack = [
+      rule.parentCategory, rule.activityName, rule.documentation,
+      rule.limitations, (rule.keywords || []).join(' ')
+    ].join(' ').toLowerCase();
+    return !query || haystack.indexOf(query) >= 0;
+  });
+  const groups = groupBy(filtered, 'parentCategory');
+  elements.directoryCount.textContent =
+    filtered.length + ' of ' + state.rules.length + ' current activity options shown';
+
+  elements.directoryGroups.innerHTML = Object.keys(groups).sort().map(function(parent) {
+    return '<div class="directory-group"><h4>' + escapeHtml(parent) + '</h4>' +
+      groups[parent].map(function(rule) {
+        return '<div class="directory-item"><div><strong>' +
+          escapeHtml(rule.activityName) + '</strong><br><small>' +
+          escapeHtml(calculationSummary(rule)) + '</small></div><div>' +
+          escapeHtml(rule.limitations) + '</div><button class="btn small ghost" type="button" data-use-category="' +
+          escapeHtml(rule.categoryKey) + '">Select</button></div>';
+      }).join('') + '</div>';
+  }).join('');
+}
+
+function renderExpired() {
+  elements.expiredList.innerHTML = state.expiredActivityNames.map(function(name) {
+    return '<div>• ' + escapeHtml(name) + '</div>';
+  }).join('');
+}
+
+function renderDashboard(count) {
+  elements.libraryCount.textContent = String(count);
+  elements.estimated.textContent = numberText(state.summary.estimatedTotal);
+  elements.approved.textContent = numberText(state.summary.approvedTotal);
+  elements.remaining.textContent = numberText(state.summary.remaining);
+  elements.warningBox.innerHTML = state.warnings.map(function(w) {
+    return '<div>• ' + escapeHtml(w) + '</div>';
+  }).join('');
+}
+
+function renderWorkspace() {
+  const hasWorkbook = Boolean(state.workspace.spreadsheetUrl);
+  const hasFolder = Boolean(state.workspace.rootFolderUrl);
+  elements.workspaceStatus.textContent = hasWorkbook
+    ? 'Connected to your teacher-owned Google Sheet.'
+    : 'Your workbook has not been created yet.';
+  elements.workspaceDetails.textContent = hasFolder
+    ? 'The PGS Drive folder structure is connected.'
+    : 'Use Workspace Setup to create the Drive folders.';
+  setLink(elements.workbookLink, state.workspace.spreadsheetUrl, 'Open Sheet');
+  setLink(elements.rootFolderLink, state.workspace.rootFolderUrl, 'Open PGS Folder');
+  elements.openWorkbookButton.disabled = !hasWorkbook;
+}
+
+function renderRecords() {
+  if (!state.activities.length) {
+    elements.recordsBody.innerHTML = '<tr><td colspan="8">No activities saved yet.</td></tr>';
+  } else {
+    elements.recordsBody.innerHTML = state.activities.map(function(a) {
+      const evidenceUrl = safeHttpUrl(a.evidenceLink || a.activityFolderUrl);
+      const evidence = evidenceUrl
+        ? '<a href="' + escapeHtml(evidenceUrl) + '" target="_blank" rel="noopener">Open</a>'
+        : 'Missing';
+      const folderButton = a.activityFolderUrl ? '' :
+        '<button class="btn small green" type="button" data-action="folder" data-id="' +
+        escapeHtml(a.id) + '">Create Folder</button>';
+      return '<tr><td><strong>' + escapeHtml(a.title) + '</strong><br><small>' +
+        escapeHtml(truncate(a.description, 70)) + '</small></td><td>' +
+        escapeHtml(a.categoryName) + '</td><td>' +
+        numberText(a.quantity) + ' ' + escapeHtml(unitLabels[a.unit] || a.unit) +
+        '</td><td>' + estimateText(a.estimatedCUs) + '</td><td>' +
+        (a.officialApprovedCUs === '' ? '—' : numberText(a.officialApprovedCUs)) +
+        '</td><td><span class="tag">' + escapeHtml(a.status) + '</span></td><td>' +
+        evidence + '</td><td><div class="table-actions"><button class="btn small ghost" type="button" data-action="edit" data-id="' +
+        escapeHtml(a.id) + '">Edit</button>' + folderButton +
+        '<button class="btn small danger-button" type="button" data-action="delete" data-id="' +
+        escapeHtml(a.id) + '">Delete</button></div></td></tr>';
+    }).join('');
+  }
+
+  elements.categoryBody.innerHTML = (state.summary.categoryBalances || []).map(function(item) {
+    return '<tr><td><strong>' + escapeHtml(item.category) + '</strong><br><small>' +
+      escapeHtml(item.parentCategory) + '</small></td><td>' + numberText(item.recorded) +
+      '</td><td>' + (item.maximum === null ? 'No stated max' : numberText(item.maximum)) +
+      '</td><td>' + (item.remaining === null ? '—' : numberText(item.remaining)) + '</td></tr>';
+  }).join('');
+}
+
+async function saveActivity(event) {
+  event.preventDefault();
+
+  if (!elements.startDate.value) {
+    showToast('Enter the activity start date. This assistant applies only to activities occurring on or after May 1, 2024.', true);
+    elements.startDate.focus();
+    return;
+  }
+
+  if (elements.startDate.value < MIN_ACTIVITY_DATE ||
+      (elements.endDate.value && elements.endDate.value < MIN_ACTIVITY_DATE)) {
+    showToast('This assistant applies only to activities occurring on or after May 1, 2024.', true);
+    return;
+  }
+
+  if (elements.endDate.value && elements.endDate.value < elements.startDate.value) {
+    showToast('The activity end date cannot be earlier than the start date.', true);
+    return;
+  }
+
+  const payload = {
+    id: elements.activityId.value, title: elements.title.value.trim(),
+    description: elements.description.value.trim(), startDate: elements.startDate.value,
+    endDate: elements.endDate.value, organization: elements.organization.value.trim(),
+    role: elements.role.value.trim(), categoryKey: elements.categoryKey.value,
+    paymentStatus: elements.paymentStatus.value, quantity: Number(elements.quantity.value || 0),
+    unit: elements.unit.value, titleIException: elements.titleIException.value,
+    status: elements.status.value, officialApprovedCUs: elements.officialApprovedCUs.value,
+    evidenceLink: elements.evidenceLink.value.trim(), notes: elements.notes.value.trim(),
+    createFolder: elements.createFolder.checked
+  };
+
+  setLoading(true, payload.id ? 'Updating the activity record…' : 'Saving the activity record…');
+  try {
+    const data = await runServer('saveActivity', payload);
+    applyBootstrap(data);
+    const saved = state.activities.find(function(a) {
+      return a.title === payload.title && a.categoryKey === payload.categoryKey;
+    });
+    if (saved) showSavedResult(saved);
+    showToast('Activity saved to the single Activity Log.');
+    resetFormState();
+  } catch (error) {
+    showToast(error.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function editActivity(id) {
+  const a = state.activities.find(function(item) { return item.id === id; });
+  if (!a) return;
+  elements.activityId.value = a.id;
+  elements.title.value = a.title;
+  elements.description.value = a.description;
+  elements.startDate.value = a.startDate || '';
+  elements.endDate.value = a.endDate || '';
+  elements.organization.value = a.organization || '';
+  elements.role.value = a.role || '';
+  elements.categoryKey.value = a.categoryKey;
+  configureCategory(a.categoryKey);
+  elements.paymentStatus.value = a.paymentStatus;
+  elements.quantity.value = a.quantity;
+  elements.unit.value = a.unit;
+  elements.titleIException.value = a.titleIException || 'no';
+  elements.status.value = a.status;
+  elements.officialApprovedCUs.value = a.officialApprovedCUs;
+  elements.evidenceLink.value = a.evidenceLink || '';
+  elements.notes.value = a.notes || '';
+  elements.formHeading.textContent = 'Edit Professional Activity';
+  elements.saveButton.textContent = 'Recalculate & Update';
+  showView('activity');
+}
+
+async function removeActivity(id) {
+  const a = state.activities.find(function(item) { return item.id === id; });
+  if (!a || !confirm('Delete "' + a.title + '"? Drive folders will remain.')) return;
+  setLoading(true, 'Deleting the activity record…');
+  try {
+    applyBootstrap(await runServer('deleteActivity', id));
+    showToast('Activity record deleted.');
+  } catch (error) { showToast(error.message, true); }
+  finally { setLoading(false); }
+}
+
+async function createWorkspaceFolders() {
+  setLoading(true, 'Creating or verifying Drive folders…');
+  try {
+    applyBootstrap(await runServer('createWorkspaceFolders'));
+    showToast('PGS folder structure is ready.');
+  } catch (error) { showToast(error.message, true); }
+  finally { setLoading(false); }
+}
+
+async function createActivityFolder(id) {
+  setLoading(true, 'Creating the activity evidence folder…');
+  try {
+    applyBootstrap(await runServer('createEvidenceFolderForActivity', id));
+    showToast('Activity evidence folder created.');
+  } catch (error) { showToast(error.message, true); }
+  finally { setLoading(false); }
+}
+
+function showSavedResult(a) {
+  elements.resultCategory.textContent = a.categoryName;
+  elements.resultCUs.textContent = estimateText(a.estimatedCUs);
+  elements.resultRule.textContent = a.ruleVersion || 'Not recorded';
+  elements.resultStatus.textContent = a.status;
+  elements.result.classList.add('show');
+}
+
+function resetFormState() {
+  elements.activityForm.reset();
+  elements.activityId.value = '';
+  elements.quantity.value = '0';
+  elements.formHeading.textContent = 'Add a Professional Activity';
+  elements.saveButton.textContent = 'Calculate & Save Once';
+  elements.categoryGuidance.hidden = true;
+  elements.paymentStatus.disabled = false;
+  elements.titleIException.disabled = false;
+}
+
+function showView(viewId) {
+  if (!pageMeta[viewId]) return;
+  document.querySelectorAll('.view').forEach(function(view) { view.classList.remove('active'); });
+  document.getElementById(viewId).classList.add('active');
+  document.querySelectorAll('nav button').forEach(function(button) {
+    button.classList.toggle('active', button.dataset.view === viewId);
+  });
+  elements.mobileNav.value = viewId;
+  elements.heading.textContent = pageMeta[viewId][0];
+  elements.sub.textContent = pageMeta[viewId][1];
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+window.showView = showView;
+
+function getRule(key) { return state.rules.find(function(rule) { return rule.categoryKey === key; }); }
+function groupBy(items, key) {
+  return items.reduce(function(groups, item) {
+    const value = item[key] || 'Other';
+    (groups[value] = groups[value] || []).push(item);
+    return groups;
+  }, {});
+}
+function unique(items) { return Array.from(new Set(items)); }
+function quantityLabelFor(unit) { return unitLabels[unit] || 'Quantity'; }
+function calculationSummary(rule) {
+  if (rule.calculationType === 'hours') {
+    return 'Normally 1 CU per ' + rule.unpaidHoursPerCU + ' unpaid hours or ' +
+      rule.paidHoursPerCU + ' paid hours';
+  }
+  if (rule.calculationType === 'count') return rule.perUnitCUs + ' CUs per ' + quantityLabelFor((rule.units || [])[0]).toLowerCase().replace(/s$/, '');
+  if (rule.calculationType === 'fixed') return rule.fixedCUs + ' fixed CUs';
+  if (rule.calculationType === 'unit_rate') {
+    return Object.keys(rule.unitRates || {}).map(function(unit) {
+      return rule.unitRates[unit] + ' CUs per ' + quantityLabelFor(unit).toLowerCase().replace(/s$/, '');
+    }).join(' or ');
+  }
+  return 'Requires activity-specific verification';
+}
+function submissionLabel(mode) {
+  if (mode === 'automatic') return 'Automatically recorded in ELMS; normally do not self-report';
+  if (mode === 'department') return 'Submitted or entered through the responsible department';
+  return 'Self-reported in ELMS with the required Drive documentation';
+}
+function estimateText(value) { return value === '' || value === null ? 'Review required' : numberText(value); }
+function setLoading(show, message) {
+  elements.loading.classList.toggle('hidden', !show);
+  if (message) elements.loadingText.textContent = message;
+}
+function showToast(message, isError) {
+  elements.toast.textContent = message;
+  elements.toast.style.borderLeft = '5px solid ' + (isError ? '#c94747' : '#4d9b45');
+  elements.toast.classList.add('show');
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(function() { elements.toast.classList.remove('show'); }, 4500);
+}
+function setLink(element, url, label) {
+  const safe = safeHttpUrl(url); element.hidden = !safe;
+  if (safe) { element.href = safe; element.textContent = label; }
+}
+function safeHttpUrl(value) {
+  if (!value) return '';
+  try {
+    const parsed = new URL(value);
+    return ['http:', 'https:'].indexOf(parsed.protocol) >= 0 ? parsed.href : '';
+  } catch (error) { return ''; }
+}
+function escapeHtml(value) {
+  return String(value === null || value === undefined ? '' : value)
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+function truncate(value, length) {
+  const text = String(value || '');
+  return text.length > length ? text.slice(0, length - 1) + '…' : text;
+}
+function numberText(value) {
+  const number = Number(value); return Number.isFinite(number) ? number.toFixed(2) : '0.00';
+}

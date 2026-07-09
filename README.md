@@ -1,69 +1,50 @@
 # PGS CU Assistant
 
-An unofficial, educator-created prototype designed to help teachers identify,
-document, estimate, organize, and prepare Professional Growth System (PGS)
-contact unit information.
+## Milestone 2.1 - Complete Category Matcher
 
-## Current milestone
+This revision should be used instead of Milestone 2.
 
-This version is a static GitHub Pages website.
+It adds:
 
-It currently:
+- A guided **Find My Category** workflow
+- A searchable directory containing **43 current activity options**
+- Category-specific calculations, maximums, documentation, and limitations
+- Plain-language matching by activity type, role, context, and description
+- Best-match and alternative recommendations
+- Special announcement alerts for LinkedIn Learning, Mental Health Academy,
+  and identified self-designed transcript exclusions
+- A historical archive of categories removed from the current guide
+- Dynamic inputs for hours, credits, IEPs, students, weeks, awards, grants,
+  micro-credentials, certifications, and endorsements
+- The same single Activity Log backend from Milestone 2
 
-- Displays the assistant dashboard
-- Saves activity records in the current browser
-- Estimates CUs using temporary prototype rules
-- Tracks category balances
-- Separates estimated progress from officially approved progress
-- Allows records to be edited or deleted
-- Provides evidence, folder, ELMS-preparation, and video guidance sections
+## Important distinction
 
-## Important limitation
+A **parent category** is not always the actual ELMS activity choice. The library
+stores both:
 
-Browser storage is temporary. It does not synchronize between devices or users.
+- Parent category, such as `School & Community Activities`
+- Exact activity option, such as `Schoolwide Planning`
 
-The next major milestone is to replace browser-only storage with a teacher-owned
-Google Sheet accessed through a Google Apps Script web application. Teachers
-should continue entering each activity only once through the assistant.
+The teacher confirms the exact activity option before saving.
 
-## Project structure
+## Accuracy boundary
 
-```text
-PGS-CU-Assistant/
-├── index.html
-├── .nojekyll
-├── README.md
-├── PROJECT_PLAN.md
-└── assets/
-    ├── css/
-    │   └── styles.css
-    ├── data/
-    │   └── pgs-rules.js
-    └── js/
-        └── app.js
-```
+The 9/1/23 Reference Guide remains the current base guide listed on the official
+CCSD PGS page. Current PGS announcements can modify eligibility or workflow
+without creating a new base category. The app therefore keeps announcements as
+separate rule overlays.
 
-## Publish with GitHub Pages
+The matcher is decision support. It does not guarantee CCSD approval.
 
-1. Upload the files and folders to the repository.
-2. Open **Settings**.
-3. Select **Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**.
-5. Select the `main` branch and `/(root)`.
-6. Save.
 
-## Data and privacy
+## Applicability date
 
-Do not commit teacher records, student information, passwords, API keys,
-private Google Drive links, or other sensitive information to this public
-repository.
+The assistant, category matcher, CU calculator, evidence guidance, Drive-folder
+tools, and ELMS-preparation features apply only to activities occurring on or
+after **May 1, 2024**.
 
-## Official-status disclaimer
-
-This project does not replace official CCSD guidance, ELMS, or district approval.
-All category rules and calculations must be verified before production use.
-
-## License
-
-A code and content license still needs to be selected before the project is
-formally released as open source.
+The interface displays this notice persistently, the date fields use
+`2024-05-01` as their minimum date, and both client-side and server-side
+validation reject activities before the cutoff. Historical activities must be
+reviewed under the rules that applied at the time they occurred.
