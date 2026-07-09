@@ -1010,8 +1010,12 @@ function validHttpUrlOrBlank_(value) {
   return text;
 }
 function sanitizeFolderName_(value) {
-  return cleanString_(value).replace(/[\\/:*?"<>|#%{}~&]/g, '-')
-    .replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 120) || 'PGS-Activity';
+  return cleanString_(value)
+    .replace(/[\\/:*?"<>|#%{}~&]/g, ' - ')
+    .replace(/\s+/g, ' ')
+    .replace(/(?:\s*-\s*)+/g, ' - ')
+    .trim()
+    .slice(0, 120) || 'PGS Activity';
 }
 function inputToDate_(value) {
   const text = cleanString_(value);

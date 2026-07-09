@@ -34,3 +34,15 @@ The application creates category folders, but it does not automatically upload
 certificates, IEP signature pages, award notices, agendas, or other evidence.
 Teachers upload those files themselves. ELMS requires the link to the final
 combined evidence file, not the folder link.
+
+
+## Milestone 3.0.1 hotfix
+
+Category folder names now preserve readable spaces. For example:
+
+- `Grant Awards`
+- `PLC Time`
+- `IEPs and MDTs Written`
+
+The previous sanitizer converted spaces into hyphens, which caused the folder-name
+test to fail even though the calculation and evidence tests passed.
