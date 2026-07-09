@@ -25,7 +25,7 @@ const unitLabels = {
 
 const state = {
   activities: [], rules: [], workspace: {}, summary: {},
-  warnings: [], specialRules: [], expiredActivityNames: []
+  warnings: [], specialRules: [], expiredActivityNames: [], ruleAudit: {}
 };
 
 const elements = {};
@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
     'evidenceLink','notes','createFolder','saveButton','formHeading','result',
     'resultCategory','resultCUs','resultRule','resultStatus','directoryCount',
     'directorySearch','directoryGroups','expiredList','openWorkbookButton',
-    'createFoldersButton','recordsBody','categoryBody'
+    'createFoldersButton','recordsBody','categoryBody','evidenceActivitySelect',
+    'evidenceGuideOutput','elmsReadinessOutput','ruleAuditLabel'
   ].forEach(function(id) { elements[id] = document.getElementById(id); });
 
   bindEvents();
@@ -59,6 +60,7 @@ function bindEvents() {
     configureCategory(elements.categoryKey.value);
   });
   elements.directorySearch.addEventListener('input', renderDirectory);
+  elements.evidenceActivitySelect.addEventListener('change', renderEvidenceGuide);
   elements.activityForm.addEventListener('submit', saveActivity);
   elements.activityForm.addEventListener('reset', function() { setTimeout(resetFormState, 0); });
   elements.openWorkbookButton.addEventListener('click', function() {
@@ -112,6 +114,7 @@ function applyBootstrap(data) {
   state.warnings = data.warnings || [];
   state.specialRules = data.specialRules || [];
   state.expiredActivityNames = data.expiredActivityNames || [];
+  state.ruleAudit = data.ruleAudit || {};
 
   populateCategories();
   renderWorkspace();
@@ -119,6 +122,10 @@ function applyBootstrap(data) {
   renderDirectory();
   renderExpired();
   renderRecords();
+  populateEvidenceActivities();
+  renderEvidenceGuide();
+  renderElmsReadiness();
+  renderRuleAudit();
 }
 
 function populateCategories() {
@@ -370,9 +377,104 @@ function renderRecords() {
   elements.categoryBody.innerHTML = (state.summary.categoryBalances || []).map(function(item) {
     return '<tr><td><strong>' + escapeHtml(item.category) + '</strong><br><small>' +
       escapeHtml(item.parentCategory) + '</small></td><td>' + numberText(item.recorded) +
+      '</td><td>' + numberText(item.countable) +
       '</td><td>' + (item.maximum === null ? 'No stated max' : numberText(item.maximum)) +
+      '</td><td>' + numberText(item.overMaximum) +
       '</td><td>' + (item.remaining === null ? '—' : numberText(item.remaining)) + '</td></tr>';
   }).join('');
+}
+
+
+function renderRuleAudit() {
+  const audit = state.ruleAudit || {};
+  elements.ruleAuditLabel.textContent = audit.lastVerified
+    ? 'Source library last verified ' + audit.lastVerified + ' • ' + (audit.currentOptions || state.rules.length) + ' current options'
+    : '';
+}
+
+function populateEvidenceActivities() {
+  const selected = elements.evidenceActivitySelect.value;
+  elements.evidenceActivitySelect.innerHTML = '<option value="">Choose an activity</option>' +
+    state.activities.map(function(activity) {
+      return '<option value="' + escapeHtml(activity.id) + '">' +
+        escapeHtml(activity.title + ' — ' + activity.categoryName) + '</option>';
+    }).join('');
+  if (state.activities.some(function(activity) { return activity.id === selected; })) {
+    elements.evidenceActivitySelect.value = selected;
+  }
+}
+
+function renderEvidenceGuide() {
+  const id = elements.evidenceActivitySelect.value;
+  if (!id) {
+    elements.evidenceGuideOutput.innerHTML = state.activities.length
+      ? '<div class="notice info">Choose a saved activity to generate its evidence guide.</div>'
+      : '<div class="notice warn">Add an activity first. The evidence guide will use that same Activity Log record.</div>';
+    return;
+  }
+
+  const activity = state.activities.find(function(item) { return item.id === id; });
+  const rule = activity ? getRule(activity.categoryKey) : null;
+  if (!activity || !rule) {
+    elements.evidenceGuideOutput.innerHTML = '<div class="notice danger">The saved category rule could not be found.</div>';
+    return;
+  }
+
+  const checklist = (rule.evidenceChecklist || []).map(function(item) {
+    return '<div class="check-item"><span>□</span><span>' + escapeHtml(item) + '</span></div>';
+  }).join('');
+
+  elements.evidenceGuideOutput.innerHTML = '<div class="evidence-card">' +
+    '<div class="parent-label">' + escapeHtml(rule.parentCategory) + '</div>' +
+    '<h3>' + escapeHtml(activity.title) + '</h3>' +
+    '<p><strong>Confirmed category:</strong> ' + escapeHtml(rule.activityName) + '</p>' +
+    '<div class="grid g2">' +
+      '<div class="detail-box"><strong>Approval form</strong>' + escapeHtml(rule.approvalForm) + '</div>' +
+      '<div class="detail-box"><strong>Approval timing</strong>' + escapeHtml(rule.approvalTiming) + '</div>' +
+      '<div class="detail-box"><strong>Required documentation</strong>' + escapeHtml(rule.documentation) + '</div>' +
+      '<div class="detail-box"><strong>Final submission packet</strong>' + escapeHtml(rule.packetInstructions) + '</div>' +
+    '</div>' +
+    '<h4>Preparation checklist</h4><div class="checklist">' + checklist + '</div>' +
+    '<div class="notice warn"><strong>Original-document safeguard:</strong> Do not change information provided by an issuing organization. Combining required documents into one file must not alter their content.</div>' +
+    '</div>';
+}
+
+function renderElmsReadiness() {
+  if (!state.activities.length) {
+    elements.elmsReadinessOutput.innerHTML = '<div class="notice info">No saved activities to review yet.</div>';
+    return;
+  }
+
+  elements.elmsReadinessOutput.innerHTML = '<div class="readiness-grid">' +
+    state.activities.map(function(activity) {
+      const rule = getRule(activity.categoryKey);
+      const issues = [];
+      let cardClass = '';
+      let label = 'Needs preparation';
+
+      if (!rule) {
+        issues.push('Category rule is missing.');
+      } else if (rule.submissionMode === 'automatic') {
+        cardClass = 'auto';
+        label = 'Automatic ELMS activity';
+        issues.push('Do not create a duplicate self-reported activity. Verify the completed course appears in Advancement Status.');
+      } else {
+        if (!activity.evidenceLink) issues.push('Add the final single-file Google Drive link.');
+        if (activity.estimatedCUs === '') issues.push('CU estimate requires category-specific review.');
+        if (!activity.startDate) issues.push('Add the activity date.');
+        if (activity.status === 'Ready for ELMS' && !issues.length) {
+          cardClass = 'ready';
+          label = 'Marked ready for ELMS';
+        }
+        if (!issues.length) issues.push('Review the category-specific evidence guide, link sharing, and current deadlines before submission.');
+      }
+
+      return '<div class="readiness-card ' + cardClass + '"><div class="parent-label">' +
+        escapeHtml(label) + '</div><h4>' + escapeHtml(activity.title) + '</h4><p>' +
+        escapeHtml(activity.categoryName) + '</p><ul>' + issues.map(function(issue) {
+          return '<li>' + escapeHtml(issue) + '</li>';
+        }).join('') + '</ul></div>';
+    }).join('') + '</div>';
 }
 
 async function saveActivity(event) {

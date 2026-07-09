@@ -35,11 +35,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "transcript"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "COLLEGE_APPROVED_NONED",
@@ -77,11 +89,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "transcript"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "COLLEGE_NONAPPROVED_ED",
@@ -119,11 +143,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "transcript"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "COLLEGE_NONAPPROVED_NONED",
@@ -161,11 +197,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "transcript"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office. Lower-level coursework also requires prior supervisor approval.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "COLLEGE_MULTI_200PLUS",
@@ -200,11 +248,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "college"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": "Matcher should ask approved/non-approved university before calculating."
+    "notes": "Matcher should ask approved/non-approved university before calculating.",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office. A 200-level course requires prior supervisor approval.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "COLLEGE_MULTI_100",
@@ -239,11 +299,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "100 level"
     ],
     "sourcePage": "2",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": "Matcher should ask approved/non-approved university before calculating."
+    "notes": "Matcher should ask approved/non-approved university before calculating.",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Lower-Level College Coursework (when applicable)",
+    "approvalTiming": "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+    "packetInstructions": "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Official university transcript sent directly to the PGS office and prior supervisor approval using the Lower-Level College Coursework form.",
+      "Prior approval is required for 200-level coursework and for 100-level multicultural coursework.",
+      "The official transcript must be delivered directly to the PGS Department. Upload and link only any required approval documentation through ELMS."
+    ]
   },
   {
     "categoryKey": "DISTRICT_PD",
@@ -276,11 +348,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "professional development"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Do not create a self-reported ELMS submission when the activity is automatically recorded. Verify that it appears in Advancement Status.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "No self-reported submission. The District course is recorded in the District PD report in ELMS.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Do not create a self-reported ELMS submission when the activity is automatically recorded. Verify that it appears in Advancement Status."
+    ]
   },
   {
     "categoryKey": "VEGAS_PBS_PD",
@@ -312,11 +396,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "my classroom"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Vegas PBS certificate of completion and the Time Report from the Vegas PBS My Classroom tab.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "RPDP_PD",
@@ -347,11 +443,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "regional professional development"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Certificate, transcript, or responsible-organization record showing completion and hours/duration.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "CCEA_COLLAB_PD",
@@ -383,11 +491,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "collaboratory"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Certificate, transcript, or responsible-organization record showing completion and hours/duration.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "TEACH_DISTRICT_PD",
@@ -421,11 +541,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "rpdp instructor"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form documenting time, plus agendas showing session start/end times.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "WRITE_DISTRICT_PD",
@@ -458,11 +590,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "district course"
     ],
     "sourcePage": "3",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form documenting creation time, plus agendas from each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SCHOOL_PD",
@@ -495,11 +639,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "school training"
     ],
     "sourcePage": "4",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form with administrative approval and a description of activities.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "TEACH_SCHOOL_PD",
@@ -532,11 +688,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "facilitate"
     ],
     "sourcePage": "4",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form documenting time, plus agendas showing session start/end times.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "WRITE_SCHOOL_PD",
@@ -568,11 +736,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "create school training"
     ],
     "sourcePage": "4",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form documenting creation time, plus agendas from each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "PLC",
@@ -607,11 +787,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "data meeting"
     ],
     "sourcePage": "4",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form with administrative approval and agendas from each PLC session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "WRITE_IEP_MDT",
@@ -643,11 +835,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "caseload"
     ],
     "sourcePage": "5",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Signature page from each IEP with all parent/student information and signatures redacted.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "IEP_MDT_TEAM",
@@ -679,11 +883,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "iep meeting"
     ],
     "sourcePage": "5",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Signature page from each IEP with all parent/student information and signatures redacted.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "EXTRACURRICULAR",
@@ -718,11 +934,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "sport"
     ],
     "sourcePage": "5",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form signed by the athletic/activity administrator.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "PARENT_COMMUNITY_LEADERSHIP",
@@ -756,11 +984,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "family workshop"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form with administrative approval and agendas from the sessions.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SOT",
@@ -792,11 +1032,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "school council"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form with administrative approval and agendas from each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SCHOOLWIDE_PLANNING",
@@ -829,11 +1081,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "schoolwide program"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form with administrative approval and agendas from each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "ACADEMIC_TRIP",
@@ -865,11 +1129,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "student travel"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form, signed CCF-145 or CCF-798, and academic-trip itinerary.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "FOS_ASSIGNMENT",
@@ -901,11 +1177,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "teacher candidate"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - University Student Assignment",
+    "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
+      "Complete and obtain supervisor approval before the university student assignment begins.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "PRACTICUM_ASSIGNMENT",
@@ -936,11 +1224,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "practicum"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - University Student Assignment",
+    "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
+      "Complete and obtain supervisor approval before the university student assignment begins.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "STUDENT_TEACHER_ASSIGNMENT",
@@ -971,11 +1271,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "cooperating teacher"
     ],
     "sourcePage": "6",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - University Student Assignment",
+    "approvalTiming": "Complete and obtain supervisor approval before the university student assignment begins.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "University Student Assignment approval form completed before assignment, plus university/program completion documentation.",
+      "Complete and obtain supervisor approval before the university student assignment begins.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "CORE_TUTORING",
@@ -1008,11 +1320,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "after school"
     ],
     "sourcePage": "7",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form and a copy of the educator's license showing the core-content endorsement.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SUMMER_SCHOOL",
@@ -1043,11 +1367,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "summer instruction"
     ],
     "sourcePage": "7",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form signed by the District-approved credit-retrieval summer school administrator.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "COMMUNITY_AWARD",
@@ -1079,11 +1415,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "recognition"
     ],
     "sourcePage": "7",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Award notification or certificate.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "STATE_AWARD",
@@ -1114,11 +1462,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "professional award"
     ],
     "sourcePage": "7",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Award notification or certificate.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "NATIONAL_AWARD",
@@ -1149,11 +1509,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "national recognition"
     ],
     "sourcePage": "7",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Award notification or certificate.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "MENTOR",
@@ -1185,11 +1557,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "vacancy substitute"
     ],
     "sourcePage": "8",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form identifying the mentor and mentee, with specific activities for each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "MENTEE",
@@ -1221,11 +1605,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "coaching support"
     ],
     "sourcePage": "8",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities",
+    "approvalTiming": "Complete after the activity and obtain the required supervising administrator signature.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities approval form identifying the mentor and mentee, with specific activities for each session.",
+      "Complete after the activity and obtain the required supervising administrator signature.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "GRANT_RECIPIENT",
@@ -1256,11 +1652,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "funding awarded"
     ],
     "sourcePage": "8",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Notification or evidence that the grant was awarded.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SYNC_CONFERENCE",
@@ -1294,11 +1702,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "virtual conference"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Certificate, transcript, or other attendance evidence showing sessions/time and proof of registration.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "ASYNC_CONFERENCE_WEBINAR",
@@ -1333,11 +1753,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "self paced conference"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities when required by the documentation rule",
+    "approvalTiming": "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Certificate/transcript showing hours. If duration is missing, also provide the activity description with estimated time and a Time-Based Activities form; administrator approval is not required.",
+      "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "CONFERENCE_PRESENTATION",
@@ -1369,11 +1801,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "conference session"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "Contact Unit Approval Form - Time-Based Activities when required by the documentation rule",
+    "approvalTiming": "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Time-Based Activities form documenting creation/presentation time; administrator approval is not required. Also provide the conference agenda naming the presenter/session.",
+      "Complete after the activity. Administrator approval is not required for the circumstances stated in the guide.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "MICRO_CREDENTIAL",
@@ -1405,11 +1849,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "digital promise"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Evidence of the digital badge or credential from Digital Promise.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "NBPTS_PROCESS",
@@ -1440,11 +1896,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "national board components"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Evidence that all four NBPTS components were submitted.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "NBPTS_CERTIFICATION",
@@ -1475,11 +1943,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "nbct"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Evidence of NBPTS certification.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "NBPTS_MOC",
@@ -1510,11 +1990,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "nbpts renewal"
     ],
     "sourcePage": "9",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Evidence of successful NBPTS Maintenance of Certification.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SECOND_ENDORSEMENT",
@@ -1547,11 +2039,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "elad"
     ],
     "sourcePage": "10",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Current NVDOE license and the most recent evaluation page showing effective or highly effective status.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   },
   {
     "categoryKey": "SPECIALTY_CEU",
@@ -1590,11 +2094,23 @@ const PGS_ACTIVITY_LIBRARY = [
       "asca"
     ],
     "sourcePage": "10",
-    "sourceUrl": "https://ccsd.net/employees/current/employment/growth.php",
+    "sourceUrl": "https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs",
     "effectiveForActivitiesFrom": "2024-05-01",
     "ruleVersion": "9/1/23 PGS Reference Guide + current announcements",
     "active": true,
-    "notes": ""
+    "notes": "",
+    "sourceDocument": "9/1/23 PGS Reference Guide and Documentation Required for CU Submission in ELMS",
+    "lastVerified": "2026-07-09",
+    "approvalForm": "No separate approval form listed for this activity unless current guidance or a reviewing department requests one.",
+    "approvalTiming": "Follow the category-specific documentation and current PGS announcements.",
+    "packetInstructions": "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view.",
+    "evidenceChecklist": [
+      "Confirm the activity occurred on or after May 1, 2024.",
+      "Confirm the activity relates to the employee assignment, license, or professional growth requirements.",
+      "Certificate or transcript from the responsible organization showing hours or CEUs.",
+      "Follow the category-specific documentation and current PGS announcements.",
+      "Keep original, unaltered source documents. Combine all required documentation into one final submission file, upload that single file to CCSD Google Drive, and share the file so anyone in CCSD with the link can view."
+    ]
   }
 ];
 

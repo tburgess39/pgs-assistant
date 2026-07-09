@@ -46,3 +46,12 @@ Complete current category library and guided activity matcher.
 - Client-side rejection of earlier dates
 - Server-side rejection of earlier dates
 - Clear direction that older activities require historical-rule review
+
+
+### Milestone 2.3
+- Verified 43-option current rule library
+- Source/version metadata and automated tests
+- Category maximum-aware dashboard estimates
+- Category-specific evidence guide
+- Single-file ELMS packet guidance
+- Activity readiness review

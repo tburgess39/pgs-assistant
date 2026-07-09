@@ -48,3 +48,15 @@ The interface displays this notice persistently, the date fields use
 `2024-05-01` as their minimum date, and both client-side and server-side
 validation reject activities before the cutoff. Historical activities must be
 reviewed under the rules that applied at the time they occurred.
+
+
+## Milestone 2.3 - Verified rules and evidence workflow
+
+- Added source and last-verified metadata to every current category.
+- Added approval-form and approval-timing guidance.
+- Added a generated category-specific Evidence Guide.
+- Added an ELMS readiness review generated from the same Activity Log.
+- Corrected dashboard estimates so category maximums limit countable progress.
+- Stopped automatic estimates for categories that require additional interpretation.
+- Redesigned activity folders around original documents and one final ELMS submission file.
+- Added `Tests.gs` and `RULE_AUDIT.md`.

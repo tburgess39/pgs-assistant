@@ -24,7 +24,7 @@ it.
 1. Open Google Drive with the account that will own the source project.
 2. Create a new **Google Apps Script** project.
 3. Name it `PGS CU Assistant`.
-4. Replace the default `Code.gs` content with `apps-script/Code.gs`, then add a second script file named `CategoryData.gs` and paste `apps-script/CategoryData.gs` into it.
+4. Replace the default `Code.gs` content with `apps-script/Code.gs`, then add script files named `CategoryData.gs` and `Tests.gs` and paste the matching files into them.
 5. Create three HTML files named:
    - `Index`
    - `Styles`
@@ -95,3 +95,10 @@ Before distributing the app, verify all three behaviors:
 
 The server-side validation is required because browser controls alone can be
 bypassed.
+
+
+## Run the rule tests
+
+After all files are saved, select `runAllPGSTests` in the Apps Script editor and run it.
+Authorize the script when prompted. A successful run returns all tests as passed. Review the
+execution log before creating the web-app deployment.

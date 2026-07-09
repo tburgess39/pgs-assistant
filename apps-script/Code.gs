@@ -27,7 +27,9 @@ const RULE_HEADERS = Object.freeze([
   'Title I Exception Allowed', 'Contract Time Allowed', 'Submission Mode',
   'Active', 'Effective For Activities From', 'Rule Version', 'Source Page',
   'Source URL', 'Required Documentation', 'Limitations', 'Match Tags JSON',
-  'Keywords JSON', 'Notes'
+  'Keywords JSON', 'Notes', 'Approval Form', 'Approval Timing',
+  'Packet Instructions', 'Evidence Checklist JSON', 'Source Document',
+  'Last Verified'
 ]);
 
 const STATUS_OPTIONS = Object.freeze([
@@ -69,6 +71,7 @@ function getBootstrapData() {
     specialRules: PGS_SPECIAL_RULES,
     expiredActivityNames: PGS_EXPIRED_ACTIVITY_NAMES,
     libraryCount: rules.filter(function(rule) { return rule.active; }).length,
+    ruleAudit: {sourceDocument: '9/1/23 PGS Reference Guide', lastVerified: '2026-07-09', currentOptions: 43},
     warnings: [
       'This assistant and its associated tools apply only to activities occurring on or after May 1, 2024.',
       'Category suggestions are guidance, not final CCSD eligibility decisions.',
@@ -300,7 +303,9 @@ function activityRuleToRow_(rule) {
     rule.ruleVersion, rule.sourcePage, rule.sourceUrl,
     rule.documentation, rule.limitations,
     JSON.stringify(rule.matchTags || []), JSON.stringify(rule.keywords || []),
-    rule.notes || ''
+    rule.notes || '', rule.approvalForm || '', rule.approvalTiming || '',
+    rule.packetInstructions || '', JSON.stringify(rule.evidenceChecklist || []),
+    rule.sourceDocument || '', rule.lastVerified || ''
   ];
 }
 
@@ -387,7 +392,13 @@ function getRules_(spreadsheet) {
         limitations: displayValue_(row[20]),
         matchTags: parseJson_(row[21], []),
         keywords: parseJson_(row[22], []),
-        notes: displayValue_(row[23])
+        notes: displayValue_(row[23]),
+        approvalForm: displayValue_(row[24]),
+        approvalTiming: displayValue_(row[25]),
+        packetInstructions: displayValue_(row[26]),
+        evidenceChecklist: parseJson_(row[27], []),
+        sourceDocument: displayValue_(row[28]),
+        lastVerified: dateToInput_(row[29]) || displayValue_(row[29])
       };
     });
 }
@@ -501,20 +512,13 @@ function calculateEstimatedCUs_(activity, rule) {
     const rate = Number(rule.unitRates[activity.unit]);
     result = Number.isFinite(rate) ? activity.quantity * rate : '';
   } else if (rule.calculationType === 'manual') {
-    if (activity.unit === 'documented_hours') {
-      result = activity.quantity / 3;
-    } else {
-      result = '';
-    }
+    result = '';
   }
 
   return result === '' ? '' : roundToTwo_(result);
 }
 
 function buildSummary_(activities, rules) {
-  const estimatedTotal = activities.reduce(function(total, item) {
-    return total + numberOrZero_(item.estimatedCUs);
-  }, 0);
   const approvedTotal = activities.reduce(function(total, item) {
     return total + numberOrZero_(item.officialApprovedCUs);
   }, 0);
@@ -524,18 +528,31 @@ function buildSummary_(activities, rules) {
       const recorded = activities
         .filter(function(item) { return item.categoryKey === rule.categoryKey; })
         .reduce(function(total, item) { return total + numberOrZero_(item.estimatedCUs); }, 0);
+      const countable = rule.maximumCUs === null
+        ? recorded
+        : Math.min(recorded, rule.maximumCUs);
       return {
         categoryKey: rule.categoryKey,
         parentCategory: rule.parentCategory,
         category: rule.activityName,
         recorded: roundToTwo_(recorded),
+        countable: roundToTwo_(countable),
+        overMaximum: rule.maximumCUs === null ? 0 : roundToTwo_(Math.max(0, recorded - rule.maximumCUs)),
         maximum: rule.maximumCUs,
         remaining: rule.maximumCUs === null ? null :
           roundToTwo_(Math.max(0, rule.maximumCUs - recorded))
       };
     });
 
+  const rawEstimatedTotal = categoryBalances.reduce(function(total, item) {
+    return total + numberOrZero_(item.recorded);
+  }, 0);
+  const estimatedTotal = categoryBalances.reduce(function(total, item) {
+    return total + numberOrZero_(item.countable);
+  }, 0);
+
   return {
+    rawEstimatedTotal: roundToTwo_(rawEstimatedTotal),
     estimatedTotal: roundToTwo_(estimatedTotal),
     approvedTotal: roundToTwo_(approvedTotal),
     goalCUs: 225,
@@ -570,8 +587,10 @@ function createActivityFolder_(activityId, title, startDate) {
   const datePart = startDate || Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd');
   const folder = parent.createFolder(sanitizeFolderName_(datePart + '_' + title));
   [
-    '01 Approval Form', '02 Agenda and Attendance', '03 Meeting Minutes',
-    '04 Work Products', '05 Supporting Evidence', '06 ELMS Submission Copy'
+    '01 Original Documentation - Do Not Alter',
+    '02 Approval Form and Signatures',
+    '03 Final Single-File ELMS Submission',
+    '04 ELMS Receipt and PGS Decision'
   ].forEach(function(name) { folder.createFolder(name); });
   folder.setDescription(APP_NAME + ' activity ID: ' + activityId);
   return {id: folder.getId(), url: folder.getUrl()};

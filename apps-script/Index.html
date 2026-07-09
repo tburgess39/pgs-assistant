@@ -87,6 +87,12 @@
         <div class="card stat"><div class="label">Remaining</div><div class="value" id="remaining">225.00</div><small>Based on approved CUs</small></div>
       </div>
       <div id="warningBox" class="notice warn"></div>
+      <div class="section"><h3>Annual Advancement Timeline</h3><p>Always verify dates on the official PGS page.</p></div>
+      <div class="grid g3">
+        <div class="card"><h3>June 1</h3><p>Request for Column Advancement deadline for the next contract year.</p></div>
+        <div class="card"><h3>August 31</h3><p>Complete all requirements and activities being used for the advancement cycle.</p></div>
+        <div class="card"><h3>October 1</h3><p>Submit all required documentation in ELMS for the current advancement cycle.</p></div>
+      </div>
     </section>
 
     <section id="matcher" class="view">
@@ -264,7 +270,7 @@
     <section id="directory" class="view">
       <div class="card">
         <div class="heading-actions">
-          <div><h3>Complete Current Category Directory</h3><p id="directoryCount">Loading…</p></div>
+          <div><h3>Complete Current Category Directory</h3><p id="directoryCount">Loading…</p><p class="verified-label" id="ruleAuditLabel"></p></div>
           <input id="directorySearch" class="search-box" placeholder="Search categories, examples, or keywords">
         </div>
         <div id="directoryGroups"></div>
@@ -284,14 +290,25 @@
     </section>
 
     <section id="evidence" class="view">
-      <div class="notice info">The selected category now supplies its own documentation list and limitations before the teacher saves the activity.</div>
+      <div class="card form">
+        <h3>Category-Specific Evidence Guide</h3>
+        <p>Select a saved activity. The guide is generated from the exact category already stored in the Activity Log.</p>
+        <div class="field">
+          <label for="evidenceActivitySelect">Saved activity</label>
+          <select id="evidenceActivitySelect"><option value="">Choose an activity</option></select>
+        </div>
+      </div>
+      <div id="evidenceGuideOutput" style="margin-top:17px"></div>
     </section>
 
     <section id="elms" class="view">
+      <div class="notice warn"><strong>Single-file requirement:</strong> A folder is not the final ELMS submission. For self-reported activities, combine the required original, unaltered documentation into one file and submit the share link to that file.</div>
       <div class="grid g2">
-        <div class="card"><h3>Before Opening ELMS</h3><p>Confirm the activity category, calculation inputs, documentation, signatures, single-file Drive packet, sharing permissions, and deadlines.</p></div>
+        <div class="card"><h3>Before Opening ELMS</h3><p>Confirm the category, calculation inputs, forms, signatures, final single-file packet, CCSD sharing permissions, and deadlines.</p></div>
         <div class="card"><h3>Current Boundary</h3><p>The assistant organizes and prepares the record. It does not directly submit into ELMS.</p></div>
       </div>
+      <div class="section"><h3>Activity Readiness Review</h3><p>Generated from the same Activity Log records.</p></div>
+      <div id="elmsReadinessOutput"></div>
     </section>
 
     <section id="records" class="view">
@@ -306,7 +323,7 @@
       </div>
       <div class="card" style="margin-top:17px">
         <h3>Category Balances</h3>
-        <div style="overflow:auto"><table><thead><tr><th>Category</th><th>Recorded</th><th>Maximum</th><th>Remaining</th></tr></thead><tbody id="categoryBody"></tbody></table></div>
+        <div style="overflow:auto"><table><thead><tr><th>Category</th><th>Recorded</th><th>Countable</th><th>Maximum</th><th>Over Maximum</th><th>Remaining</th></tr></thead><tbody id="categoryBody"></tbody></table></div>
       </div>
     </section>
 
