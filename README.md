@@ -1,62 +1,56 @@
-# PGS CU Assistant
+# FamilyPD PGS Assistant
 
-## Milestone 2.1 - Complete Category Matcher
+Public site: `https://pgs.familypd.org`
 
-This revision should be used instead of Milestone 2.
+An unofficial, educator-created, open-source guidance project intended to make
+CCSD Professional Growth System organization easier for licensed educators.
 
-It adds:
+## Current build
 
-- A guided **Find My Category** workflow
-- A searchable directory containing **43 current activity options**
-- Category-specific calculations, maximums, documentation, and limitations
-- Plain-language matching by activity type, role, context, and description
-- Best-match and alternative recommendations
-- Special announcement alerts for LinkedIn Learning, Mental Health Academy,
-  and identified self-designed transcript exclusions
-- A historical archive of categories removed from the current guide
-- Dynamic inputs for hours, credits, IEPs, students, weeks, awards, grants,
-  micro-credentials, certifications, and endorsements
-- The same single Activity Log backend from Milestone 2
+### Public GitHub Pages homepage
 
-## Important distinction
+The root `index.html` is now the actual public project entrance. It includes:
 
-A **parent category** is not always the actual ELMS activity choice. The library
-stores both:
+- May 1, 2024 applicability notice
+- Current annual deadline overview
+- One-entry workflow explanation
+- Major PGS activity families
+- Official source links
+- FamilyPD video roadmap
+- Private-assistant connection status
 
-- Parent category, such as `School & Community Activities`
-- Exact activity option, such as `Schoolwide Planning`
+### Private Google Workspace assistant
 
-The teacher confirms the exact activity option before saving.
+The `apps-script/` folder contains the teacher-facing private application with:
 
-## Accuracy boundary
+- Guided category matching
+- Complete current activity library
+- Teacher-owned Google Sheet
+- Google Drive evidence workspace
+- Category-specific evidence guidance
+- CU estimates and category maximums
+- ELMS-readiness review
+- Automated rule tests
 
-The 9/1/23 Reference Guide remains the current base guide listed on the official
-CCSD PGS page. Current PGS announcements can modify eligibility or workflow
-without creating a new base category. The app therefore keeps announcements as
-separate rule overlays.
+## Connect the two sites
 
-The matcher is decision support. It does not guarantee CCSD approval.
+See `CONNECT_ASSISTANT.md`.
 
+The public site reads the Apps Script URL from:
 
-## Applicability date
+```text
+assets/js/site-config.js
+```
 
-The assistant, category matcher, CU calculator, evidence guidance, Drive-folder
-tools, and ELMS-preparation features apply only to activities occurring on or
-after **May 1, 2024**.
+Until that URL is added, the public buttons show that private setup is still in
+progress.
 
-The interface displays this notice persistently, the date fields use
-`2024-05-01` as their minimum date, and both client-side and server-side
-validation reject activities before the cutoff. Historical activities must be
-reviewed under the rules that applied at the time they occurred.
+## Applicability
 
+The assistant and associated tools apply only to activities occurring on or
+after May 1, 2024. Older activities require historical-rule review.
 
-## Milestone 2.3 - Verified rules and evidence workflow
+## Important disclaimer
 
-- Added source and last-verified metadata to every current category.
-- Added approval-form and approval-timing guidance.
-- Added a generated category-specific Evidence Guide.
-- Added an ELMS readiness review generated from the same Activity Log.
-- Corrected dashboard estimates so category maximums limit countable progress.
-- Stopped automatic estimates for categories that require additional interpretation.
-- Redesigned activity folders around original documents and one final ELMS submission file.
-- Added `Tests.gs` and `RULE_AUDIT.md`.
+This project does not replace official CCSD or CCEA guidance, ELMS, the PGS
+Reference Guide, Human Resources direction, or final PGS approval.
