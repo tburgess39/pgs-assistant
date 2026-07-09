@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="An unofficial educator-created assistant for organizing CCSD Professional Growth System CU documentation.">
+  <title>PGS CU Assistant</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="shell">
+<aside>
+  <div class="brand"><div class="logo">CU</div><div><h1>PGS CU Assistant</h1><small>Identify • Document • Calculate • Submit</small></div></div>
+  <nav>
+    <button class="active" data-view="dashboard">🏠 Dashboard</button>
+    <button data-view="activity">➕ Add Activity</button>
+    <button data-view="folders">📁 Folder Setup</button>
+    <button data-view="evidence">📎 Evidence Guide</button>
+    <button data-view="elms">🧭 Prepare for ELMS</button>
+    <button data-view="videos">▶️ Video Tutorials</button>
+    <button data-view="records">📊 Activity Records</button>
+  </nav>
+  <div class="note"><strong>Unofficial prototype.</strong><br>Uses public PGS information only. CCSD makes final approval decisions.</div>
+</aside>
+
+<main>
+  <select class="mobile" id="mobileNav">
+    <option value="dashboard">Dashboard</option><option value="activity">Add Activity</option><option value="folders">Folder Setup</option><option value="evidence">Evidence Guide</option><option value="elms">Prepare for ELMS</option><option value="videos">Video Tutorials</option><option value="records">Activity Records</option>
+  </select>
+  <div class="top">
+    <div><h2 id="heading">Dashboard</h2><p id="sub">Your guided path from professional activity to organized CU documentation.</p></div>
+    <a class="link" target="_blank" rel="noopener" href="https://www.ccsd.net/resources/ccsd-professional-growth-system-pgs">Official CCSD PGS Resources ↗</a>
+  </div>
+
+  <div class="storage-banner">
+    <strong>Current build:</strong> activity records are saved only in this browser.
+    This is temporary while we connect the assistant to a teacher-owned Google Sheet.
+  </div>
+
+  <section id="dashboard" class="view active">
+    <div class="hero">
+      <h3>Turn professional growth into organized, trackable CU progress.</h3>
+      <p>Use this assistant to classify activities, estimate CUs, organize evidence, track category limits, and prepare information for ELMS.</p>
+      <div class="actions"><button class="btn gold" onclick="show('activity')">Add an Activity</button><button class="btn white" onclick="show('folders')">Set Up My Folders</button></div>
+    </div>
+
+    <div class="grid g4 stats">
+      <div class="card stat"><div class="label">Estimated CUs</div><div class="value" id="estimated">0.00</div><small>All saved activities</small></div>
+      <div class="card stat"><div class="label">Approved CUs</div><div class="value" id="approved">0.00</div><small>Only official approvals</small></div>
+      <div class="card stat"><div class="label">Goal Progress</div><div class="value" id="pct">0%</div><small>Toward 225 CUs</small></div>
+      <div class="card stat"><div class="label">Remaining</div><div class="value" id="remaining">225.00</div><small>Based on approved CUs</small></div>
+    </div>
+
+    <div class="section"><h3>What do you need help with?</h3><p>Choose the task that matches your current step.</p></div>
+    <div class="grid g3">
+      <div class="card"><div class="icon b">🧠</div><h3>Identify My Activity</h3><p>Choose a likely category and calculate estimated CUs.</p><button class="btn ghost" onclick="show('activity')">Start</button></div>
+      <div class="card"><div class="icon g">📁</div><h3>Set Up CU Folders</h3><p>Organize Google Drive evidence with a clean structure.</p><button class="btn ghost" onclick="show('folders')">Open Guide</button></div>
+      <div class="card"><div class="icon y">📎</div><h3>Check My Evidence</h3><p>Review documentation, permissions, and common issues.</p><button class="btn ghost" onclick="show('evidence')">Review</button></div>
+      <div class="card"><div class="icon p">🧭</div><h3>Prepare for ELMS</h3><p>Use a final readiness checklist before submission.</p><button class="btn ghost" onclick="show('elms')">Prepare</button></div>
+      <div class="card"><div class="icon r">▶️</div><h3>Watch Tutorials</h3><p>Learn through short, focused visual lessons.</p><button class="btn ghost" onclick="show('videos')">Watch</button></div>
+      <div class="card"><div class="icon b">📊</div><h3>Track Progress</h3><p>See totals, category balances, and activity status.</p><button class="btn ghost" onclick="show('records')">View Records</button></div>
+    </div>
+  </section>
+
+  <section id="activity" class="view">
+    <div class="card form">
+      <h3>Add a Professional Activity</h3>
+      <p>This provides guidance only and does not guarantee approval.</p>
+      <form id="activityForm">
+        <div class="fg">
+          <div class="field full"><label>Activity title</label><input id="title" required placeholder="Example: BSU Student Success PLC Meeting"></div>
+          <div class="field full"><label>What did you do?</label><textarea id="desc" required placeholder="Describe what adults learned, analyzed, designed, taught, tested, supervised, or improved."></textarea></div>
+          <div class="field"><label>Likely category</label>
+            <select id="category" required>
+              <option value="">Choose one</option><option>PLC Participation</option><option>Extracurricular Advising</option><option>Schoolwide Planning</option><option>School-Based Core Tutoring</option><option>Mentor</option><option>Mentee</option><option>Conference Participation</option><option>Recorded Webinar</option><option>Grant Award</option><option>Additional Endorsement</option>
+            </select>
+          </div>
+          <div class="field"><label>Payment status</label><select id="payment"><option value="unpaid">Unpaid</option><option value="paid">Paid stipend/supplemental rate</option><option value="contract">Regular contractual rate</option></select></div>
+          <div class="field"><label>Qualifying hours</label><input id="hours" type="number" min="0" step=".25" value="0"></div>
+          <div class="field"><label>Title I exception applicable?</label><select id="titleI"><option value="no">No / Not sure</option><option value="yes">Yes</option></select></div>
+          <div class="field"><label>Status</label><select id="status"><option>Needs evidence</option><option>In progress</option><option>Ready for ELMS</option><option>Submitted</option><option>Approved — enter only after official CCSD approval</option></select></div>
+          <div class="field"><label>Google Drive evidence link</label><input id="drive" type="url" placeholder="https://drive.google.com/..."></div>
+        </div>
+        <div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="reset" class="btn ghost">Clear</button><button class="btn blue">Calculate & Save</button></div>
+      </form>
+      <div class="result" id="result">
+        <h3>Estimated Result</h3>
+        <div class="rg">
+          <div class="rb"><small>Category</small><strong id="rCat">—</strong></div>
+          <div class="rb"><small>Estimated CUs</small><strong id="rCu">0.00</strong></div>
+          <div class="rb"><small>Category maximum</small><strong id="rMax">—</strong></div>
+          <div class="rb"><small>Remaining balance</small><strong id="rBal">—</strong></div>
+        </div>
+        <div class="notice info" id="rNotice"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="folders" class="view">
+    <div class="grid g2">
+      <div class="card"><h3>Recommended Google Drive Structure</h3>
+        <div class="tree"><span class="folder">📁 PGS Column Advancement</span><br>├── <span class="folder">📁 01 Approved CU Records</span><br>├── <span class="folder">📁 02 Submitted - Awaiting Review</span><br>├── <span class="folder">📁 03 Ready for ELMS</span><br>├── <span class="folder">📁 04 Needs Documentation</span><br>├── <span class="folder">📁 05 Certificates and Transcripts</span><br>└── <span class="folder">📁 CU Activity Categories</span></div>
+      </div>
+      <div class="card"><h3>First-Time Setup</h3><div class="check">
+        <label><input type="checkbox">Open Google Drive with your district account.</label>
+        <label><input type="checkbox">Create the main PGS folder.</label>
+        <label><input type="checkbox">Add approved, submitted, ready, and incomplete folders.</label>
+        <label><input type="checkbox">Create category folders only as needed.</label>
+        <label><input type="checkbox">Use clear file names with dates.</label>
+        <label><input type="checkbox">Keep original, unaltered evidence.</label>
+      </div></div>
+    </div>
+    <div class="card" style="margin-top:17px"><h3>Suggested File Name</h3><div class="tree">2026-09-18_PLC_BSU-Leadership-Structure.pdf</div></div>
+  </section>
+
+  <section id="evidence" class="view">
+    <div class="grid g3">
+      <div class="card"><div class="icon b">🗓️</div><h3>Time Evidence</h3><p>Keep dates, start/end times, hours, payment status, and contract-time details.</p></div>
+      <div class="card"><div class="icon g">📑</div><h3>Activity Evidence</h3><p>Use agendas, minutes, certificates, attendance, work products, or award letters.</p></div>
+      <div class="card"><div class="icon y">🔗</div><h3>Access Evidence</h3><p>Set permissions, copy the link, and test it before ELMS.</p></div>
+    </div>
+    <div class="card" style="margin-top:17px"><h3>Evidence Readiness Checklist</h3><div class="check">
+      <label><input type="checkbox">The category is supported by the current guide.</label>
+      <label><input type="checkbox">The activity occurred during qualifying time.</label>
+      <label><input type="checkbox">The description explains professional work, not only logistics.</label>
+      <label><input type="checkbox">Required forms and signatures are complete.</label>
+      <label><input type="checkbox">Evidence is original and organized.</label>
+      <label><input type="checkbox">Sharing permissions are correct.</label>
+      <label><input type="checkbox">The link opens without requesting access.</label>
+      <label><input type="checkbox">The same hours were not claimed elsewhere.</label>
+    </div></div>
+  </section>
+
+  <section id="elms" class="view">
+    <div class="grid g2">
+      <div class="card"><h3>Before You Open ELMS</h3><div class="check">
+        <label><input type="checkbox">Confirm category and qualifying hours.</label>
+        <label><input type="checkbox">Complete required forms and signatures.</label>
+        <label><input type="checkbox">Organize supporting evidence.</label>
+        <label><input type="checkbox">Set and test Drive permissions.</label>
+        <label><input type="checkbox">Prepare a clear activity description.</label>
+      </div></div>
+      <div class="card"><h3>Important Reminder</h3><div class="notice info">Describe what you learned, analyzed, designed, taught, supervised, or improved. Avoid vague entries.</div><div class="notice warn">This prototype prepares information but does not submit directly into ELMS.</div></div>
+    </div>
+  </section>
+
+  <section id="videos" class="view">
+    <div class="grid g3">
+      <div class="card video"><div class="thumb">▶</div><div class="vb"><span class="tag">Beginner</span><h3>PGS and CUs Explained</h3><p>What PGS is, how CUs work, and why tracking matters.</p></div></div>
+      <div class="card video"><div class="thumb" style="background:linear-gradient(135deg,#2f75b5,#17365d)">📁</div><div class="vb"><span class="tag">Drive</span><h3>Set Up Your Folders</h3><p>Create a clean Google Drive structure.</p></div></div>
+      <div class="card video"><div class="thumb" style="background:linear-gradient(135deg,#4d9b45,#265c21)">🔗</div><div class="vb"><span class="tag">Evidence</span><h3>Sharing Permissions</h3><p>Set access and test your evidence link.</p></div></div>
+      <div class="card video"><div class="thumb" style="background:linear-gradient(135deg,#f2b33d,#a96e00)">💵</div><div class="vb"><span class="tag">Calculations</span><h3>Paid vs. Unpaid</h3><p>Understand conversion rules and exceptions.</p></div></div>
+      <div class="card video"><div class="thumb" style="background:linear-gradient(135deg,#6f42c1,#3e226e)">🧠</div><div class="vb"><span class="tag">Categories</span><h3>Identify Your Activity</h3><p>Choose the strongest category match.</p></div></div>
+      <div class="card video"><div class="thumb">🧭</div><div class="vb"><span class="tag">ELMS</span><h3>Prepare and Submit</h3><p>Gather everything before entering ELMS.</p></div></div>
+    </div>
+  </section>
+
+  <section id="records" class="view">
+    <div class="card"><h3>Activity Records</h3><div style="overflow:auto"><table><thead><tr><th>Activity</th><th>Category</th><th>Hours</th><th>Estimated CUs</th><th>Status</th><th>Evidence</th><th>Actions</th></tr></thead><tbody id="recordsBody"><tr><td colspan="7">No activities saved yet.</td></tr></tbody></table></div></div>
+    <div class="card" style="margin-top:17px"><h3>Category Balances</h3><div style="overflow:auto"><table><thead><tr><th>Category</th><th>Recorded</th><th>Maximum</th><th>Remaining</th></tr></thead><tbody id="categoryBody"></tbody></table></div></div>
+  </section>
+
+  <footer><strong>Disclaimer:</strong> This is an unofficial educator-created prototype based on publicly available CCSD PGS information. It does not replace official guidance or guarantee CU approval.</footer>
+</main>
+</div>
+<script src="assets/data/pgs-rules.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
