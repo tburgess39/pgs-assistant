@@ -140,7 +140,8 @@ function runAllPGSTests() {
         startTime: '15:00',
         endTime: '17:30',
         breakMinutes: 30,
-        paymentStatus: 'unpaid'
+        paymentStatus: 'unpaid',
+        description: 'PLC planning and student-data review'
       }
     ]);
     assertEqual_(sessions[0].minutes, 120);
@@ -159,14 +160,16 @@ function runAllPGSTests() {
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid'
+          paymentStatus: 'unpaid',
+          description: 'PLC planning and student-data review'
         },
         {
           date: '2026-07-09',
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'paid'
+          paymentStatus: 'paid',
+          description: 'PLC follow-up and instructional planning'
         }
       ])
     };
@@ -182,7 +185,8 @@ function runAllPGSTests() {
           startTime: '17:00',
           endTime: '16:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid'
+          paymentStatus: 'unpaid',
+          description: 'Invalid-time validation test'
         }
       ]);
     } catch (error) {
