@@ -570,3 +570,39 @@ label{position:relative}
   .packet-row{grid-template-columns:1fr}
   .packet-status-control{align-items:stretch;flex-direction:column}
 }
+
+.connection-guardrail{
+  display:grid;
+  grid-template-columns:74px minmax(0,1fr);
+  gap:16px;
+  align-items:start;
+  padding:18px;
+  border:2px solid #c94747;
+  border-radius:14px;
+  background:#fff4f4;
+  color:#3e2424;
+}
+.connection-guardrail h3{
+  margin:0 0 7px;
+  color:#8a2020;
+}
+.connection-guardrail p{
+  margin:6px 0;
+  line-height:1.55;
+}
+.connection-lock{
+  width:68px;
+  min-height:68px;
+  display:grid;
+  place-items:center;
+  border-radius:16px;
+  background:#8a2020;
+  color:#fff;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+@media(max-width:700px){
+  .connection-guardrail{grid-template-columns:1fr}
+  .connection-lock{width:58px;min-height:46px}
+}

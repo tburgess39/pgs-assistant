@@ -28,6 +28,14 @@ const PROFILE_SETTING_KEYS = Object.freeze({
   advancementCycle: 'Profile - Advancement Cycle'
 });
 
+const MANAGED_CATEGORY_SUBFOLDERS = Object.freeze([
+  '01 Evidence to Combine',
+  '02 Final Single File for ELMS'
+]);
+
+const CONNECTION_GUARDRAIL_MESSAGE =
+  'Managed by FamilyPD PGS Assistant. Do not rename, move, or delete this folder or its numbered subfolders. Use the assistant to create and locate folders. Renaming may create duplicate folders; deleting or moving folders can break saved links.';
+
 const CARRYOVER_RULE = Object.freeze({
   categoryKey: CARRYOVER_CATEGORY_KEY,
   parentCategory: 'PGS Office / ELMS',
@@ -617,12 +625,12 @@ function buildStartHereSheet_(spreadsheet) {
     .setWrap(true);
 
   sheet.getRange('A5:B10').setValues([
-    ['Safe to do in this workbook', 'Avoid doing in this workbook'],
-    ['View and filter your Activity Log', 'Do not rename or delete sheets'],
-    ['Open evidence links and category folders', 'Do not change column headers'],
+    ['Safe to do in this workbook', 'Connection guardrails - do not change'],
+    ['View and filter your Activity Log', 'Do not rename, delete, or move Sheet tabs'],
+    ['Open evidence links and managed category folders', 'Do not rename, delete, reorder, or insert column headers'],
     ['Review estimated and official CU totals', 'Do not sort only part of the Activity Log'],
-    ['Download or print a copy for your records', 'Do not edit Category Rules, Settings, Change Log, or Generated Packets'],
-    ['Return to the web app for corrections', 'Do not paste a folder URL into the final evidence-link field']
+    ['Download or print a copy for your records', 'Do not edit hidden/internal tabs or technical fields'],
+    ['Return to the web app for all corrections', 'Do not rename, move, or delete numbered Drive folders']
   ]);
 
   sheet.getRange('A5:B5')
@@ -631,8 +639,8 @@ function buildStartHereSheet_(spreadsheet) {
     .setFontWeight('bold');
   sheet.getRange('A6:B10').setWrap(true).setVerticalAlignment('top');
   sheet.getRange('A12:F12').merge()
-    .setValue('Important: the Sheet stores form entries. Evidence documents are uploaded by the teacher. Generated approval-form packets are unofficial drafts and must be reviewed before use.')
-    .setBackground('#fff4d6')
+    .setValue('IMPORTANT CONNECTION NOTICE: Use the website to add, edit, or delete records. Changing Sheet tab names, column headers, hidden fields, or technical columns can break the assistant. Deleting or moving managed Drive folders can break saved links; renaming numbered folders can cause duplicates. Evidence files may be uploaded inside the provided folders, but the managed folder structure should remain unchanged.')
+    .setBackground('#fde2e2')
     .setFontColor('#5b4500')
     .setFontWeight('bold')
     .setWrap(true);
@@ -671,7 +679,7 @@ function applyWorkbookGuardrails_(spreadsheet) {
     activitySheet.showSheet();
     activitySheet.setTabColor('#2f75b5');
     activitySheet.getRange(1, 1, 1, ACTIVITY_HEADERS.length)
-      .setNote('PGS Guardrail: Do not rename, delete, or reorder these headers. Use the web app to change records.');
+      .setNote('PGS CONNECTION GUARDRAIL: Do not rename, delete, reorder, or insert headers. Use the web app to add, edit, or delete records. Changing this structure can break the assistant connection.');
 
     activitySheet.protect()
       .setDescription('PGS Guardrail - Use the web app to edit the Activity Log')
@@ -1217,8 +1225,27 @@ function createOrGetFolderStructure_() {
 
   const categoryEvidence = ensureChildFolder_(root, '01 Category Evidence');
   const automaticRecords = ensureChildFolder_(root, '02 Automatic ELMS Records');
-  const receipts = ensureChildFolder_(root, '03 Advancement Receipts and Decisions');
-  const references = ensureChildFolder_(root, '04 Reference and Forms');
+  const references = ensureRenamedChildFolder_(
+    root,
+    '04 Reference and Forms',
+    '03 Reference and Forms'
+  );
+
+  root.setDescription(CONNECTION_GUARDRAIL_MESSAGE);
+  categoryEvidence.setDescription(
+    CONNECTION_GUARDRAIL_MESSAGE +
+    ' This folder contains the reusable evidence folders for each PGS category.'
+  );
+  automaticRecords.setDescription(
+    CONNECTION_GUARDRAIL_MESSAGE +
+    ' This folder is optional storage for records that ELMS enters automatically.'
+  );
+  references.setDescription(
+    CONNECTION_GUARDRAIL_MESSAGE +
+    ' Store reference copies and blank forms here.'
+  );
+
+  markLegacyReceiptFolder_(root);
 
   properties.setProperty('PGS_ACTIVITY_FOLDER_ID', categoryEvidence.getId());
 
@@ -1226,7 +1253,6 @@ function createOrGetFolderStructure_() {
     rootFolder: root,
     activityEvidenceFolder: categoryEvidence,
     automaticRecordsFolder: automaticRecords,
-    receiptsFolder: receipts,
     referenceFolder: references
   };
 }
@@ -1242,17 +1268,19 @@ function createCategoryFolder_(rule) {
     PropertiesService.getUserProperties().setProperty(propertyName, folder.getId());
   }
 
-  [
-    '01 Evidence to Combine',
-    '02 Final Single File for ELMS',
-    '03 ELMS Receipt and Decision'
-  ].forEach(function(name) {
-    ensureChildFolder_(folder, name);
+  MANAGED_CATEGORY_SUBFOLDERS.forEach(function(name) {
+    const child = ensureChildFolder_(folder, name);
+    child.setDescription(
+      CONNECTION_GUARDRAIL_MESSAGE +
+      (name === '01 Evidence to Combine'
+        ? ' Upload supporting evidence and generated unsigned drafts here.'
+        : ' Place the one final combined evidence file for ELMS here.')
+    );
   });
 
   folder.setDescription(
-    APP_NAME + ' category folder: ' + rule.activityName +
-    ' (' + rule.categoryKey + ')'
+    CONNECTION_GUARDRAIL_MESSAGE + ' Category: ' +
+    rule.activityName + ' (' + rule.categoryKey + ').'
   );
 
   return {id: folder.getId(), url: folder.getUrl()};
@@ -1291,6 +1319,35 @@ function categoryFolderName_(rule) {
   };
 
   return sanitizeFolderName_(names[rule.categoryKey] || rule.activityName);
+}
+
+
+function ensureRenamedChildFolder_(parent, oldName, newName) {
+  const newFolders = parent.getFoldersByName(newName);
+  if (newFolders.hasNext()) return newFolders.next();
+
+  const oldFolders = parent.getFoldersByName(oldName);
+  if (oldFolders.hasNext()) {
+    const folder = oldFolders.next();
+    folder.setName(newName);
+    return folder;
+  }
+
+  return parent.createFolder(newName);
+}
+
+function markLegacyReceiptFolder_(root) {
+  [
+    '03 Advancement Receipts and Decisions',
+    '03 ELMS Receipt and Decision'
+  ].forEach(function(name) {
+    const folders = root.getFoldersByName(name);
+    while (folders.hasNext()) {
+      folders.next().setDescription(
+        'LEGACY OPTIONAL FOLDER: The FamilyPD PGS Assistant no longer creates or uses this folder. It was not deleted automatically because it may contain user files. You may keep it or remove it after confirming it is empty or no longer needed.'
+      );
+    }
+  });
 }
 
 function ensureChildFolder_(parent, name) {
@@ -2117,7 +2174,7 @@ function numberFormat_(value) {
 function appendChangeLog_(spreadsheet, action, activityId, details) {
   spreadsheet.getSheetByName(SHEETS.CHANGE_LOG).appendRow([
     formatDateTime_(new Date()), safeText_(action), safeText_(activityId),
-    safeText_(details), safeText_(Session.getActiveUser().getEmail() || 'Authorized user')
+    safeText_(details), safeText_('Authorized workspace user')
   ]);
 }
 

@@ -182,6 +182,25 @@ function runAllPGSTests() {
   });
 
 
+
+  test('Managed category folders use only the two required subfolders', function() {
+    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS.length, 2);
+    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS[0], '01 Evidence to Combine');
+    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS[1], '02 Final Single File for ELMS');
+
+    if (MANAGED_CATEGORY_SUBFOLDERS.indexOf('03 ELMS Receipt and Decision') !== -1) {
+      throw new Error('The retired receipt/decision folder is still configured.');
+    }
+  });
+
+  test('Connection guardrail warning is configured', function() {
+    if (CONNECTION_GUARDRAIL_MESSAGE.indexOf('Do not rename') === -1 ||
+        CONNECTION_GUARDRAIL_MESSAGE.indexOf('duplicate folders') === -1 ||
+        CONNECTION_GUARDRAIL_MESSAGE.indexOf('break saved links') === -1) {
+      throw new Error('The managed-folder warning is incomplete.');
+    }
+  });
+
   test('Official approval-form row capacities are enforced', function() {
     assertEqual_(FORM_CAPACITIES.time_based, 20);
     assertEqual_(FORM_CAPACITIES.university_assignment, 5);
@@ -258,7 +277,8 @@ function runAllPGSTests() {
         startTime: '15:00',
         endTime: '17:30',
         breakMinutes: 30,
-        paymentStatus: 'unpaid'
+        paymentStatus: 'unpaid',
+        description: 'Test session for hour calculation.'
       }
     ]);
     assertEqual_(sessions[0].minutes, 120);
@@ -277,14 +297,16 @@ function runAllPGSTests() {
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid'
+          paymentStatus: 'unpaid',
+          description: 'Unpaid PLC test session.'
         },
         {
           date: '2026-07-09',
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'paid'
+          paymentStatus: 'paid',
+          description: 'Paid PLC test session.'
         }
       ])
     };
@@ -300,7 +322,8 @@ function runAllPGSTests() {
           startTime: '17:00',
           endTime: '16:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid'
+          paymentStatus: 'unpaid',
+          description: 'Invalid-time validation test.'
         }
       ]);
     } catch (error) {

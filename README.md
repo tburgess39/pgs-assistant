@@ -104,3 +104,31 @@ do not duplicate them.
 
 The new Assistant Documentation page explains the workflow, unofficial status,
 privacy boundaries, generated drafts, Drive folders, and ELMS preparation.
+
+
+## Milestone 4.1 - Simplified folders and connection guardrails
+
+The assistant no longer creates or uses:
+
+- `03 ELMS Receipt and Decision` inside category folders
+- `03 Advancement Receipts and Decisions` at the root level
+
+Each category now contains only:
+
+- `01 Evidence to Combine`
+- `02 Final Single File for ELMS`
+
+Existing receipt/decision folders are not deleted automatically because they may
+contain user files. The assistant marks their Drive description as legacy/optional.
+
+Connection warnings now appear:
+
+- on the My Google Workspace page,
+- on the Assistant Documentation page,
+- in the START HERE Sheet,
+- in Activity Log header notes,
+- in managed Drive folder descriptions.
+
+The warning explains that Sheet tab/header/technical-field changes can break the
+assistant, while deleting/moving managed folders can break links and renaming
+numbered subfolders can cause duplicates or misfiled generated documents.

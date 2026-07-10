@@ -472,17 +472,29 @@
         <div class="card">
           <h3>Your Category Evidence Folders</h3>
           <p>
-            The app creates reusable category folders. You still upload the actual certificates,
-            redacted IEP pages, agendas, award notices, and other evidence.
+            The app creates reusable category folders with only two managed subfolders:
+            <strong>01 Evidence to Combine</strong> and <strong>02 Final Single File for ELMS</strong>.
+            You still upload the actual certificates, redacted IEP pages, agendas, award notices, and other evidence.
           </p>
           <button id="createFoldersButton" class="btn green" type="button">Create or Verify My PGS Folders</button>
         </div>
       </div>
 
-      <div class="notice info" style="margin-top:17px">
-        <strong>Sheet guardrails:</strong>
-        Use the website to add or edit records. The tracker Sheet is for viewing, filtering, and reference.
-        Internal tabs and technical columns are hidden, and protected areas display a warning before manual edits.
+      <div class="connection-guardrail" style="margin-top:17px">
+        <div class="connection-lock" aria-hidden="true">LOCK</div>
+        <div>
+          <h3>Protect Your Assistant Connection</h3>
+          <p>
+            Use this website to add, edit, or delete records. In the Google Sheet, do not rename or
+            delete tabs, change field/column names, insert or reorder technical columns, or edit hidden tabs.
+            Those changes can break record matching and calculations.
+          </p>
+          <p>
+            In Google Drive, do not delete or move the managed folders. Do not rename the numbered
+            subfolders. Renaming may cause duplicate folders; deleting or moving folders can break saved links.
+          </p>
+          <p><strong>Safe:</strong> open folders, upload evidence files, open generated drafts, and place the final combined file in the provided final-file folder.</p>
+        </div>
       </div>
 
       <form class="card form" id="profileForm" style="margin-top:17px">
@@ -567,6 +579,19 @@
           <div><strong>Google Sheet</strong><span>Activity entries, calculations, statuses, profile information, and generated-packet records.</span></div>
           <div><strong>Google Drive folders</strong><span>Evidence files and generated Google Doc/PDF drafts. Evidence is not uploaded automatically.</span></div>
           <div><strong>ELMS</strong><span>The assistant does not submit to ELMS. The teacher completes the official ELMS submission.</span></div>
+        </div>
+
+        <h3>Protect the Connection to Your Workspace</h3>
+        <div class="notice danger">
+          <strong>Do not restructure assistant-managed files.</strong><br>
+          The assistant relies on stable Google Sheet tabs, column headers, technical fields, folder IDs,
+          and numbered folder names. Changing them can break calculations, disconnect saved links, cause
+          duplicate folders, or prevent generated documents from being filed correctly.
+        </div>
+        <div class="simple-guidance">
+          <div><strong>Do not change</strong><span>Sheet tab names, column/field names, hidden tabs, technical columns, managed folder locations, or numbered subfolder names.</span></div>
+          <div><strong>Safe actions</strong><span>View/filter the Activity Log, open links, upload evidence files, open generated documents, and download or print copies.</span></div>
+          <div><strong>Need a correction?</strong><span>Return to the website and edit the activity there instead of changing the Google Sheet directly.</span></div>
         </div>
 
         <h3>Privacy and Student Information</h3>
