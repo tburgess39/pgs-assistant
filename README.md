@@ -1,134 +1,73 @@
-# FamilyPD PGS CU Assistant - Milestone 3.0
+# PGS CU Assistant
 
-This rebuild simplifies the teacher workflow.
+An open-source teacher workflow assistant for organizing CCSD Professional Growth System activities, estimating Contact Units, preparing evidence, generating required documentation, and getting ready for ELMS submission.
 
-## Major changes
+> **Unofficial resource:** CCSD and the Professional Growth System Department make all final eligibility, documentation, and CU approval decisions.
 
-- Nine alphabetized starting choices in Find My Category.
-- All 43 current categories remain covered.
-- Category-specific calculation is separated from activity details.
-- Evidence instructions are reduced to:
-  - what to upload,
-  - one important category note,
-  - the final single-file reminder.
-- IEP activities ask for the number of qualifying IEPs/cases and clearly
-  remind teachers to redact parent/student information and signatures.
-- Grants ask for the number of grants actually received, not grant-writing
-  hours.
-- Reusable category folders replace a separate folder for every event.
-- The final evidence file link is stored separately from the category folder.
-- Self-reported and automatically entered ELMS CUs are tracked separately.
-- Dashboard totals show:
-  - estimated self-reported CUs,
-  - approved self-reported CUs,
-  - automatic ELMS CUs,
-  - total confirmed,
-  - remaining to 225.
+## Core design rule
 
-## Google Drive boundary
+Each professional activity is entered once. That activity record is the single source of truth used to:
 
-All form entries are stored in a teacher-owned Google Sheet created in the
-signed-in user's Google Drive.
+- estimate CUs;
+- track category maximums and balances;
+- organize Google Drive evidence;
+- populate required approval forms;
+- build documentation packets;
+- prepare the teacher for official ELMS entry.
 
-The application creates category folders, but it does not automatically upload
-certificates, IEP signature pages, award notices, agendas, or other evidence.
-Teachers upload those files themselves. ELMS requires the link to the final
-combined evidence file, not the folder link.
+Teachers should not have to enter the same activity separately in both the dashboard and a tracker spreadsheet. The spreadsheet functions as the behind-the-scenes database and administrative console.
 
+## Public site
 
-## Milestone 3.0.1 hotfix
+The production custom domain is intended to open the working dashboard directly:
 
-Category folder names now preserve readable spaces. For example:
+`pgs.familypd.org`
 
-- `Grant Awards`
-- `PLC Time`
-- `IEPs and MDTs Written`
+## Google Apps Script project files
 
-The previous sanitizer converted spaces into hyphens, which caused the folder-name
-test to fail even though the calculation and evidence tests passed.
+A complete deployment normally includes:
 
+- `Code.gs`
+- `Index.html`
+- `Tests.gs`
+- `appsscript.json` when manifest settings are maintained in source control
 
-## Milestone 3.1 - Contextual Help and Workbook Guardrails
+The recovered `Tests.gs` in this package is the latest preserved file. The missing final `Code.gs` and `Index.html` must be restored from the existing Apps Script project or rebuilt against the recovered tests.
 
-- Added keyboard-accessible help icons for unfamiliar form terms.
-- Quantity and unit help changes with the selected category.
-- Explained the limited Title I paid exception in plain language.
-- Fixed the CSS issue that displayed fields before they were needed.
-- Added a START HERE worksheet.
-- Hid internal Category Rules, Settings, and Change Log tabs.
-- Hid technical Activity Log columns such as IDs, JSON, rule version, and record type.
-- Added warning-only protections to discourage manual edits without preventing
-  the Apps Script web app from maintaining the teacher-owned workbook.
-- Added header notes explaining that records should be changed through the web app.
+## Latest approval-form requirements
 
-The workbook remains owned by the teacher. These controls prevent accidental
-changes; the owner can still override warnings or unhide sheets, so the web app
-continues to be the recommended editing interface.
+Generated approval forms must match the official documents rather than using a redesigned substitute.
 
+- Time-Based Activities: 20 detail rows per page
+- University Student Assignment: 5 detail rows per page
+- Lower-Level College Coursework: 5 detail rows per page
+- Overflow records create additional official-form pages
+- Session descriptions remain attached to their correct rows
+- Records in signed packets are locked against duplicate reuse
 
-## Milestone 3.2 - Carryover / Rollover
+See `LATEST_FIX_REQUIREMENTS.md` for the recovered acceptance criteria.
 
-The ELMS tracking workflow now includes a special `Carryover / Rollover` option.
+## Validation
 
-Carryover:
+In Apps Script, run:
 
-- is entered as an automatic ELMS tracking record,
-- is separate from the 43 current activity categories,
-- does not create an evidence folder,
-- does not use a category maximum,
-- is displayed separately from automatic activity CUs,
-- counts toward total confirmed CUs and the remaining amount toward 225.
+```javascript
+runAllPGSTests();
+```
 
+Do not deploy when any test fails. Also perform a visual comparison of every generated approval form against its official source PDF.
 
-## Milestone 4.0 - Approval-form packets and Assistant Documentation
+## GitHub workflow
 
-The Evidence and ELMS page can now generate assistant-prepared draft packets for:
+1. Export or copy the current Apps Script project files into the repository.
+2. Replace only the files that were actually changed.
+3. Run the Apps Script test suite.
+4. Commit with a message describing the form-generation fix.
+5. Deploy a new Apps Script web-app version if server/client code changed.
+6. Confirm the GitHub Pages/custom-domain entry still routes teachers directly to the working dashboard.
 
-- Contact Unit Approval Form - Time Based
-- Contact Unit Approval Form - University Student Assignment
-- Contact Unit Approval Form - Lower-Level College Coursework
+Suggested commit message:
 
-The generator groups eligible entries from the same category, separates incompatible
-payment/CU-rate groups, enforces the official row capacity, creates additional pages,
-and saves both a Google Doc and PDF in the category's `01 Evidence to Combine` folder.
-
-Row capacities:
-
-- Time-Based Activities: 20 activity rows per page
-- University Student Assignment: 5 assignment rows per page
-- Lower-Level College Coursework: 5 course rows per page
-
-Packet records are stored in the hidden `Generated Packets` sheet. Packets marked
-Signed or Included in final ELMS file lock their included entry keys so later packets
-do not duplicate them.
-
-The new Assistant Documentation page explains the workflow, unofficial status,
-privacy boundaries, generated drafts, Drive folders, and ELMS preparation.
-
-
-## Milestone 4.1 - Simplified folders and connection guardrails
-
-The assistant no longer creates or uses:
-
-- `03 ELMS Receipt and Decision` inside category folders
-- `03 Advancement Receipts and Decisions` at the root level
-
-Each category now contains only:
-
-- `01 Evidence to Combine`
-- `02 Final Single File for ELMS`
-
-Existing receipt/decision folders are not deleted automatically because they may
-contain user files. The assistant marks their Drive description as legacy/optional.
-
-Connection warnings now appear:
-
-- on the My Google Workspace page,
-- on the Assistant Documentation page,
-- in the START HERE Sheet,
-- in Activity Log header notes,
-- in managed Drive folder descriptions.
-
-The warning explains that Sheet tab/header/technical-field changes can break the
-assistant, while deleting/moving managed folders can break links and renaming
-numbered subfolders can cause duplicates or misfiled generated documents.
+```text
+Fix generated CU approval forms to match official layouts
+```
