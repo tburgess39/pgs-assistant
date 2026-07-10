@@ -606,3 +606,14 @@ label{position:relative}
   .connection-guardrail{grid-template-columns:1fr}
   .connection-lock{width:58px;min-height:46px}
 }
+
+.saved-record{
+  background:#eaf7ea;
+  outline:3px solid #4d9b45;
+  outline-offset:-3px;
+  animation:savedRecordPulse 1.2s ease-in-out 2;
+}
+@keyframes savedRecordPulse{
+  0%,100%{box-shadow:inset 0 0 0 0 rgba(77,155,69,0)}
+  50%{box-shadow:inset 0 0 0 5px rgba(77,155,69,.18)}
+}

@@ -201,6 +201,13 @@ function runAllPGSTests() {
     }
   });
 
+  test('Activity save verification dependencies are available', function() {
+    if (typeof findActivityRow_ !== 'function' ||
+        typeof readActivities_ !== 'function') {
+      throw new Error('Save verification helpers are missing.');
+    }
+  });
+
   test('Official approval-form row capacities are enforced', function() {
     assertEqual_(FORM_CAPACITIES.time_based, 20);
     assertEqual_(FORM_CAPACITIES.university_assignment, 5);

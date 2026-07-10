@@ -419,8 +419,29 @@ function saveActivity(input) {
     activity.recordType + ': ' + activity.title
   );
 
+  // Force all pending Sheet writes to complete before reporting success.
+  SpreadsheetApp.flush();
+
+  const verifiedRow = findActivityRow_(sheet, id);
+  if (!verifiedRow) {
+    throw new Error(
+      'The activity could not be verified in the tracker Sheet. Please check My CU Records before trying again.'
+    );
+  }
+
   const data = getBootstrapData();
+  const verifiedActivity = (data.activities || []).find(function(item) {
+    return item.id === id;
+  });
+
+  if (!verifiedActivity) {
+    throw new Error(
+      'The activity row was written, but the refreshed tracker data did not include it. Refresh the app before trying again.'
+    );
+  }
+
   data.savedId = id;
+  data.savedActivity = verifiedActivity;
   return data;
 }
 

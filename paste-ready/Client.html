@@ -57,7 +57,9 @@ const state = {
   finder: {contexts: []},
   profile: {},
   generatedPackets: [],
-  currentStep: 1
+  currentStep: 1,
+  activitySaveInProgress: false,
+  lastSavedId: ''
 };
 
 const elements = {};
@@ -1191,6 +1193,9 @@ function updateSessionTotals() {
 async function saveActivity(event) {
   if (event) event.preventDefault();
 
+  // Prevent a second click while the first save is still running.
+  if (state.activitySaveInProgress) return;
+
   if (!validateCalculationStep() || !validateDetailsStep()) return;
 
   const rule = getRule(elements.categoryKey.value);
@@ -1221,23 +1226,51 @@ async function saveActivity(event) {
       elements.createFolder.checked
   };
 
-  setLoading(true, 'Saving to your Google Sheet...');
+  state.activitySaveInProgress = true;
+  elements.saveButton.disabled = true;
+  elements.saveAutomaticButton.disabled = true;
+  setLoading(true, 'Saving and verifying your Google Sheet record...');
 
   try {
     const data = await runServer('saveActivity', payload);
+
+    if (!data || !data.savedId) {
+      throw new Error('The server did not return a verified saved-record ID.');
+    }
+
+    state.lastSavedId = data.savedId;
     applyBootstrap(data);
 
     const saved = state.activities.find(function(item) {
       return item.id === data.savedId;
     });
 
-    if (saved) showSavedResult(saved);
+    if (!saved) {
+      throw new Error(
+        'The save could not be confirmed in My CU Records. Refresh the app before trying again.'
+      );
+    }
 
-    showToast('Saved in your teacher-owned Google Sheet.');
-    showView('activity');
+    // Clear the completed form so it cannot be submitted a second time.
+    resetActivityForm();
+
+    // Leave the entry screen and show the verified row.
+    showView('records');
+
+    requestAnimationFrame(function() {
+      const row = elements.recordsBody.querySelector(
+        '[data-record-id="' + cssEscape(data.savedId) + '"]'
+      );
+      if (row) row.scrollIntoView({behavior: 'smooth', block: 'center'});
+    });
+
+    showToast('Saved and verified. Your activity appears in My CU Records.');
   } catch (error) {
     showToast(error.message, true);
   } finally {
+    state.activitySaveInProgress = false;
+    elements.saveButton.disabled = false;
+    elements.saveAutomaticButton.disabled = false;
     setLoading(false);
   }
 }
@@ -1409,7 +1442,11 @@ function renderRecords() {
         ? 'Carryover / Rollover'
         : (automatic ? 'Automatic ELMS' : 'Self-reported');
 
-      return '<tr>' +
+      const savedClass = activity.id === state.lastSavedId
+        ? ' class="saved-record"'
+        : '';
+
+      return '<tr data-record-id="' + escapeHtml(activity.id) + '"' + savedClass + '>' +
         '<td><strong>' + escapeHtml(activity.title) + '</strong><br><small>' +
           escapeHtml(truncate(activity.description, 75)) + '</small></td>' +
         '<td>' + typeLabel + '</td>' +
