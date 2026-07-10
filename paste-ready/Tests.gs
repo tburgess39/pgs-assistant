@@ -183,6 +183,49 @@ function runAllPGSTests() {
 
 
 
+  test('Carryover uses the actual ELMS appearance date and confirmed status', function() {
+    const activity = normalizeActivityInput_({
+      recordType: 'automatic_elms',
+      categoryKey: CARRYOVER_CATEGORY_KEY,
+      startDate: '2026-07-09',
+      officialApprovedCUs: 18.5
+    }, CARRYOVER_RULE);
+
+    assertEqual_(activity.title, 'Carryover / Rollover');
+    assertEqual_(activity.status, 'Confirmed in ELMS');
+    assertEqual_(activity.organization, 'PGS Office / ELMS');
+    assertEqual_(activity.role, 'Carryover');
+    assertEqual_(activity.officialApprovedCUs, 18.5);
+  });
+
+  test('Carryover requires an official ELMS amount', function() {
+    let rejected = false;
+
+    try {
+      normalizeActivityInput_({
+        recordType: 'automatic_elms',
+        categoryKey: CARRYOVER_CATEGORY_KEY,
+        startDate: '2026-07-09',
+        officialApprovedCUs: ''
+      }, CARRYOVER_RULE);
+    } catch (error) {
+      rejected = error.message.indexOf('official carryover CUs') >= 0;
+    }
+
+    if (!rejected) throw new Error('Carryover without an official amount was not rejected.');
+  });
+
+  test('Carryover date is not treated as an activity cutoff date', function() {
+    const activity = normalizeActivityInput_({
+      recordType: 'automatic_elms',
+      categoryKey: CARRYOVER_CATEGORY_KEY,
+      startDate: '2024-01-15',
+      officialApprovedCUs: 4
+    }, CARRYOVER_RULE);
+
+    assertEqual_(activity.startDate, '2024-01-15');
+  });
+
   test('Managed category folders use only the two required subfolders', function() {
     assertEqual_(MANAGED_CATEGORY_SUBFOLDERS.length, 2);
     assertEqual_(MANAGED_CATEGORY_SUBFOLDERS[0], '01 Evidence to Combine');
@@ -198,6 +241,16 @@ function runAllPGSTests() {
         CONNECTION_GUARDRAIL_MESSAGE.indexOf('duplicate folders') === -1 ||
         CONNECTION_GUARDRAIL_MESSAGE.indexOf('break saved links') === -1) {
       throw new Error('The managed-folder warning is incomplete.');
+    }
+  });
+
+  test('Workbook refresh uses the same workbook bootstrap helper', function() {
+    assertEqual_(WORKBOOK_SCHEMA_VERSION, '4.1.3');
+
+    if (typeof buildBootstrapData_ !== 'function' ||
+        typeof inspectPGSWorkbookCandidates !== 'function' ||
+        typeof repairPGSWorkbookConnection !== 'function') {
+      throw new Error('Workbook connection or recovery helpers are missing.');
     }
   });
 

@@ -1,5 +1,6 @@
 const APP_NAME = 'PGS CU Assistant';
 const WORKBOOK_NAME = 'PGS CU Assistant Data';
+const WORKBOOK_SCHEMA_VERSION = '4.1.3';
 const ROOT_FOLDER_NAME = 'PGS Column Advancement';
 const TIME_ZONE = 'America/Los_Angeles';
 const MIN_ACTIVITY_DATE = '2024-05-01';
@@ -65,11 +66,11 @@ const CARRYOVER_RULE = Object.freeze({
   evidenceChecklist: [],
   lastVerified: '2026-07-10',
   entryMode: 'automatic',
-  dateLabel: 'Date carryover appeared in ELMS',
+  dateLabel: 'Date carryover first appeared in ELMS',
   endDateLabel: 'End date',
   showEndDate: false,
   quantityLabel: 'Official carryover CUs',
-  quantityHelp: 'Enter the amount exactly as it appears in ELMS.',
+  quantityHelp: 'Enter the official amount only after the carryover appears in ELMS.',
   quantityStep: 0.01,
   evidenceInputBasis: 'ELMS Advancement Status carryover row'
 });
@@ -141,7 +142,10 @@ function include(filename) {
 }
 
 function getBootstrapData() {
-  const spreadsheet = getOrCreateWorkbook_();
+  return buildBootstrapData_(getOrCreateWorkbook_());
+}
+
+function buildBootstrapData_(spreadsheet) {
   const rules = getRules_(spreadsheet);
   const activities = readActivities_(spreadsheet);
   const folders = getFolderLinks_();
@@ -149,6 +153,7 @@ function getBootstrapData() {
   return {
     appName: APP_NAME,
     workspace: {
+      spreadsheetId: spreadsheet.getId(),
       spreadsheetUrl: spreadsheet.getUrl(),
       spreadsheetName: spreadsheet.getName(),
       rootFolderUrl: folders.rootFolderUrl || '',
@@ -188,7 +193,8 @@ function saveUserProfile(input) {
   writeSettingValue_(spreadsheet, PROFILE_SETTING_KEYS.contractEnd, profile.contractEnd);
   writeSettingValue_(spreadsheet, PROFILE_SETTING_KEYS.advancementCycle, profile.advancementCycle);
   appendChangeLog_(spreadsheet, 'UPDATED PROFILE', '', profile.fullName + ' | ' + profile.schoolSite);
-  return getBootstrapData();
+  SpreadsheetApp.flush();
+  return buildBootstrapData_(spreadsheet);
 }
 
 function generateApprovalPacket(input) {
@@ -293,7 +299,8 @@ function generateApprovalPacket(input) {
     rule.categoryKey + ' | ' + packetData.pages.length + ' page(s)'
   );
 
-  const data = getBootstrapData();
+  SpreadsheetApp.flush();
+  const data = buildBootstrapData_(spreadsheet);
   data.generatedPacketId = packetId;
   return data;
 }
@@ -317,7 +324,8 @@ function updateGeneratedPacketStatus(input) {
   sheet.getRange(row, 16).setValue(formatDateTime_(new Date()));
 
   appendChangeLog_(spreadsheet, 'UPDATED PACKET STATUS', packetId, status);
-  return getBootstrapData();
+  SpreadsheetApp.flush();
+  return buildBootstrapData_(spreadsheet);
 }
 
 function saveActivity(input) {
@@ -429,7 +437,7 @@ function saveActivity(input) {
     );
   }
 
-  const data = getBootstrapData();
+  const data = buildBootstrapData_(spreadsheet);
   const verifiedActivity = (data.activities || []).find(function(item) {
     return item.id === id;
   });
@@ -464,15 +472,58 @@ function deleteActivity(activityId) {
   sheet.deleteRow(row);
   appendChangeLog_(spreadsheet, 'DELETED ACTIVITY RECORD', activityId,
     title + ' — Drive folders were not deleted.');
-  return getBootstrapData();
+  SpreadsheetApp.flush();
+  return buildBootstrapData_(spreadsheet);
 }
 
 function createWorkspaceFolders() {
   createOrGetFolderStructure_();
   const spreadsheet = getOrCreateWorkbook_();
+  const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+  const rules = getRules_(spreadsheet);
+  const activities = readActivities_(spreadsheet);
+  const map = getHeaderMap_(ACTIVITY_HEADERS);
+  const verified = {};
+
+  activities
+    .filter(function(activity) {
+      return activity.recordType !== 'automatic_elms';
+    })
+    .forEach(function(activity) {
+      if (!verified[activity.categoryKey]) {
+        const rule = rules.find(function(item) {
+          return item.categoryKey === activity.categoryKey && item.active;
+        });
+
+        if (rule) verified[activity.categoryKey] = createCategoryFolder_(rule);
+      }
+
+      const folder = verified[activity.categoryKey];
+      if (!folder) return;
+
+      const row = findActivityRow_(sheet, activity.id);
+      if (!row) return;
+
+      sheet.getRange(row, map['Activity Folder ID']).setValue(folder.id);
+      sheet.getRange(row, map['Activity Folder URL']).setValue(folder.url);
+      sheet.getRange(row, map['Updated At']).setValue(formatDateTime_(new Date()));
+    });
+
+  SpreadsheetApp.flush();
   updateSettingsSheet_(spreadsheet);
-  appendChangeLog_(spreadsheet, 'CREATED / VERIFIED FOLDER STRUCTURE', '', ROOT_FOLDER_NAME);
-  return getBootstrapData();
+  appendChangeLog_(
+    spreadsheet,
+    'CREATED / VERIFIED FOLDER STRUCTURE',
+    '',
+    ROOT_FOLDER_NAME + ' | categories verified: ' + Object.keys(verified).length
+  );
+
+  const data = buildBootstrapData_(spreadsheet);
+  data.folderRepairSummary = {
+    categoriesVerified: Object.keys(verified).length,
+    filesRecreated: 0
+  };
+  return data;
 }
 
 function createEvidenceFolderForActivity(activityId) {
@@ -504,28 +555,142 @@ function createEvidenceFolderForActivity(activityId) {
   sheet.getRange(row, map['Updated At']).setValue(formatDateTime_(new Date()));
 
   appendChangeLog_(spreadsheet, 'CREATED / VERIFIED CATEGORY FOLDER', record.id, folder.url);
-  return getBootstrapData();
+  SpreadsheetApp.flush();
+  return buildBootstrapData_(spreadsheet);
 }
 
 function getOrCreateWorkbook_() {
   const properties = PropertiesService.getUserProperties();
   const storedId = properties.getProperty('PGS_SPREADSHEET_ID');
+  let spreadsheet = null;
 
   if (storedId) {
     try {
-      const existing = SpreadsheetApp.openById(storedId);
-      ensureWorkbookStructure_(existing);
-      return existing;
+      spreadsheet = SpreadsheetApp.openById(storedId);
     } catch (error) {
+      console.error(
+        'Unable to open stored PGS workbook ' + storedId + ': ' + error.message
+      );
       properties.deleteProperty('PGS_SPREADSHEET_ID');
+      properties.deleteProperty('PGS_WORKBOOK_SCHEMA_VERSION');
     }
   }
 
-  const spreadsheet = SpreadsheetApp.create(WORKBOOK_NAME);
-  setupWorkbook_(spreadsheet);
-  properties.setProperty('PGS_SPREADSHEET_ID', spreadsheet.getId());
+  if (!spreadsheet) {
+    spreadsheet = SpreadsheetApp.create(WORKBOOK_NAME);
+    setupWorkbook_(spreadsheet);
+    properties.setProperty('PGS_SPREADSHEET_ID', spreadsheet.getId());
+    properties.setProperty(
+      'PGS_WORKBOOK_SCHEMA_VERSION',
+      WORKBOOK_SCHEMA_VERSION
+    );
+    return spreadsheet;
+  }
+
+  const appliedSchema =
+    properties.getProperty('PGS_WORKBOOK_SCHEMA_VERSION');
+
+  if (appliedSchema !== WORKBOOK_SCHEMA_VERSION) {
+    ensureWorkbookStructure_(spreadsheet);
+    properties.setProperty(
+      'PGS_WORKBOOK_SCHEMA_VERSION',
+      WORKBOOK_SCHEMA_VERSION
+    );
+  }
+
   return spreadsheet;
 }
+
+function inspectPGSWorkbookCandidates() {
+  const candidates = getPGSWorkbookCandidates_();
+  console.log(JSON.stringify(candidates, null, 2));
+  return candidates;
+}
+
+function repairPGSWorkbookConnection() {
+  const candidates = getPGSWorkbookCandidates_();
+
+  if (!candidates.length) {
+    throw new Error('No existing "' + WORKBOOK_NAME + '" spreadsheet was found.');
+  }
+
+  candidates.sort(function(a, b) {
+    if (b.activityCount !== a.activityCount) {
+      return b.activityCount - a.activityCount;
+    }
+    return b.lastUpdatedMillis - a.lastUpdatedMillis;
+  });
+
+  const selected = candidates[0];
+  const properties = PropertiesService.getUserProperties();
+  properties.setProperty('PGS_SPREADSHEET_ID', selected.id);
+  properties.deleteProperty('PGS_WORKBOOK_SCHEMA_VERSION');
+
+  const spreadsheet = SpreadsheetApp.openById(selected.id);
+  ensureWorkbookStructure_(spreadsheet);
+  properties.setProperty(
+    'PGS_WORKBOOK_SCHEMA_VERSION',
+    WORKBOOK_SCHEMA_VERSION
+  );
+
+  console.log(
+    'Connected to ' + selected.url +
+    ' with ' + selected.activityCount + ' saved activity record(s).'
+  );
+
+  const data = buildBootstrapData_(spreadsheet);
+  data.workbookRepair = selected;
+  return data;
+}
+
+function getPGSWorkbookCandidates_() {
+  const files = DriveApp.getFilesByName(WORKBOOK_NAME);
+  const candidates = [];
+
+  while (files.hasNext()) {
+    const file = files.next();
+    if (file.isTrashed() || file.getMimeType() !== MimeType.GOOGLE_SHEETS) {
+      continue;
+    }
+
+    try {
+      const spreadsheet = SpreadsheetApp.openById(file.getId());
+      const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+      let activityCount = 0;
+
+      if (sheet && sheet.getLastRow() >= 2) {
+        activityCount = sheet
+          .getRange(2, 1, sheet.getLastRow() - 1, 1)
+          .getDisplayValues()
+          .filter(function(row) {
+            return cleanString_(row[0]) !== '';
+          }).length;
+      }
+
+      candidates.push({
+        id: file.getId(),
+        url: file.getUrl(),
+        name: file.getName(),
+        activityCount: activityCount,
+        lastUpdated: formatDateTime_(file.getLastUpdated()),
+        lastUpdatedMillis: file.getLastUpdated().getTime()
+      });
+    } catch (error) {
+      candidates.push({
+        id: file.getId(),
+        url: file.getUrl(),
+        name: file.getName(),
+        activityCount: -1,
+        lastUpdated: '',
+        lastUpdatedMillis: 0,
+        error: error.message
+      });
+    }
+  }
+
+  return candidates;
+}
+
 
 function setupWorkbook_(spreadsheet) {
   const activities = spreadsheet.getSheets()[0];
@@ -908,12 +1073,19 @@ function activityToRow_(a) {
 function normalizeActivityInput_(input, rule) {
   const a = input || {};
   const recordType = cleanString_(a.recordType) || 'self_report';
-  const title = cleanString_(a.title);
-  const description = cleanString_(a.description);
   const categoryKey = cleanString_(a.categoryKey);
+  const isCarryover = recordType === 'automatic_elms' &&
+    categoryKey === CARRYOVER_CATEGORY_KEY;
+
+  const title = cleanString_(a.title) ||
+    (isCarryover ? 'Carryover / Rollover' : '');
+  const description = cleanString_(a.description) ||
+    (isCarryover ? 'CUs carried over from a prior approved advancement round.' : '');
   const paymentStatus = cleanString_(a.paymentStatus) || 'unpaid';
-  const status = cleanString_(a.status) ||
-    (recordType === 'automatic_elms' ? 'Waiting to appear in ELMS' : 'Planning');
+  const status = isCarryover
+    ? 'Confirmed in ELMS'
+    : (cleanString_(a.status) ||
+      (recordType === 'automatic_elms' ? 'Waiting to appear in ELMS' : 'Planning'));
   const entryMode = rule.entryMode || '';
   const sessions = recordType === 'self_report' && entryMode === 'session_time'
     ? normalizeSessions_(a.sessions)
@@ -938,14 +1110,17 @@ function normalizeActivityInput_(input, rule) {
   const endDate = sessionDates.length ? sessionDates[sessionDates.length - 1] : cleanString_(a.endDate);
 
   if (!startDate) {
-    throw new Error('Enter the activity start date. This assistant applies only to activities occurring on or after May 1, 2024.');
+    throw new Error(isCarryover
+      ? 'Enter the date the carryover first appeared in ELMS. Do not enter an expected date.'
+      : 'Enter the activity start date. This assistant applies only to activities occurring on or after May 1, 2024.');
   }
 
-  if (startDate < MIN_ACTIVITY_DATE) {
+  // Carryover is an administrative ELMS entry, not a new activity date.
+  if (!isCarryover && startDate < MIN_ACTIVITY_DATE) {
     throw new Error('This assistant applies only to activities occurring on or after May 1, 2024.');
   }
 
-  if (endDate && endDate < MIN_ACTIVITY_DATE) {
+  if (!isCarryover && endDate && endDate < MIN_ACTIVITY_DATE) {
     throw new Error('This assistant applies only to activities occurring on or after May 1, 2024.');
   }
 
@@ -953,24 +1128,38 @@ function normalizeActivityInput_(input, rule) {
     throw new Error('The activity end date cannot be earlier than the start date.');
   }
 
-  if (recordType === 'automatic_elms' &&
+  if (isCarryover && !(numberOrZero_(a.officialApprovedCUs) > 0)) {
+    throw new Error('Enter the official carryover CUs exactly as shown in ELMS.');
+  }
+
+  if (!isCarryover &&
+      recordType === 'automatic_elms' &&
       status === 'Confirmed in ELMS' &&
       !(numberOrZero_(a.officialApprovedCUs) > 0)) {
     throw new Error('Enter the CUs shown in ELMS for a confirmed automatic record.');
   }
 
   return {
-    id: cleanString_(a.id), title: title, description: description,
-    startDate: startDate, endDate: endDate,
-    organization: cleanString_(a.organization), role: cleanString_(a.role),
-    categoryKey: categoryKey, paymentStatus: paymentStatus,
+    id: cleanString_(a.id),
+    title: title,
+    description: description,
+    startDate: startDate,
+    endDate: endDate,
+    organization: cleanString_(a.organization) ||
+      (isCarryover ? 'PGS Office / ELMS' : ''),
+    role: cleanString_(a.role) || (isCarryover ? 'Carryover' : ''),
+    categoryKey: categoryKey,
+    paymentStatus: paymentStatus,
     quantity: Math.max(0, numberOrZero_(a.quantity)),
     unit: cleanString_(a.unit),
     titleIException: cleanString_(a.titleIException) === 'yes' ? 'yes' : 'no',
-    status: status, officialApprovedCUs: a.officialApprovedCUs,
+    status: status,
+    officialApprovedCUs: a.officialApprovedCUs,
     evidenceLink: validHttpUrlOrBlank_(a.evidenceLink),
-    notes: cleanString_(a.notes), createFolder: Boolean(a.createFolder),
-    sessions: sessions, recordType: recordType
+    notes: cleanString_(a.notes),
+    createFolder: Boolean(a.createFolder),
+    sessions: sessions,
+    recordType: recordType
   };
 }
 
@@ -1345,13 +1534,18 @@ function categoryFolderName_(rule) {
 
 function ensureRenamedChildFolder_(parent, oldName, newName) {
   const newFolders = parent.getFoldersByName(newName);
-  if (newFolders.hasNext()) return newFolders.next();
+  while (newFolders.hasNext()) {
+    const folder = newFolders.next();
+    if (!folder.isTrashed()) return folder;
+  }
 
   const oldFolders = parent.getFoldersByName(oldName);
-  if (oldFolders.hasNext()) {
+  while (oldFolders.hasNext()) {
     const folder = oldFolders.next();
-    folder.setName(newName);
-    return folder;
+    if (!folder.isTrashed()) {
+      folder.setName(newName);
+      return folder;
+    }
   }
 
   return parent.createFolder(newName);
@@ -1373,15 +1567,29 @@ function markLegacyReceiptFolder_(root) {
 
 function ensureChildFolder_(parent, name) {
   const matches = parent.getFoldersByName(name);
-  return matches.hasNext() ? matches.next() : parent.createFolder(name);
+
+  while (matches.hasNext()) {
+    const folder = matches.next();
+    if (!folder.isTrashed()) return folder;
+  }
+
+  return parent.createFolder(name);
 }
 
 function getFolderByStoredId_(propertyName) {
-  const id = PropertiesService.getUserProperties().getProperty(propertyName);
+  const properties = PropertiesService.getUserProperties();
+  const id = properties.getProperty(propertyName);
   if (!id) return null;
-  try { return DriveApp.getFolderById(id); }
-  catch (error) {
-    PropertiesService.getUserProperties().deleteProperty(propertyName);
+
+  try {
+    const folder = DriveApp.getFolderById(id);
+    if (folder.isTrashed()) {
+      properties.deleteProperty(propertyName);
+      return null;
+    }
+    return folder;
+  } catch (error) {
+    properties.deleteProperty(propertyName);
     return null;
   }
 }
