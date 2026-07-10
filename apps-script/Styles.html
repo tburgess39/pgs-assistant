@@ -360,3 +360,43 @@ details summary{cursor:pointer;color:var(--navy)}
 }
 
 #quantityHelp{display:block;margin-top:6px;color:var(--muted);line-height:1.4}
+
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.session-template{
+  display:flex;
+  align-items:end;
+  gap:12px;
+  margin:12px 0;
+  padding:12px;
+  border-radius:10px;
+  background:#eef6fc;
+}
+.session-template .field{flex:1;margin:0}
+.session-table .session-description{min-width:320px}
+.status-select{min-width:190px;padding:8px}
+.file-links{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:120px;
+}
+.file-links.large{
+  flex-direction:row;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+.file-links a{
+  font-weight:800;
+  color:var(--blue);
+}
+#resultFolder{
+  color:var(--blue);
+  font-weight:900;
+}
+@media(max-width:1200px){
+  .g5{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  .g5{grid-template-columns:1fr}
+  .session-template{align-items:stretch;flex-direction:column}
+}

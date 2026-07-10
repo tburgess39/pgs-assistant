@@ -15,9 +15,12 @@ const ACTIVITY_HEADERS = Object.freeze([
   'ID', 'Activity Title', 'Description', 'Start Date', 'End Date',
   'Organization / Site', 'Role', 'Category Key', 'Parent Category',
   'Activity Category', 'Payment Status', 'Quantity', 'Unit',
-  'Title I Exception', 'Estimated CUs', 'Status', 'Official Approved CUs',
-  'Evidence Link', 'Activity Folder ID', 'Activity Folder URL', 'Notes',
-  'Rule Version', 'Created At', 'Updated At', 'Sessions JSON'
+  'Title I Exception', 'Estimated CUs', 'Status',
+  'Legacy Approved CU Override (Unused)', 'Generated Packet Link',
+  'Category Folder ID', 'Category Folder URL', 'Notes',
+  'Rule Version', 'Created At', 'Updated At', 'Sessions JSON',
+  'Official Form URL', 'Session Log PDF URL', 'Packet Created At',
+  'Submitted to ELMS At'
 ]);
 
 const RULE_HEADERS = Object.freeze([
@@ -35,12 +38,18 @@ const RULE_HEADERS = Object.freeze([
 ]);
 
 const STATUS_OPTIONS = Object.freeze([
-  'Needs evidence', 'In progress', 'Ready for ELMS', 'Submitted',
+  'Draft',
+  'PDF created - review and sign',
+  'Submitted to ELMS',
   'Returned for corrections',
-  'Approved — enter only after official CCSD approval', 'Denied'
+  'Approved',
+  'Denied',
+  'Tracked - verify in ELMS'
 ]);
 
-const PAYMENT_OPTIONS = Object.freeze(['unpaid', 'paid', 'contract', 'mixed']);
+const PAYMENT_OPTIONS = Object.freeze(['unpaid', 'paid', 'contract', 'not_applicable']);
+const OFFICIAL_TIME_FORM_FILE_ID = '19ts7-3nb1Gz1ZQZ-eabjwkGykRrrWkrh';
+const OFFICIAL_TIME_FORM_URL = 'https://drive.google.com/file/d/19ts7-3nb1Gz1ZQZ-eabjwkGykRrrWkrh/view';
 
 function doGet() {
   return HtmlService.createTemplateFromFile('Index')
@@ -65,7 +74,8 @@ function getBootstrapData() {
       spreadsheetUrl: spreadsheet.getUrl(),
       spreadsheetName: spreadsheet.getName(),
       rootFolderUrl: folders.rootFolderUrl || '',
-      activityEvidenceFolderUrl: folders.activityEvidenceFolderUrl || ''
+      activityEvidenceFolderUrl: folders.activityEvidenceFolderUrl || '',
+      officialTimeFormUrl: OFFICIAL_TIME_FORM_URL
     },
     rules: rules,
     activities: activities,
@@ -101,29 +111,21 @@ function saveActivity(input) {
   const activity = normalizeActivityInput_(input, rule);
   applyEntryCalculations_(activity, rule);
 
-  const existingRow = activity.id ? findActivityRow_(sheet, activity.id) : 0;
-  const existing = existingRow
-    ? rowToActivity_(sheet.getRange(existingRow, 1, 1, ACTIVITY_HEADERS.length).getValues()[0])
-    : null;
+  if (activity.id && findActivityRow_(sheet, activity.id)) {
+    throw new Error(
+      'Saved activity details are locked. Delete the record and create a corrected one, ' +
+      'or use the status controls in Activity Records.'
+    );
+  }
 
   const estimate = calculateEstimatedCUs_(activity, rule);
   const now = new Date();
-  const id = activity.id || Utilities.getUuid();
+  const id = Utilities.getUuid();
+  const categoryFolder = ensureCategoryFolder_(rule);
 
-  let folderId = existing ? existing.activityFolderId : '';
-  let folderUrl = existing ? existing.activityFolderUrl : '';
-  let evidenceLink = activity.evidenceLink || (existing ? existing.evidenceLink : '');
-
-  if (activity.createFolder && !folderId) {
-    const folder = createActivityFolder_(id, activity.title, activity.startDate);
-    folderId = folder.id;
-    folderUrl = folder.url;
-    evidenceLink = evidenceLink || folder.url;
-  }
-
-  const officialApprovedCUs = activity.status.indexOf('Approved') === 0
-    ? numberOrBlank_(activity.officialApprovedCUs)
-    : '';
+  const status = rule.submissionMode === 'automatic'
+    ? 'Tracked - verify in ELMS'
+    : 'Draft';
 
   const record = {
     id: id,
@@ -139,30 +141,33 @@ function saveActivity(input) {
     paymentStatus: activity.paymentStatus,
     quantity: activity.quantity,
     unit: activity.unit,
-    titleIException: activity.titleIException,
+    titleIException: 'no',
     estimatedCUs: estimate,
-    status: activity.status,
-    officialApprovedCUs: officialApprovedCUs,
-    evidenceLink: evidenceLink,
-    activityFolderId: folderId,
-    activityFolderUrl: folderUrl,
-    notes: activity.notes,
+    status: status,
+    officialApprovedCUs: '',
+    evidenceLink: '',
+    activityFolderId: categoryFolder.getId(),
+    activityFolderUrl: categoryFolder.getUrl(),
+    notes: '',
     ruleVersion: rule.ruleVersion,
-    createdAt: existing ? existing.createdAt : formatDateTime_(now),
+    createdAt: formatDateTime_(now),
     updatedAt: formatDateTime_(now),
-    sessions: activity.sessions
+    sessions: activity.sessions,
+    officialFormUrl: '',
+    sessionLogPdfUrl: '',
+    packetCreatedAt: '',
+    submittedToElmsAt: ''
   };
 
-  const rowValues = activityToRow_(record);
-
-  if (existingRow) {
-    sheet.getRange(existingRow, 1, 1, ACTIVITY_HEADERS.length).setValues([rowValues]);
-  } else {
-    sheet.appendRow(rowValues);
-  }
-
+  sheet.appendRow(activityToRow_(record));
   applyActivityRowFormatting_(sheet);
-  appendChangeLog_(spreadsheet, existingRow ? 'UPDATED ACTIVITY' : 'CREATED ACTIVITY', id, activity.title);
+  appendChangeLog_(
+    spreadsheet,
+    'CREATED LOCKED ACTIVITY',
+    id,
+    activity.title + ' | Category folder: ' + categoryFolder.getUrl()
+  );
+
   return getBootstrapData();
 }
 
@@ -175,8 +180,90 @@ function deleteActivity(activityId) {
 
   const title = sheet.getRange(row, 2).getDisplayValue();
   sheet.deleteRow(row);
-  appendChangeLog_(spreadsheet, 'DELETED ACTIVITY RECORD', activityId,
-    title + ' — Drive folders were not deleted.');
+  appendChangeLog_(
+    spreadsheet,
+    'DELETED ACTIVITY RECORD',
+    activityId,
+    title + ' - Category folders and generated files were not deleted.'
+  );
+  return getBootstrapData();
+}
+
+function updateActivityStatus(input) {
+  const activityId = cleanString_(input && input.id);
+  const requestedStatus = cleanString_(input && input.status);
+
+  if (STATUS_OPTIONS.indexOf(requestedStatus) === -1) {
+    throw new Error('Choose a valid activity status.');
+  }
+
+  const spreadsheet = getOrCreateWorkbook_();
+  const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+  const row = findActivityRow_(sheet, activityId);
+
+  if (!row) throw new Error('The activity could not be found.');
+
+  const map = getHeaderMap_(ACTIVITY_HEADERS);
+  sheet.getRange(row, map['Status']).setValue(requestedStatus);
+  sheet.getRange(row, map['Updated At']).setValue(formatDateTime_(new Date()));
+
+  if (requestedStatus === 'Submitted to ELMS') {
+    sheet.getRange(row, map['Submitted to ELMS At'])
+      .setValue(formatDateTime_(new Date()));
+  }
+
+  appendChangeLog_(
+    spreadsheet,
+    'UPDATED STATUS',
+    activityId,
+    requestedStatus
+  );
+
+  return getBootstrapData();
+}
+
+function prepareActivityPacket(activityId) {
+  const spreadsheet = getOrCreateWorkbook_();
+  const sheet = spreadsheet.getSheetByName(SHEETS.ACTIVITIES);
+  const row = findActivityRow_(sheet, cleanString_(activityId));
+
+  if (!row) throw new Error('The activity could not be found.');
+
+  const rules = getRules_(spreadsheet);
+  const record = rowToActivity_(
+    sheet.getRange(row, 1, 1, ACTIVITY_HEADERS.length).getValues()[0]
+  );
+  const rule = rules.find(function(item) {
+    return item.categoryKey === record.categoryKey;
+  });
+
+  if (!rule) throw new Error('The category rule could not be found.');
+  if (rule.entryMode !== 'session_time') {
+    throw new Error('The automatic packet generator is currently for time-based activities.');
+  }
+
+  const folder = ensureCategoryFolder_(rule);
+  const officialCopy = copyOfficialTimeBasedForm_(folder, record);
+  const sessionReport = createSessionLogPdf_(folder, record, rule);
+  const map = getHeaderMap_(ACTIVITY_HEADERS);
+  const now = formatDateTime_(new Date());
+
+  sheet.getRange(row, map['Category Folder ID']).setValue(folder.getId());
+  sheet.getRange(row, map['Category Folder URL']).setValue(folder.getUrl());
+  sheet.getRange(row, map['Generated Packet Link']).setValue(sessionReport.url);
+  sheet.getRange(row, map['Official Form URL']).setValue(officialCopy.url);
+  sheet.getRange(row, map['Session Log PDF URL']).setValue(sessionReport.url);
+  sheet.getRange(row, map['Packet Created At']).setValue(now);
+  sheet.getRange(row, map['Status']).setValue('PDF created - review and sign');
+  sheet.getRange(row, map['Updated At']).setValue(now);
+
+  appendChangeLog_(
+    spreadsheet,
+    'PREPARED TIME-BASED PACKET',
+    record.id,
+    'Official form: ' + officialCopy.url + ' | Session log: ' + sessionReport.url
+  );
+
   return getBootstrapData();
 }
 
@@ -198,23 +285,19 @@ function createEvidenceFolderForActivity(activityId) {
   const record = rowToActivity_(
     sheet.getRange(row, 1, 1, ACTIVITY_HEADERS.length).getValues()[0]
   );
+  const rule = getRules_(spreadsheet).find(function(item) {
+    return item.categoryKey === record.categoryKey;
+  });
 
-  if (record.activityFolderId) {
-    try {
-      DriveApp.getFolderById(record.activityFolderId);
-      return getBootstrapData();
-    } catch (error) {}
-  }
+  if (!rule) throw new Error('The category rule could not be found.');
 
-  const folder = createActivityFolder_(record.id, record.title, record.startDate);
+  const folder = ensureCategoryFolder_(rule);
   const map = getHeaderMap_(ACTIVITY_HEADERS);
-  sheet.getRange(row, map['Activity Folder ID']).setValue(folder.id);
-  sheet.getRange(row, map['Activity Folder URL']).setValue(folder.url);
-  if (!record.evidenceLink) {
-    sheet.getRange(row, map['Evidence Link']).setValue(folder.url);
-  }
+  sheet.getRange(row, map['Category Folder ID']).setValue(folder.getId());
+  sheet.getRange(row, map['Category Folder URL']).setValue(folder.getUrl());
   sheet.getRange(row, map['Updated At']).setValue(formatDateTime_(new Date()));
-  appendChangeLog_(spreadsheet, 'CREATED ACTIVITY FOLDER', record.id, folder.url);
+
+  appendChangeLog_(spreadsheet, 'VERIFIED CATEGORY FOLDER', record.id, folder.getUrl());
   return getBootstrapData();
 }
 
@@ -340,6 +423,10 @@ function styleWorkbook_(spreadsheet) {
   activitySheet.setColumnWidth(18, 300);
   activitySheet.setColumnWidth(20, 300);
   activitySheet.setColumnWidth(21, 300);
+  activitySheet.setColumnWidths(26, 4, 260);
+  activitySheet.hideColumns(14);
+  activitySheet.hideColumns(17);
+  activitySheet.hideColumns(18);
 
   const rulesSheet = spreadsheet.getSheetByName(SHEETS.RULES);
   rulesSheet.setColumnWidth(1, 210);
@@ -433,69 +520,117 @@ function readActivities_(spreadsheet) {
 
 function rowToActivity_(row) {
   return {
-    id: displayValue_(row[0]), title: displayValue_(row[1]),
-    description: displayValue_(row[2]), startDate: dateToInput_(row[3]),
-    endDate: dateToInput_(row[4]), organization: displayValue_(row[5]),
-    role: displayValue_(row[6]), categoryKey: displayValue_(row[7]),
-    parentCategory: displayValue_(row[8]), categoryName: displayValue_(row[9]),
-    paymentStatus: displayValue_(row[10]), quantity: numberOrZero_(row[11]),
-    unit: displayValue_(row[12]), titleIException: displayValue_(row[13]) || 'no',
+    id: displayValue_(row[0]),
+    title: displayValue_(row[1]),
+    description: displayValue_(row[2]),
+    startDate: dateToInput_(row[3]),
+    endDate: dateToInput_(row[4]),
+    organization: displayValue_(row[5]),
+    role: displayValue_(row[6]),
+    categoryKey: displayValue_(row[7]),
+    parentCategory: displayValue_(row[8]),
+    categoryName: displayValue_(row[9]),
+    paymentStatus: displayValue_(row[10]),
+    quantity: numberOrZero_(row[11]),
+    unit: displayValue_(row[12]),
+    titleIException: displayValue_(row[13]) || 'no',
     estimatedCUs: row[14] === '' ? '' : numberOrZero_(row[14]),
-    status: displayValue_(row[15]),
-    officialApprovedCUs: row[16] === '' ? '' : numberOrZero_(row[16]),
-    evidenceLink: displayValue_(row[17]), activityFolderId: displayValue_(row[18]),
-    activityFolderUrl: displayValue_(row[19]), notes: displayValue_(row[20]),
-    ruleVersion: displayValue_(row[21]), createdAt: dateTimeToString_(row[22]),
+    status: displayValue_(row[15]) || 'Draft',
+    officialApprovedCUs: '',
+    evidenceLink: displayValue_(row[17]),
+    activityFolderId: displayValue_(row[18]),
+    activityFolderUrl: displayValue_(row[19]),
+    notes: displayValue_(row[20]),
+    ruleVersion: displayValue_(row[21]),
+    createdAt: dateTimeToString_(row[22]),
     updatedAt: dateTimeToString_(row[23]),
-    sessions: parseJson_(row[24], [])
+    sessions: parseJson_(row[24], []),
+    officialFormUrl: displayValue_(row[25]),
+    sessionLogPdfUrl: displayValue_(row[26]),
+    packetCreatedAt: dateTimeToString_(row[27]),
+    submittedToElmsAt: dateTimeToString_(row[28])
   };
 }
 
 function activityToRow_(a) {
   return [
-    safeText_(a.id), safeText_(a.title), safeText_(a.description),
-    inputToDate_(a.startDate), inputToDate_(a.endDate),
-    safeText_(a.organization), safeText_(a.role), safeText_(a.categoryKey),
-    safeText_(a.parentCategory), safeText_(a.categoryName),
-    safeText_(a.paymentStatus), a.quantity, safeText_(a.unit),
-    safeText_(a.titleIException), a.estimatedCUs, safeText_(a.status),
-    a.officialApprovedCUs, safeText_(a.evidenceLink),
-    safeText_(a.activityFolderId), safeText_(a.activityFolderUrl),
-    safeText_(a.notes), safeText_(a.ruleVersion),
-    safeText_(a.createdAt), safeText_(a.updatedAt),
-    JSON.stringify(a.sessions || [])
+    safeText_(a.id),
+    safeText_(a.title),
+    safeText_(a.description),
+    inputToDate_(a.startDate),
+    inputToDate_(a.endDate),
+    safeText_(a.organization),
+    safeText_(a.role),
+    safeText_(a.categoryKey),
+    safeText_(a.parentCategory),
+    safeText_(a.categoryName),
+    safeText_(a.paymentStatus),
+    a.quantity,
+    safeText_(a.unit),
+    'no',
+    a.estimatedCUs,
+    safeText_(a.status),
+    '',
+    safeText_(a.evidenceLink),
+    safeText_(a.activityFolderId),
+    safeText_(a.activityFolderUrl),
+    '',
+    safeText_(a.ruleVersion),
+    safeText_(a.createdAt),
+    safeText_(a.updatedAt),
+    JSON.stringify(a.sessions || []),
+    safeText_(a.officialFormUrl),
+    safeText_(a.sessionLogPdfUrl),
+    safeText_(a.packetCreatedAt),
+    safeText_(a.submittedToElmsAt)
   ];
 }
 
 function normalizeActivityInput_(input, rule) {
   const a = input || {};
-  const title = cleanString_(a.title);
-  const description = cleanString_(a.description);
   const categoryKey = cleanString_(a.categoryKey);
-  const paymentStatus = cleanString_(a.paymentStatus) || 'unpaid';
-  const status = cleanString_(a.status) || STATUS_OPTIONS[0];
+  const organization = cleanString_(a.organization);
+  const role = cleanString_(a.role);
   const entryMode = rule.entryMode || '';
-  const sessions = entryMode === 'session_time' ? normalizeSessions_(a.sessions) : [];
+  const paymentStatus = ['session_time', 'duration_hours'].indexOf(entryMode) >= 0
+    ? cleanString_(a.paymentStatus)
+    : 'not_applicable';
 
-  if (!title) throw new Error('Activity title is required.');
-  if (!description) throw new Error('Activity description is required.');
   if (!categoryKey) throw new Error('Choose or confirm an activity category.');
-  if (PAYMENT_OPTIONS.indexOf(paymentStatus) === -1) throw new Error('Select a valid payment status.');
-  if (STATUS_OPTIONS.indexOf(status) === -1) throw new Error('Select a valid status.');
+  if (!organization) throw new Error('Enter the school, site, organization, or provider.');
+  if (!role) throw new Error('Choose your official role for this activity.');
 
-  const sessionDates = sessions.map(function(session) { return session.date; }).sort();
-  const startDate = sessionDates.length ? sessionDates[0] : cleanString_(a.startDate);
-  const endDate = sessionDates.length ? sessionDates[sessionDates.length - 1] : cleanString_(a.endDate);
+  const allowedRoles = allowedRolesForCategory_(categoryKey);
+  if (allowedRoles.length && allowedRoles.indexOf(role) === -1) {
+    throw new Error('Choose a role listed for the official activity category.');
+  }
+
+  if (['session_time', 'duration_hours'].indexOf(entryMode) >= 0 &&
+      ['unpaid', 'paid', 'contract'].indexOf(paymentStatus) === -1) {
+    throw new Error('Select whether the entire activity was unpaid, paid by stipend/supplemental rate, or paid at the contractual rate.');
+  }
+
+  const sessions = entryMode === 'session_time'
+    ? normalizeSessions_(a.sessions, paymentStatus)
+    : [];
+
+  const sessionDates = sessions.map(function(session) {
+    return session.date;
+  }).sort();
+
+  const startDate = sessionDates.length
+    ? sessionDates[0]
+    : cleanString_(a.startDate);
+  const endDate = sessionDates.length
+    ? sessionDates[sessionDates.length - 1]
+    : cleanString_(a.endDate);
 
   if (!startDate) {
-    throw new Error('Enter the activity start date. This assistant applies only to activities occurring on or after May 1, 2024.');
+    throw new Error('Enter the activity date. This assistant applies only to activities occurring on or after May 1, 2024.');
   }
 
-  if (startDate < MIN_ACTIVITY_DATE) {
-    throw new Error('This assistant applies only to activities occurring on or after May 1, 2024.');
-  }
-
-  if (endDate && endDate < MIN_ACTIVITY_DATE) {
+  if (startDate < MIN_ACTIVITY_DATE ||
+      (endDate && endDate < MIN_ACTIVITY_DATE)) {
     throw new Error('This assistant applies only to activities occurring on or after May 1, 2024.');
   }
 
@@ -503,22 +638,50 @@ function normalizeActivityInput_(input, rule) {
     throw new Error('The activity end date cannot be earlier than the start date.');
   }
 
+  let description = cleanString_(a.description);
+  if (entryMode === 'session_time') {
+    const uniqueDescriptions = sessions
+      .map(function(session) { return session.description; })
+      .filter(function(value, index, array) {
+        return value && array.indexOf(value) === index;
+      });
+    description = uniqueDescriptions.join(' | ');
+  }
+
+  if (!description) {
+    throw new Error(
+      entryMode === 'session_time'
+        ? 'Enter a brief description for each session.'
+        : 'Enter a brief activity description.'
+    );
+  }
+
+  const title = cleanString_(a.title) ||
+    [organization, rule.activityName, role].filter(Boolean).join(' - ');
+
   return {
-    id: cleanString_(a.id), title: title, description: description,
-    startDate: startDate, endDate: endDate,
-    organization: cleanString_(a.organization), role: cleanString_(a.role),
-    categoryKey: categoryKey, paymentStatus: paymentStatus,
+    id: '',
+    title: title,
+    description: description,
+    startDate: startDate,
+    endDate: endDate,
+    organization: organization,
+    role: role,
+    categoryKey: categoryKey,
+    paymentStatus: paymentStatus,
     quantity: Math.max(0, numberOrZero_(a.quantity)),
-    unit: cleanString_(a.unit), titleIException: cleanString_(a.titleIException) === 'yes' ? 'yes' : 'no',
-    status: status, officialApprovedCUs: a.officialApprovedCUs,
-    evidenceLink: validHttpUrlOrBlank_(a.evidenceLink),
-    notes: cleanString_(a.notes), createFolder: Boolean(a.createFolder),
+    unit: cleanString_(a.unit),
+    titleIException: 'no',
+    status: 'Draft',
+    officialApprovedCUs: '',
+    evidenceLink: '',
+    notes: '',
+    createFolder: true,
     sessions: sessions
   };
 }
 
-
-function normalizeSessions_(input) {
+function normalizeSessions_(input, activityPaymentStatus) {
   if (!Array.isArray(input)) return [];
 
   return input
@@ -526,7 +689,8 @@ function normalizeSessions_(input) {
       return session && (
         cleanString_(session.date) ||
         cleanString_(session.startTime) ||
-        cleanString_(session.endTime)
+        cleanString_(session.endTime) ||
+        cleanString_(session.description)
       );
     })
     .map(function(session, index) {
@@ -534,31 +698,47 @@ function normalizeSessions_(input) {
       const date = cleanString_(session.date);
       const startTime = cleanString_(session.startTime);
       const endTime = cleanString_(session.endTime);
-      const breakMinutes = Math.max(0, Math.floor(numberOrZero_(session.breakMinutes)));
-      const paymentStatus = cleanString_(session.paymentStatus) || 'unpaid';
+      const description = cleanString_(session.description);
+      const breakMinutes = Math.max(
+        0,
+        Math.floor(numberOrZero_(session.breakMinutes))
+      );
 
       if (!date || !startTime || !endTime) {
-        throw new Error('Session ' + rowNumber + ' requires a date, start time, and end time.');
+        throw new Error(
+          'Session ' + rowNumber +
+          ' requires a date, start time, and end time.'
+        );
+      }
+
+      if (!description) {
+        throw new Error(
+          'Session ' + rowNumber + ' requires a brief description.'
+        );
       }
 
       if (date < MIN_ACTIVITY_DATE) {
-        throw new Error('Session ' + rowNumber + ' is before May 1, 2024.');
-      }
-
-      if (PAYMENT_OPTIONS.indexOf(paymentStatus) === -1 || paymentStatus === 'mixed') {
-        throw new Error('Session ' + rowNumber + ' has an invalid payment status.');
+        throw new Error(
+          'Session ' + rowNumber + ' is before May 1, 2024.'
+        );
       }
 
       const startMinutes = timeToMinutes_(startTime);
       const endMinutes = timeToMinutes_(endTime);
 
       if (endMinutes <= startMinutes) {
-        throw new Error('Session ' + rowNumber + ' end time must be later than its start time.');
+        throw new Error(
+          'Session ' + rowNumber +
+          ' end time must be later than its start time.'
+        );
       }
 
       const grossMinutes = endMinutes - startMinutes;
       if (breakMinutes >= grossMinutes) {
-        throw new Error('Session ' + rowNumber + ' break must be shorter than the session.');
+        throw new Error(
+          'Session ' + rowNumber +
+          ' break must be shorter than the session.'
+        );
       }
 
       const netMinutes = grossMinutes - breakMinutes;
@@ -568,7 +748,8 @@ function normalizeSessions_(input) {
         startTime: startTime,
         endTime: endTime,
         breakMinutes: breakMinutes,
-        paymentStatus: paymentStatus,
+        paymentStatus: activityPaymentStatus,
+        description: description,
         minutes: netMinutes,
         hours: roundToTwo_(netMinutes / 60)
       };
@@ -580,22 +761,22 @@ function applyEntryCalculations_(activity, rule) {
 
   if (mode === 'session_time') {
     if (!activity.sessions.length) {
-      throw new Error('Add at least one dated session with a start time and end time.');
+      throw new Error(
+        'Add at least one dated session with a start time, end time, and description.'
+      );
     }
 
     const totalMinutes = activity.sessions.reduce(function(total, session) {
       return total + session.minutes;
     }, 0);
 
-    const paymentStatuses = activity.sessions
-      .map(function(session) { return session.paymentStatus; })
-      .filter(function(value, index, array) { return array.indexOf(value) === index; });
-
     activity.quantity = totalMinutes / 60;
     activity.unit = 'hours';
-    activity.paymentStatus = paymentStatuses.length === 1 ? paymentStatuses[0] : 'mixed';
 
-    const dates = activity.sessions.map(function(session) { return session.date; }).sort();
+    const dates = activity.sessions.map(function(session) {
+      return session.date;
+    }).sort();
+
     activity.startDate = dates[0];
     activity.endDate = dates[dates.length - 1];
     return activity;
@@ -617,12 +798,17 @@ function applyEntryCalculations_(activity, rule) {
 
   if (['duration_hours', 'count', 'credit', 'credit_review', 'ceu_or_hours'].indexOf(mode) >= 0) {
     if (!(activity.quantity > 0)) {
-      throw new Error(rule.quantityLabel + ' must be greater than zero.');
+      throw new Error(
+        (rule.quantityLabel || 'Quantity') + ' must be greater than zero.'
+      );
     }
   }
 
-  if (mode === 'count' && Math.floor(activity.quantity) !== activity.quantity) {
-    throw new Error(rule.quantityLabel + ' must be a whole number.');
+  if (mode === 'count' &&
+      Math.floor(activity.quantity) !== activity.quantity) {
+    throw new Error(
+      (rule.quantityLabel || 'Quantity') + ' must be a whole number.'
+    );
   }
 
   if (mode === 'duration_hours') activity.unit = 'hours';
@@ -643,38 +829,31 @@ function calculateEstimatedCUs_(activity, rule) {
   if (rule.entryMode === 'automatic') return '';
 
   if (rule.calculationType === 'hours') {
-    if (activity.sessions && activity.sessions.length) {
-      result = activity.sessions.reduce(function(total, session) {
-        if (session.paymentStatus === 'contract' && !rule.contractTimeAllowed) {
-          return total;
-        }
-
-        const fullRateException = rule.titleIExceptionAllowed &&
-          activity.titleIException === 'yes' &&
-          session.paymentStatus === 'paid';
-
-        const divisor = session.paymentStatus === 'paid' && !fullRateException
-          ? rule.paidHoursPerCU
-          : rule.unpaidHoursPerCU;
-
-        return divisor ? total + (session.minutes / 60) / divisor : total;
-      }, 0);
-    } else {
-      if (activity.paymentStatus === 'contract' && !rule.contractTimeAllowed) return 0;
-      const fullRateException = rule.titleIExceptionAllowed &&
-        activity.titleIException === 'yes' &&
-        activity.paymentStatus === 'paid';
-      const divisor = activity.paymentStatus === 'paid' && !fullRateException
-        ? rule.paidHoursPerCU : rule.unpaidHoursPerCU;
-      result = divisor ? activity.quantity / divisor : '';
+    if (activity.paymentStatus === 'contract' &&
+        !rule.contractTimeAllowed) {
+      return 0;
     }
+
+    const divisor = activity.paymentStatus === 'paid'
+      ? rule.paidHoursPerCU
+      : rule.unpaidHoursPerCU;
+
+    const hours = activity.sessions && activity.sessions.length
+      ? activity.sessions.reduce(function(total, session) {
+          return total + session.minutes / 60;
+        }, 0)
+      : activity.quantity;
+
+    result = divisor ? hours / divisor : '';
   } else if (rule.calculationType === 'count') {
     result = activity.quantity * numberOrZero_(rule.perUnitCUs);
   } else if (rule.calculationType === 'fixed') {
     result = numberOrZero_(rule.fixedCUs);
   } else if (rule.calculationType === 'unit_rate') {
     const rate = Number(rule.unitRates[activity.unit]);
-    result = Number.isFinite(rate) ? activity.quantity * rate : '';
+    result = Number.isFinite(rate)
+      ? activity.quantity * rate
+      : '';
   } else if (rule.calculationType === 'manual') {
     result = '';
   }
@@ -683,46 +862,73 @@ function calculateEstimatedCUs_(activity, rule) {
 }
 
 function buildSummary_(activities, rules) {
-  const approvedTotal = activities.reduce(function(total, item) {
-    return total + numberOrZero_(item.officialApprovedCUs);
-  }, 0);
+  function balancesFor_(includedActivities) {
+    return rules
+      .filter(function(rule) { return rule.active; })
+      .map(function(rule) {
+        const recorded = includedActivities
+          .filter(function(item) {
+            return item.categoryKey === rule.categoryKey;
+          })
+          .reduce(function(total, item) {
+            return total + numberOrZero_(item.estimatedCUs);
+          }, 0);
 
-  const categoryBalances = rules.filter(function(rule) { return rule.active; })
-    .map(function(rule) {
-      const recorded = activities
-        .filter(function(item) { return item.categoryKey === rule.categoryKey; })
-        .reduce(function(total, item) { return total + numberOrZero_(item.estimatedCUs); }, 0);
-      const countable = rule.maximumCUs === null
-        ? recorded
-        : Math.min(recorded, rule.maximumCUs);
-      return {
-        categoryKey: rule.categoryKey,
-        parentCategory: rule.parentCategory,
-        category: rule.activityName,
-        recorded: roundToTwo_(recorded),
-        countable: roundToTwo_(countable),
-        overMaximum: rule.maximumCUs === null ? 0 : roundToTwo_(Math.max(0, recorded - rule.maximumCUs)),
-        maximum: rule.maximumCUs,
-        remaining: rule.maximumCUs === null ? null :
-          roundToTwo_(Math.max(0, rule.maximumCUs - recorded))
-      };
-    });
+        const countable = rule.maximumCUs === null
+          ? recorded
+          : Math.min(recorded, rule.maximumCUs);
+
+        return {
+          categoryKey: rule.categoryKey,
+          parentCategory: rule.parentCategory,
+          category: rule.activityName,
+          recorded: roundToTwo_(recorded),
+          countable: roundToTwo_(countable),
+          overMaximum: rule.maximumCUs === null
+            ? 0
+            : roundToTwo_(Math.max(0, recorded - rule.maximumCUs)),
+          maximum: rule.maximumCUs,
+          remaining: rule.maximumCUs === null
+            ? null
+            : roundToTwo_(Math.max(0, rule.maximumCUs - recorded))
+        };
+      });
+  }
+
+  const estimatedActivities = activities.filter(function(item) {
+    return item.status !== 'Denied';
+  });
+
+  const approvedActivities = activities.filter(function(item) {
+    return item.status === 'Approved';
+  });
+
+  const categoryBalances = balancesFor_(estimatedActivities);
+  const approvedCategoryBalances = balancesFor_(approvedActivities);
 
   const rawEstimatedTotal = categoryBalances.reduce(function(total, item) {
     return total + numberOrZero_(item.recorded);
   }, 0);
+
   const estimatedTotal = categoryBalances.reduce(function(total, item) {
+    return total + numberOrZero_(item.countable);
+  }, 0);
+
+  const approvedTotal = approvedCategoryBalances.reduce(function(total, item) {
     return total + numberOrZero_(item.countable);
   }, 0);
 
   return {
     rawEstimatedTotal: roundToTwo_(rawEstimatedTotal),
     estimatedTotal: roundToTwo_(estimatedTotal),
+    estimatedRemaining: roundToTwo_(Math.max(0, 225 - estimatedTotal)),
     approvedTotal: roundToTwo_(approvedTotal),
+    approvedRemaining: roundToTwo_(Math.max(0, 225 - approvedTotal)),
     goalCUs: 225,
     percent: Math.min(100, Math.round((approvedTotal / 225) * 100)),
     remaining: roundToTwo_(Math.max(0, 225 - approvedTotal)),
-    categoryBalances: categoryBalances
+    categoryBalances: categoryBalances,
+    approvedCategoryBalances: approvedCategoryBalances
   };
 }
 
@@ -746,18 +952,223 @@ function createOrGetFolderStructure_() {
   return {rootFolder: root, activityEvidenceFolder: folders.activities};
 }
 
-function createActivityFolder_(activityId, title, startDate) {
-  const parent = createOrGetFolderStructure_().activityEvidenceFolder;
-  const datePart = startDate || Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd');
-  const folder = parent.createFolder(sanitizeFolderName_(datePart + '_' + title));
-  [
-    '01 Original Documentation - Do Not Alter',
-    '02 Approval Form and Signatures',
-    '03 Final Single-File ELMS Submission',
-    '04 ELMS Receipt and PGS Decision'
-  ].forEach(function(name) { folder.createFolder(name); });
-  folder.setDescription(APP_NAME + ' activity ID: ' + activityId);
-  return {id: folder.getId(), url: folder.getUrl()};
+function ensureCategoryFolder_(rule) {
+  const structure = createOrGetFolderStructure_();
+  const parent = structure.activityEvidenceFolder;
+  const properties = PropertiesService.getUserProperties();
+  const propertyKey = categoryFolderPropertyKey_(rule.categoryKey);
+  const storedId = properties.getProperty(propertyKey);
+
+  if (storedId) {
+    try {
+      return DriveApp.getFolderById(storedId);
+    } catch (error) {
+      properties.deleteProperty(propertyKey);
+    }
+  }
+
+  const folderName = sanitizeFolderName_(
+    rule.parentCategory + ' - ' + rule.activityName
+  );
+  const matches = parent.getFoldersByName(folderName);
+  const folder = matches.hasNext()
+    ? matches.next()
+    : parent.createFolder(folderName);
+
+  folder.setDescription(
+    APP_NAME + ' reusable category folder for ' +
+    rule.categoryKey + '. Add all activities in this category here.'
+  );
+  properties.setProperty(propertyKey, folder.getId());
+  return folder;
+}
+
+function categoryFolderPropertyKey_(categoryKey) {
+  return 'PGS_CATEGORY_FOLDER_' +
+    cleanString_(categoryKey).replace(/[^A-Za-z0-9_]/g, '_');
+}
+
+function copyOfficialTimeBasedForm_(folder, activity) {
+  const fileName = sanitizeFolderName_(
+    'Official CCSD CU Approval Form - Time-Based Activities - ' +
+    activity.title
+  ) + '.pdf';
+
+  const existing = folder.getFilesByName(fileName);
+  if (existing.hasNext()) {
+    const file = existing.next();
+    return {url: file.getUrl(), copied: true};
+  }
+
+  try {
+    const source = DriveApp.getFileById(OFFICIAL_TIME_FORM_FILE_ID);
+    const copy = source.makeCopy(fileName, folder);
+    return {url: copy.getUrl(), copied: true};
+  } catch (error) {
+    return {
+      url: OFFICIAL_TIME_FORM_URL,
+      copied: false,
+      message: 'Open the official CCSD form from the district PGS page.'
+    };
+  }
+}
+
+function createSessionLogPdf_(folder, activity, rule) {
+  const baseName = sanitizeFolderName_(
+    'FamilyPD Session Log - ' + activity.title
+  );
+  const pdfName = baseName + '.pdf';
+
+  const existing = folder.getFilesByName(pdfName);
+  while (existing.hasNext()) {
+    existing.next().setTrashed(true);
+  }
+
+  const document = DocumentApp.create(baseName);
+  const documentFile = DriveApp.getFileById(document.getId());
+  documentFile.moveTo(folder);
+
+  const body = document.getBody();
+  body.clear();
+
+  body.appendParagraph('FamilyPD PGS Session Log')
+    .setHeading(DocumentApp.ParagraphHeading.TITLE);
+
+  const disclaimer = body.appendParagraph(
+    'Attachment generated from the teacher-entered activity record. ' +
+    'This is not the official CCSD approval form and does not replace it.'
+  );
+  disclaimer.editAsText().setBold(true);
+
+  const summary = body.appendTable([
+    ['Employee', Session.getActiveUser().getEmail() || 'Authorized CCSD user'],
+    ['Activity', activity.title],
+    ['Official category', rule.activityName],
+    ['Organization / site', activity.organization],
+    ['Role', activity.role],
+    ['Payment status', paymentLabel_(activity.paymentStatus)],
+    ['Activity dates', activity.startDate +
+      (activity.endDate && activity.endDate !== activity.startDate
+        ? ' through ' + activity.endDate
+        : '')],
+    ['Calculated hours', String(roundToTwo_(activity.quantity))],
+    ['Estimated CUs', activity.estimatedCUs === ''
+      ? 'Review required'
+      : String(roundToTwo_(activity.estimatedCUs))]
+  ]);
+
+  summary.getRow(0).getCell(0).setBackgroundColor('#d9eaf7');
+  body.appendParagraph('');
+
+  const rows = [[
+    'Date', 'Start', 'End', 'Break (min)', 'Description', 'Hours'
+  ]];
+
+  (activity.sessions || []).forEach(function(session) {
+    rows.push([
+      session.date,
+      session.startTime,
+      session.endTime,
+      String(session.breakMinutes),
+      session.description,
+      String(roundToTwo_(session.hours))
+    ]);
+  });
+
+  const table = body.appendTable(rows);
+  for (let i = 0; i < table.getRow(0).getNumCells(); i += 1) {
+    const headerCell = table.getRow(0).getCell(i);
+    headerCell.setBackgroundColor('#17365d');
+    headerCell.editAsText().setForegroundColor('#ffffff').setBold(true);
+  }
+
+  body.appendParagraph('');
+  body.appendParagraph('Teacher review: ________________________________');
+  body.appendParagraph('Supervising administrator ink signature: ________________________________');
+  body.appendParagraph('Date signed: ____________________');
+
+  body.appendParagraph('');
+  body.appendParagraph(
+    'Next steps: Review the official CCSD form and this session log for accuracy; ' +
+    'print and obtain required ink signatures; scan the signed form; upload the ' +
+    'signed scan and all required original documentation to the category folder; ' +
+    'set the final file to "Anyone in the Clark County School District with the link can view"; ' +
+    'submit that final file link in ELMS; then mark the activity Submitted to ELMS in the assistant.'
+  );
+
+  document.saveAndClose();
+
+  const pdfBlob = documentFile.getAs(MimeType.PDF).setName(pdfName);
+  const pdfFile = folder.createFile(pdfBlob);
+  documentFile.setTrashed(true);
+
+  return {id: pdfFile.getId(), url: pdfFile.getUrl()};
+}
+
+function paymentLabel_(value) {
+  if (value === 'paid') return 'Paid stipend / supplemental rate';
+  if (value === 'contract') return 'Regular contractual rate';
+  if (value === 'unpaid') return 'Unpaid';
+  return 'Not applicable';
+}
+
+function allowedRolesForCategory_(categoryKey) {
+  const roles = [];
+  const labels = {
+    completed_coursework: 'Course Participant',
+    district_participant: 'Participant',
+    district_instructor: 'Presenter / Instructor',
+    district_developer: 'Course Developer',
+    rpdp_participant: 'Participant',
+    rpdp_instructor: 'Presenter / Instructor',
+    rpdp_developer: 'Course Developer',
+    ccea_participant: 'Participant',
+    ccea_instructor: 'Presenter / Instructor',
+    ccea_developer: 'Course Developer',
+    vegas_pbs_participant: 'Participant',
+    school_pd_participant: 'Participant',
+    school_pd_instructor: 'Presenter / Instructor',
+    school_pd_developer: 'Course Developer',
+    plc_participant: 'PLC Participant',
+    parent_community_leader: 'Activity Leader',
+    sot_member: 'SOT Member',
+    schoolwide_planner: 'Planning Lead / Contributor',
+    coach_advisor: 'Coach / Advisor / Coordinator',
+    core_tutor: 'Tutor',
+    academic_trip_staff: 'Academic Trip Supervisor',
+    summer_school_teacher: 'Summer School Instructor',
+    iep_writer: 'IEP / MDT Writer',
+    iep_team_member: 'IEP / MDT Team Member',
+    candidate_host: 'Host / Master Teacher',
+    mentor: 'Mentor',
+    mentee: 'Mentee',
+    live_attendee: 'Conference Participant',
+    async_attendee: 'Asynchronous Participant',
+    conference_presenter: 'Conference Presenter',
+    award_recipient: 'Award Recipient',
+    grant_recipient: 'Grant Recipient',
+    microcredential_earner: 'Micro-Credential Earner',
+    nbpts_candidate: 'National Board Candidate',
+    nbpts_certified: 'National Board Certified Educator',
+    nbpts_moc: 'National Board MOC Candidate',
+    second_endorsement: 'Licensed Educator',
+    specialty_ceu: 'CEU Participant'
+  };
+
+  (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
+    (context.roles || []).forEach(function(role) {
+      const matches = (role.activities || []).some(function(activity) {
+        return activity.categoryKey === categoryKey;
+      });
+
+      if (matches) {
+        const label = labels[role.id] || role.label;
+        if (roles.indexOf(label) === -1) roles.push(label);
+      }
+    });
+  });
+
+  return roles;
 }
 
 function ensureChildFolder_(parent, name) {
@@ -814,6 +1225,7 @@ function applyActivityRowFormatting_(sheet) {
   sheet.getRange(2, 15, sheet.getLastRow() - 1, 1).setNumberFormat('0.00');
   sheet.getRange(2, 17, sheet.getLastRow() - 1, 1).setNumberFormat('0.00');
   sheet.setColumnWidth(25, 420);
+  sheet.setColumnWidths(26, 4, 260);
   sheet.getRange(2, 1, sheet.getLastRow() - 1, ACTIVITY_HEADERS.length).setWrap(true);
 }
 

@@ -122,10 +122,21 @@ function runAllPGSTests() {
     let rejected = false;
     try {
       normalizeActivityInput_({
-        title: 'Old Activity', description: 'Testing cutoff',
-        categoryKey: 'PLC', paymentStatus: 'unpaid', status: 'Needs evidence',
-        startDate: '2024-04-30', endDate: '2024-04-30', quantity: 3,
-        unit: 'hours', titleIException: 'no'
+        title: 'Old Activity',
+        description: '',
+        organization: 'Test School',
+        role: 'PLC Participant',
+        categoryKey: 'PLC',
+        paymentStatus: 'unpaid',
+        sessions: [
+          {
+            date: '2024-04-30',
+            startTime: '15:00',
+            endTime: '18:00',
+            breakMinutes: 0,
+            description: 'Testing the applicability cutoff'
+          }
+        ]
       }, findRuleForTest_('PLC'));
     } catch (error) {
       rejected = error.message.indexOf('May 1, 2024') >= 0;
@@ -143,14 +154,14 @@ function runAllPGSTests() {
         paymentStatus: 'unpaid',
         description: 'PLC planning and student-data review'
       }
-    ]);
+    ], 'unpaid');
     assertEqual_(sessions[0].minutes, 120);
     assertEqual_(sessions[0].hours, 2);
   });
 
-  test('Mixed session payment statuses calculate separately', function() {
+  test('One payment status applies to the complete time-based activity', function() {
     const activity = {
-      paymentStatus: 'mixed',
+      paymentStatus: 'paid',
       quantity: 0,
       unit: 'hours',
       titleIException: 'no',
@@ -160,7 +171,6 @@ function runAllPGSTests() {
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid',
           description: 'PLC planning and student-data review'
         },
         {
@@ -168,12 +178,11 @@ function runAllPGSTests() {
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'paid',
           description: 'PLC follow-up and instructional planning'
         }
-      ])
+      ], 'paid')
     };
-    assertEqual_(calculateEstimatedCUs_(activity, findRuleForTest_('PLC')), 1.5);
+    assertEqual_(calculateEstimatedCUs_(activity, findRuleForTest_('PLC')), 1);
   });
 
   test('Invalid session times are rejected', function() {
@@ -188,17 +197,62 @@ function runAllPGSTests() {
           paymentStatus: 'unpaid',
           description: 'Invalid-time validation test'
         }
-      ]);
+      ], 'unpaid');
     } catch (error) {
       rejected = error.message.indexOf('later than') >= 0;
     }
     if (!rejected) throw new Error('Invalid session time was not rejected.');
   });
 
+
+  test('Dashboard shows separate estimated and approved remaining totals', function() {
+    const activities = [
+      {
+        categoryKey: 'GRANT_RECIPIENT',
+        estimatedCUs: 6,
+        status: 'Draft'
+      },
+      {
+        categoryKey: 'WRITE_IEP_MDT',
+        estimatedCUs: 5,
+        status: 'Approved'
+      },
+      {
+        categoryKey: 'COMMUNITY_AWARD',
+        estimatedCUs: 5,
+        status: 'Denied'
+      }
+    ];
+    const summary = buildSummary_(activities, PGS_ACTIVITY_LIBRARY);
+    assertEqual_(summary.estimatedTotal, 11);
+    assertEqual_(summary.estimatedRemaining, 214);
+    assertEqual_(summary.approvedTotal, 5);
+    assertEqual_(summary.approvedRemaining, 220);
+  });
+
+  test('Every current category has at least one official role', function() {
+    PGS_ACTIVITY_LIBRARY.forEach(function(rule) {
+      const roles = allowedRolesForCategory_(rule.categoryKey);
+      if (!roles.length) {
+        throw new Error('No official role for ' + rule.categoryKey);
+      }
+    });
+  });
+
+  test('Denied records are excluded from estimated totals', function() {
+    const summary = buildSummary_([
+      {
+        categoryKey: 'GRANT_RECIPIENT',
+        estimatedCUs: 30,
+        status: 'Denied'
+      }
+    ], PGS_ACTIVITY_LIBRARY);
+    assertEqual_(summary.estimatedTotal, 0);
+  });
+
   test('Representative calculations', function() {
     assertEqual_(calculateEstimatedCUs_({paymentStatus:'unpaid', quantity:9, titleIException:'no'}, findRuleForTest_('PLC')), 3);
     assertEqual_(calculateEstimatedCUs_({paymentStatus:'paid', quantity:12, titleIException:'no'}, findRuleForTest_('PLC')), 2);
-    assertEqual_(calculateEstimatedCUs_({paymentStatus:'paid', quantity:12, titleIException:'yes'}, findRuleForTest_('PLC')), 4);
     assertEqual_(calculateEstimatedCUs_({paymentStatus:'unpaid', quantity:5, titleIException:'no'}, findRuleForTest_('WRITE_IEP_MDT')), 5);
     assertEqual_(calculateEstimatedCUs_({paymentStatus:'unpaid', quantity:3, titleIException:'no'}, findRuleForTest_('FOS_ASSIGNMENT')), 6);
     assertEqual_(calculateEstimatedCUs_({paymentStatus:'unpaid', quantity:3, unit:'semester_credit', titleIException:'no'}, findRuleForTest_('COLLEGE_APPROVED_ED')), 24);

@@ -80,11 +80,12 @@
         </div>
       </div>
 
-      <div class="grid g4 stats">
-        <div class="card stat"><div class="label">Current Activity Options</div><div class="value" id="libraryCount">0</div><small>Loaded from the full current guide</small></div>
-        <div class="card stat"><div class="label">Estimated CUs</div><div class="value" id="estimated">0.00</div><small>All activity estimates</small></div>
-        <div class="card stat"><div class="label">Approved CUs</div><div class="value" id="approved">0.00</div><small>Only official approvals entered</small></div>
-        <div class="card stat"><div class="label">Remaining</div><div class="value" id="remaining">225.00</div><small>Based on approved CUs</small></div>
+      <div class="grid g5 stats">
+        <div class="card stat"><div class="label">Current Activity Options</div><div class="value" id="libraryCount">0</div><small>Loaded from the current official guide</small></div>
+        <div class="card stat"><div class="label">Estimated CUs</div><div class="value" id="estimated">0.00</div><small>All non-denied records, with category maximums applied</small></div>
+        <div class="card stat"><div class="label">Estimated Remaining</div><div class="value" id="estimatedRemaining">225.00</div><small>225 minus current estimated CUs</small></div>
+        <div class="card stat"><div class="label">ELMS-Approved CUs</div><div class="value" id="approved">0.00</div><small>Records teachers mark Approved after ELMS review</small></div>
+        <div class="card stat"><div class="label">Approved Remaining</div><div class="value" id="approvedRemaining">225.00</div><small>225 minus ELMS-approved CUs</small></div>
       </div>
       <div id="warningBox" class="notice warn"></div>
       <div class="section"><h3>Annual Advancement Timeline</h3><p>Always verify dates on the official PGS page.</p></div>
@@ -173,55 +174,97 @@
       <div class="card form">
         <div class="heading-actions">
           <div>
-            <h3 id="formHeading">Add a Professional Activity</h3>
-            <p>Choose directly or return to the matcher for help.</p><div class="notice warn"><strong>Only current-cycle rules:</strong> This form accepts activities occurring on or after May 1, 2024.</div>
+            <h3 id="formHeading">Create a Professional Activity Record</h3>
+            <p>Choose the official category first. The form will show only the inputs that apply.</p>
+            <div class="notice warn">
+              <strong>No manual CU entry:</strong> The assistant calculates CUs from the official rule. Saved activity details are locked; use Activity Records to prepare documents, update status, or delete the record.
+            </div>
           </div>
           <button class="btn ghost" type="button" onclick="showView('matcher')">Help Me Choose</button>
         </div>
+
         <form id="activityForm">
           <input id="activityId" type="hidden">
+          <input id="titleIException" type="hidden" value="no">
+
           <div class="fg">
             <div class="field full">
-              <label for="title">Activity title</label>
-              <input id="title" required placeholder="Example: BSU Student Success PLC Meeting">
+              <label for="categoryKey">Official activity category</label>
+              <select id="categoryKey" required>
+                <option value="">Loading current category library...</option>
+              </select>
             </div>
+
+            <div id="categoryGuidance" class="category-guidance full" hidden></div>
+
+            <div class="field">
+              <label for="organization">School, site, organization, or provider</label>
+              <input id="organization" list="organizationSuggestions" required placeholder="Example: Eldorado High School">
+              <datalist id="organizationSuggestions"></datalist>
+            </div>
+
+            <div class="field">
+              <label for="role">Official role</label>
+              <select id="role" required disabled>
+                <option value="">Choose a category first</option>
+              </select>
+            </div>
+
             <div class="field full">
-              <label for="description">What did you do?</label>
-              <textarea id="description" required></textarea>
+              <label for="title">Activity record name</label>
+              <input id="title" readonly placeholder="Generated from site + category + role">
+              <small>Generated automatically so the same information is not entered twice.</small>
             </div>
+
+            <div class="field full" id="descriptionField">
+              <label for="description">Brief activity description</label>
+              <input id="description" list="descriptionSuggestions" placeholder="Choose a previous description or type a new one">
+              <small>Suggestions include prior descriptions from the same category and a generated site/category/role description.</small>
+            </div>
+
+            <datalist id="descriptionSuggestions"></datalist>
+
             <div class="field" id="startDateField">
-              <label id="startDateLabel" for="startDate">Start date</label>
-              <input id="startDate" type="date" min="2024-05-01" required>
+              <label id="startDateLabel" for="startDate">Activity date</label>
+              <input id="startDate" type="date" min="2024-05-01">
             </div>
+
             <div class="field" id="endDateField">
               <label id="endDateLabel" for="endDate">End date</label>
               <input id="endDate" type="date" min="2024-05-01">
             </div>
-            <div class="field">
-              <label for="organization">Organization / site</label>
-              <input id="organization">
+
+            <div class="field" id="paymentStatusField" hidden>
+              <label for="paymentStatus">Payment status for the entire activity</label>
+              <select id="paymentStatus">
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid stipend / supplemental rate</option>
+                <option value="contract">Regular contractual rate</option>
+              </select>
+              <small>All sessions in one time-based activity must use the same payment status.</small>
             </div>
-            <div class="field">
-              <label for="role">Your role</label>
-              <input id="role" placeholder="Participant, advisor, presenter…">
-            </div>
-            <div class="field full">
-              <label for="categoryKey">Confirmed activity category</label>
-              <select id="categoryKey" required><option value="">Loading full category library…</option></select>
-            </div>
-            <div id="categoryGuidance" class="category-guidance full" hidden></div>
 
             <div class="session-panel full" id="sessionSection" hidden>
               <div class="session-heading">
                 <div>
                   <h4>Activity Session Log</h4>
-                  <p>Enter each meeting or work session. Hours are calculated automatically after breaks.</p>
+                  <p>Enter each session once. Hours and estimated CUs are calculated from the times.</p>
                 </div>
-                <button class="btn small ghost" id="addSessionButton" type="button">+ Add Session</button>
+                <button class="btn small ghost" id="addSessionButton" type="button">+ Duplicate / Add Session</button>
               </div>
+
+              <div class="session-template">
+                <div class="field">
+                  <label for="sessionDescriptionTemplate">Reusable session description</label>
+                  <input id="sessionDescriptionTemplate" list="descriptionSuggestions" placeholder="Example: Delivered credit-retrieval instruction">
+                </div>
+                <button class="btn small ghost" id="applySessionDescriptionButton" type="button">Apply to Blank Sessions</button>
+              </div>
+
               <div class="session-note" id="sessionInputBasis">
-                Use separate activity records when the work belongs to different PGS categories. Payment status may vary by session.
+                New rows copy the previous row's times and description while leaving the date blank.
               </div>
+
               <div class="session-table-wrap">
                 <table class="session-table">
                   <thead>
@@ -230,7 +273,7 @@
                       <th>Start</th>
                       <th>End</th>
                       <th>Break</th>
-                      <th>Payment</th>
+                      <th>Description</th>
                       <th>Hours</th>
                       <th></th>
                     </tr>
@@ -238,77 +281,43 @@
                   <tbody id="sessionRows"></tbody>
                 </table>
               </div>
+
               <div class="session-total">
                 <span>Total qualifying time</span>
                 <strong id="sessionTotal">0.00 hours</strong>
               </div>
               <div class="notice warn" id="sessionWarning" hidden></div>
             </div>
-            <div class="field" id="paymentStatusField">
-              <label for="paymentStatus">Payment status</label>
-              <select id="paymentStatus">
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid stipend / supplemental rate</option>
-                <option value="contract">Regular contractual rate</option>
-              </select>
-            </div>
-            <div class="field" id="quantityField">
+
+            <div class="field" id="quantityField" hidden>
               <label id="quantityLabel" for="quantity">Quantity</label>
               <input id="quantity" type="number" min="0" step="1" value="0">
               <small id="quantityHelp"></small>
             </div>
-            <div class="field" id="unitField">
-              <label for="unit">Calculation unit</label>
+
+            <div class="field" id="unitField" hidden>
+              <label for="unit">Evidence measurement</label>
               <select id="unit"><option value="hours">Hours</option></select>
             </div>
-            <div class="field" id="titleIField">
-              <label for="titleIException">Title I paid exception applicable?</label>
-              <select id="titleIException">
-                <option value="no">No / Not sure</option>
-                <option value="yes">Yes</option>
-              </select>
+
+            <div class="notice info full" id="saveWorkflowNotice">
+              Saving automatically creates or reuses the Google Drive folder for this official category.
             </div>
-            <div class="field">
-              <label for="status">Status</label>
-              <select id="status">
-                <option>Needs evidence</option>
-                <option>In progress</option>
-                <option>Ready for ELMS</option>
-                <option>Submitted</option>
-                <option>Returned for corrections</option>
-                <option>Approved — enter only after official CCSD approval</option>
-                <option>Denied</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="officialApprovedCUs">Official approved CUs</label>
-              <input id="officialApprovedCUs" type="number" min="0" step=".01">
-            </div>
-            <div class="field full">
-              <label for="evidenceLink">Google Drive evidence link</label>
-              <input id="evidenceLink" type="url" placeholder="https://drive.google.com/...">
-            </div>
-            <div class="field full">
-              <label for="notes">Private notes</label>
-              <textarea id="notes"></textarea>
-            </div>
-            <label class="checkline full">
-              <input id="createFolder" type="checkbox">
-              Create a Google Drive evidence folder when saving.
-            </label>
           </div>
+
           <div class="actions" style="justify-content:flex-end;margin-top:18px">
             <button type="reset" class="btn ghost">Clear</button>
-            <button id="saveButton" class="btn blue">Calculate & Save Once</button>
+            <button id="saveButton" class="btn blue">Create Locked Activity Record</button>
           </div>
         </form>
+
         <div class="result" id="result">
-          <h3>Saved Result</h3>
+          <h3>Activity Created</h3>
           <div class="rg">
-            <div class="rb"><small>Category</small><strong id="resultCategory">—</strong></div>
-            <div class="rb"><small>Estimated CUs</small><strong id="resultCUs">—</strong></div>
-            <div class="rb"><small>Rule version</small><strong id="resultRule">—</strong></div>
-            <div class="rb"><small>Status</small><strong id="resultStatus">—</strong></div>
+            <div class="rb"><small>Category</small><strong id="resultCategory">-</strong></div>
+            <div class="rb"><small>Estimated CUs</small><strong id="resultCUs">-</strong></div>
+            <div class="rb"><small>Status</small><strong id="resultStatus">-</strong></div>
+            <div class="rb"><small>Category folder</small><a id="resultFolder" href="#" target="_blank" rel="noopener">Open folder</a></div>
           </div>
         </div>
       </div>
@@ -332,7 +341,7 @@
     <section id="workspace" class="view">
       <div class="grid g2">
         <div class="card"><h3>Teacher-Owned Workbook</h3><p>One Activity Log, complete Category Rules, Settings, and Change Log.</p><button id="openWorkbookButton" class="btn blue" type="button">Open My Workbook</button></div>
-        <div class="card"><h3>Drive Folder Structure</h3><p>Create the PGS folders once; each activity can receive its own evidence folder.</p><button id="createFoldersButton" class="btn green" type="button">Create / Verify Folders</button></div>
+        <div class="card"><h3>Drive Folder Structure</h3><p>Create the PGS workspace once. The assistant automatically creates one reusable folder for each official category.</p><button id="createFoldersButton" class="btn green" type="button">Create / Verify Folders</button></div>
       </div>
     </section>
 
@@ -349,7 +358,7 @@
     </section>
 
     <section id="elms" class="view">
-      <div class="notice warn"><strong>Single-file requirement:</strong> A folder is not the final ELMS submission. For self-reported activities, combine the required original, unaltered documentation into one file and submit the share link to that file.</div>
+      <div class="notice warn"><strong>Final ELMS file:</strong> The category folder organizes the work, but the teacher must submit the shareable link to the final signed/scanned single file required by CCSD.</div>
       <div class="grid g2">
         <div class="card"><h3>Before Opening ELMS</h3><p>Confirm the category, calculation inputs, forms, signatures, final single-file packet, CCSD sharing permissions, and deadlines.</p></div>
         <div class="card"><h3>Current Boundary</h3><p>The assistant organizes and prepares the record. It does not directly submit into ELMS.</p></div>
@@ -363,8 +372,8 @@
         <h3>Activity Records</h3>
         <div style="overflow:auto">
           <table>
-            <thead><tr><th>Activity</th><th>Category</th><th>Quantity</th><th>Estimated</th><th>Official</th><th>Status</th><th>Evidence</th><th>Actions</th></tr></thead>
-            <tbody id="recordsBody"><tr><td colspan="8">Loading records…</td></tr></tbody>
+            <thead><tr><th>Activity</th><th>Category</th><th>Amount</th><th>Estimated CUs</th><th>Status</th><th>Files</th><th>Actions</th></tr></thead>
+            <tbody id="recordsBody"><tr><td colspan="7">Loading records...</td></tr></tbody>
           </table>
         </div>
       </div>
