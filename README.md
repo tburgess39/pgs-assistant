@@ -1,73 +1,101 @@
-# PGS CU Assistant
+# FamilyPD PGS Assistant
 
-An open-source teacher workflow assistant for organizing CCSD Professional Growth System activities, estimating Contact Units, preparing evidence, generating required documentation, and getting ready for ELMS submission.
+Public site: `https://pgs.familypd.org`
 
-> **Unofficial resource:** CCSD and the Professional Growth System Department make all final eligibility, documentation, and CU approval decisions.
+An unofficial, educator-created, open-source guidance project intended to make
+CCSD Professional Growth System organization easier for licensed educators.
 
-## Core design rule
+## Current build
 
-Each professional activity is entered once. That activity record is the single source of truth used to:
+### Public GitHub Pages homepage
 
-- estimate CUs;
-- track category maximums and balances;
-- organize Google Drive evidence;
-- populate required approval forms;
-- build documentation packets;
-- prepare the teacher for official ELMS entry.
+The root `index.html` is now the actual public project entrance. It includes:
 
-Teachers should not have to enter the same activity separately in both the dashboard and a tracker spreadsheet. The spreadsheet functions as the behind-the-scenes database and administrative console.
+- May 1, 2024 applicability notice
+- Current annual deadline overview
+- One-entry workflow explanation
+- Major PGS activity families
+- Official source links
+- FamilyPD video roadmap
+- Private-assistant connection status
 
-## Public site
+### Private Google Workspace assistant
 
-The production custom domain is intended to open the working dashboard directly:
+The `apps-script/` folder contains the teacher-facing private application with:
 
-`pgs.familypd.org`
+- Guided category matching
+- Complete current activity library
+- Teacher-owned Google Sheet
+- Google Drive evidence workspace
+- Category-specific evidence guidance
+- CU estimates and category maximums
+- ELMS-readiness review
+- Automated rule tests
 
-## Google Apps Script project files
+## Connect the two sites
 
-A complete deployment normally includes:
+See `CONNECT_ASSISTANT.md`.
 
-- `Code.gs`
-- `Index.html`
-- `Tests.gs`
-- `appsscript.json` when manifest settings are maintained in source control
-
-The recovered `Tests.gs` in this package is the latest preserved file. The missing final `Code.gs` and `Index.html` must be restored from the existing Apps Script project or rebuilt against the recovered tests.
-
-## Latest approval-form requirements
-
-Generated approval forms must match the official documents rather than using a redesigned substitute.
-
-- Time-Based Activities: 20 detail rows per page
-- University Student Assignment: 5 detail rows per page
-- Lower-Level College Coursework: 5 detail rows per page
-- Overflow records create additional official-form pages
-- Session descriptions remain attached to their correct rows
-- Records in signed packets are locked against duplicate reuse
-
-See `LATEST_FIX_REQUIREMENTS.md` for the recovered acceptance criteria.
-
-## Validation
-
-In Apps Script, run:
-
-```javascript
-runAllPGSTests();
-```
-
-Do not deploy when any test fails. Also perform a visual comparison of every generated approval form against its official source PDF.
-
-## GitHub workflow
-
-1. Export or copy the current Apps Script project files into the repository.
-2. Replace only the files that were actually changed.
-3. Run the Apps Script test suite.
-4. Commit with a message describing the form-generation fix.
-5. Deploy a new Apps Script web-app version if server/client code changed.
-6. Confirm the GitHub Pages/custom-domain entry still routes teachers directly to the working dashboard.
-
-Suggested commit message:
+The public site reads the Apps Script URL from:
 
 ```text
-Fix generated CU approval forms to match official layouts
+assets/js/site-config.js
 ```
+
+Until that URL is added, the public buttons show that private setup is still in
+progress.
+
+## Applicability
+
+The assistant and associated tools apply only to activities occurring on or
+after May 1, 2024. Older activities require historical-rule review.
+
+## Important disclaimer
+
+This project does not replace official CCSD or CCEA guidance, ELMS, the PGS
+Reference Guide, Human Resources direction, or final PGS approval.
+
+
+## Milestone 2.5 - Automatic session hours
+
+Hour-based activities now use a session log instead of asking teachers to
+calculate decimal hours.
+
+Each session records:
+
+- Date
+- Start time
+- End time
+- Break minutes
+- Payment status
+- Automatically calculated net hours
+
+The app totals all sessions, derives the activity start/end dates, supports
+mixed paid and unpaid sessions, and recalculates the result again on the server
+before saving. Count-, credit-, fixed-value, and manual-review activities keep
+their category-specific inputs.
+
+
+## Milestone 2.6 - Official guided category finder
+
+The Find My Category page no longer combines unrelated independent dropdowns.
+
+The new path is:
+
+1. Where the activity occurred or who provided/assigned it
+2. The educator's role
+3. Only the official activity descriptions valid for that setting and role
+4. Activity date and optional confirming details
+
+All 43 current activity category keys are covered by automated tests. Results
+show the official category, description/limitations, calculation, documentation,
+submission path, source document, and source page. Current announcement-only
+workflows such as LinkedIn Learning for CTE teachers are shown without forcing
+an inaccurate self-reported category.
+
+
+## Milestone 2.7 - Evidence-driven activity inputs
+
+The Add Activity form and Guided Finder now use the official documentation requirement to choose the input model. Categories requiring the Time-Based Activities form or session agendas use exact session start/end times. Categories supported by certificates or transcripts showing duration use documented total hours. Grants, IEPs, awards, assignments, micro-credentials, endorsements, college credits, CEUs, and fixed National Board values no longer display an inappropriate time log.
+
+The evidence guide and finder result both explain how the selected category is measured and what the teacher should enter.

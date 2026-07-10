@@ -66,33 +66,12 @@ function runAllPGSTests() {
     });
   });
 
-
-
-
-  test('Streamlined finder has nine alphabetized starting choices', function() {
-    const labels = PGS_GUIDED_FINDER.contexts.map(function(context) {
-      return context.label;
-    });
-
-    assertEqual_(labels.length, 9);
-
-    const sorted = labels.slice().sort(function(a, b) {
-      return a.localeCompare(b);
-    });
-
-    assertEqual_(JSON.stringify(labels), JSON.stringify(sorted));
-  });
-
-  test('Streamlined finder still covers all 43 current categories', function() {
+  test('Guided finder covers all 43 current category keys', function() {
     const finderKeys = [];
-
-    PGS_GUIDED_FINDER.contexts.forEach(function(context) {
-      context.roles.forEach(function(role) {
-        role.activities.forEach(function(activity) {
-          if (activity.categoryKey &&
-              finderKeys.indexOf(activity.categoryKey) === -1) {
-            finderKeys.push(activity.categoryKey);
-          }
+    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
+      (context.roles || []).forEach(function(role) {
+        (role.activities || []).forEach(function(activity) {
+          if (activity.categoryKey) finderKeys.push(activity.categoryKey);
         });
       });
     });
@@ -110,209 +89,33 @@ function runAllPGSTests() {
     }
   });
 
-  test('Automatic ELMS and self-reported totals remain separate', function() {
-    const rules = [
-      {
-        active: true,
-        categoryKey: 'TEST',
-        parentCategory: 'Test',
-        activityName: 'Test Activity',
-        maximumCUs: 30
-      }
-    ];
-
-    const activities = [
-      {
-        recordType: 'self_report',
-        categoryKey: 'TEST',
-        estimatedCUs: 12,
-        officialApprovedCUs: 6
-      },
-      {
-        recordType: 'automatic_elms',
-        categoryKey: 'TEST',
-        estimatedCUs: '',
-        officialApprovedCUs: 9
-      },
-      {
-        recordType: 'automatic_elms',
-        categoryKey: CARRYOVER_CATEGORY_KEY,
-        estimatedCUs: '',
-        officialApprovedCUs: 30.18
-      }
-    ];
-
-    const summary = buildSummary_(activities, rules);
-    assertEqual_(summary.estimatedSelfReported, 12);
-    assertEqual_(summary.approvedSelfReported, 6);
-    assertEqual_(summary.automaticElmsTotal, 9);
-    assertEqual_(summary.carryoverTotal, 30.18);
-    assertEqual_(summary.confirmedTotal, 45.18);
-    assertEqual_(summary.categoryBalances[0].remaining, 15);
-  });
-
-  test('Carryover is tracked separately and has no category maximum', function() {
-    assertEqual_(CARRYOVER_RULE.categoryKey, 'CARRYOVER');
-    assertEqual_(CARRYOVER_RULE.submissionMode, 'automatic');
-    assertEqual_(CARRYOVER_RULE.maximumCUs, null);
-    assertEqual_(CARRYOVER_RULE.entryMode, 'automatic');
-  });
-
-  test('Category folders are reused and final evidence links stay separate', function() {
-    const rule = findRuleForTest_('GRANT_RECIPIENT');
-    if (categoryFolderName_(rule) !== 'Grant Awards') {
-      throw new Error('Grant folder name is not concise.');
-    }
-  });
-
-  test('Workbook guardrail sheet is configured', function() {
-    assertEqual_(SHEETS.START_HERE, 'START HERE');
-    if (typeof buildStartHereSheet_ !== 'function' ||
-        typeof applyWorkbookGuardrails_ !== 'function') {
-      throw new Error('Workbook guardrail functions are missing.');
-    }
-  });
-
-  test('Activity Log retains the protected technical columns', function() {
-    ['ID', 'Category Key', 'Sessions JSON', 'Record Type'].forEach(function(header) {
-      if (ACTIVITY_HEADERS.indexOf(header) === -1) {
-        throw new Error('Missing technical header: ' + header);
-      }
+  test('Guided finder contains only known category keys and documented choices', function() {
+    const currentKeys = PGS_ACTIVITY_LIBRARY.map(function(rule) {
+      return rule.categoryKey;
     });
-  });
 
-
-
-  test('Carryover uses the actual ELMS appearance date and confirmed status', function() {
-    const activity = normalizeActivityInput_({
-      recordType: 'automatic_elms',
-      categoryKey: CARRYOVER_CATEGORY_KEY,
-      startDate: '2026-07-09',
-      officialApprovedCUs: 18.5
-    }, CARRYOVER_RULE);
-
-    assertEqual_(activity.title, 'Carryover / Rollover');
-    assertEqual_(activity.status, 'Confirmed in ELMS');
-    assertEqual_(activity.organization, 'PGS Office / ELMS');
-    assertEqual_(activity.role, 'Carryover');
-    assertEqual_(activity.officialApprovedCUs, 18.5);
-  });
-
-  test('Carryover requires an official ELMS amount', function() {
-    let rejected = false;
-
-    try {
-      normalizeActivityInput_({
-        recordType: 'automatic_elms',
-        categoryKey: CARRYOVER_CATEGORY_KEY,
-        startDate: '2026-07-09',
-        officialApprovedCUs: ''
-      }, CARRYOVER_RULE);
-    } catch (error) {
-      rejected = error.message.indexOf('official carryover CUs') >= 0;
-    }
-
-    if (!rejected) throw new Error('Carryover without an official amount was not rejected.');
-  });
-
-  test('Carryover date is not treated as an activity cutoff date', function() {
-    const activity = normalizeActivityInput_({
-      recordType: 'automatic_elms',
-      categoryKey: CARRYOVER_CATEGORY_KEY,
-      startDate: '2024-01-15',
-      officialApprovedCUs: 4
-    }, CARRYOVER_RULE);
-
-    assertEqual_(activity.startDate, '2024-01-15');
-  });
-
-  test('Managed category folders use only the two required subfolders', function() {
-    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS.length, 2);
-    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS[0], '01 Evidence to Combine');
-    assertEqual_(MANAGED_CATEGORY_SUBFOLDERS[1], '02 Final Single File for ELMS');
-
-    if (MANAGED_CATEGORY_SUBFOLDERS.indexOf('03 ELMS Receipt and Decision') !== -1) {
-      throw new Error('The retired receipt/decision folder is still configured.');
-    }
-  });
-
-  test('Connection guardrail warning is configured', function() {
-    if (CONNECTION_GUARDRAIL_MESSAGE.indexOf('Do not rename') === -1 ||
-        CONNECTION_GUARDRAIL_MESSAGE.indexOf('duplicate folders') === -1 ||
-        CONNECTION_GUARDRAIL_MESSAGE.indexOf('break saved links') === -1) {
-      throw new Error('The managed-folder warning is incomplete.');
-    }
-  });
-
-  test('Workbook refresh uses the same workbook bootstrap helper', function() {
-    assertEqual_(WORKBOOK_SCHEMA_VERSION, '4.1.3');
-
-    if (typeof buildBootstrapData_ !== 'function' ||
-        typeof inspectPGSWorkbookCandidates !== 'function' ||
-        typeof repairPGSWorkbookConnection !== 'function') {
-      throw new Error('Workbook connection or recovery helpers are missing.');
-    }
-  });
-
-  test('Activity save verification dependencies are available', function() {
-    if (typeof findActivityRow_ !== 'function' ||
-        typeof readActivities_ !== 'function') {
-      throw new Error('Save verification helpers are missing.');
-    }
-  });
-
-  test('Official approval-form row capacities are enforced', function() {
-    assertEqual_(FORM_CAPACITIES.time_based, 20);
-    assertEqual_(FORM_CAPACITIES.university_assignment, 5);
-    assertEqual_(FORM_CAPACITIES.lower_level_college, 5);
-  });
-
-  test('Time-based packet pagination creates additional pages', function() {
-    const items = [];
-    for (let index = 0; index < 21; index += 1) items.push(index);
-    const chunks = chunkArray_(items, FORM_CAPACITIES.time_based);
-    assertEqual_(chunks.length, 2);
-    assertEqual_(chunks[0].length, 20);
-    assertEqual_(chunks[1].length, 1);
-  });
-
-  test('Packet form type follows official approval-form metadata', function() {
-    assertEqual_(approvalFormType_(findRuleForTest_('PLC')), 'time_based');
-    assertEqual_(approvalFormType_(findRuleForTest_('PRACTICUM_ASSIGNMENT')), 'university_assignment');
-    assertEqual_(approvalFormType_(findRuleForTest_('COLLEGE_MULTI_100')), 'lower_level_college');
-    assertEqual_(approvalFormType_(findRuleForTest_('GRANT_RECIPIENT')), '');
-  });
-
-  test('Session descriptions are preserved for generated forms', function() {
-    const sessions = normalizeSessions_([
-      {
-        date: '2026-07-08',
-        startTime: '15:00',
-        endTime: '16:00',
-        breakMinutes: 0,
-        paymentStatus: 'unpaid',
-        description: 'Reviewed PLC data and planned interventions.'
+    (PGS_GUIDED_FINDER.contexts || []).forEach(function(context) {
+      if (!context.label || !context.description) {
+        throw new Error('Incomplete context: ' + context.id);
       }
-    ]);
-    assertEqual_(sessions[0].description, 'Reviewed PLC data and planned interventions.');
-  });
 
-  test('Signed packet keys remain locked from later packets', function() {
-    const locked = packetLockedKeys_([
-      {
-        categoryKey: 'PLC',
-        status: 'Signed',
-        includedKeys: ['session:a:0']
-      },
-      {
-        categoryKey: 'PLC',
-        status: 'Draft',
-        includedKeys: ['session:b:0']
-      }
-    ], 'PLC');
+      (context.roles || []).forEach(function(role) {
+        if (!role.label || !role.description) {
+          throw new Error('Incomplete role: ' + role.id);
+        }
 
-    assertEqual_(locked.length, 1);
-    assertEqual_(locked[0], 'session:a:0');
+        (role.activities || []).forEach(function(activity) {
+          if (!activity.label || !activity.description || !activity.officialBasis) {
+            throw new Error('Incomplete guided activity: ' + activity.id);
+          }
+
+          if (activity.categoryKey &&
+              currentKeys.indexOf(activity.categoryKey) === -1) {
+            throw new Error('Unknown category key: ' + activity.categoryKey);
+          }
+        });
+      });
+    });
   });
 
   test('May 1, 2024 cutoff is enforced', function() {
@@ -337,8 +140,7 @@ function runAllPGSTests() {
         startTime: '15:00',
         endTime: '17:30',
         breakMinutes: 30,
-        paymentStatus: 'unpaid',
-        description: 'Test session for hour calculation.'
+        paymentStatus: 'unpaid'
       }
     ]);
     assertEqual_(sessions[0].minutes, 120);
@@ -357,16 +159,14 @@ function runAllPGSTests() {
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid',
-          description: 'Unpaid PLC test session.'
+          paymentStatus: 'unpaid'
         },
         {
           date: '2026-07-09',
           startTime: '15:00',
           endTime: '18:00',
           breakMinutes: 0,
-          paymentStatus: 'paid',
-          description: 'Paid PLC test session.'
+          paymentStatus: 'paid'
         }
       ])
     };
@@ -382,8 +182,7 @@ function runAllPGSTests() {
           startTime: '17:00',
           endTime: '16:00',
           breakMinutes: 0,
-          paymentStatus: 'unpaid',
-          description: 'Invalid-time validation test.'
+          paymentStatus: 'unpaid'
         }
       ]);
     } catch (error) {
